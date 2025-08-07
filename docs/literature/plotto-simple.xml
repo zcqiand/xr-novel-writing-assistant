@@ -1,0 +1,1190 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<plotto>
+  <characters>
+    <character designation="A" sex="男性">男性主角</character>
+    <character designation="A-2" sex="男性">A 的男性朋友</character>
+    <character designation="A-3" sex="男性">A 的男性对手或敌人</character>
+    <character designation="A-4" sex="男性">男性陌生人</character>
+    <character designation="A-5" sex="男性">男性罪犯</character>
+    <character designation="A-6" sex="男性">男性执法人员</character>
+    <character designation="A-7" sex="男性">男性下级，员工</character>
+    <character designation="A-8" sex="男性">男性效用符号</character>
+    <character designation="A-9" sex="男性">男性上司，雇主，权威人士</character>
+    <character designation="B" sex="女性">女性主角</character>
+    <character designation="B-2" sex="女性">B 的女性朋友</character>
+    <character designation="B-3" sex="女性">B 的女性对手或敌人</character>
+    <character designation="B-4" sex="女性">女性陌生人</character>
+    <character designation="B-5" sex="女性">女性罪犯</character>
+    <character designation="B-6" sex="女性">女性执法人员</character>
+    <character designation="B-7" sex="女性">女性下级，员工</character>
+    <character designation="B-8" sex="女性">女性效用符号</character>
+    <character designation="B-9" sex="女性">女性上司，雇主。一位权威人士</character>
+    <character designation="FA" sex="男性">A 的父亲</character>
+    <character designation="MA" sex="女性">A 的母亲</character>
+    <character designation="BR-A" sex="男性">A 的兄弟</character>
+    <character designation="SR-A" sex="女性">A 的姐妹</character>
+    <character designation="SN-A" sex="男性">A 的儿子</character>
+    <character designation="DA" sex="女性">A 的女儿</character>
+    <character designation="UA" sex="男性">A 叔叔</character>
+    <character designation="AU-A" sex="女性">A 的姑姑</character>
+    <character designation="CN-A" sex="男性">A 的堂兄弟</character>
+    <character designation="NW-A" sex="男性">A 的侄子</character>
+    <character designation="NC-A" sex="女性">A 的侄女</character>
+    <character designation="GF-A" sex="男性">A 的祖父</character>
+    <character designation="GM-A" sex="女性">A 的祖母</character>
+    <character designation="SF-A" sex="男性">A 的继父</character>
+    <character designation="SM-A" sex="女性">A 的继母</character>
+    <character designation="GCH-A" sex="任何">A 的孙辈</character>
+    <character designation="FB" sex="男性">B 的父亲</character>
+    <character designation="MB" sex="女性">B 的母亲</character>
+    <character designation="BR-B" sex="男性">B 的兄弟</character>
+    <character designation="SR-B" sex="女性">B 的姐妹</character>
+    <character designation="SN-B" sex="男性">B 的儿子</character>
+    <character designation="DB" sex="女性">B 的女儿</character>
+    <character designation="UB" sex="男性">B 叔叔</character>
+    <character designation="AU-B" sex="女性">B 的姑姑</character>
+    <character designation="CN-B" sex="女性">B 的表妹</character>
+    <character designation="NW-B" sex="男性">B 的侄子</character>
+    <character designation="NC-B" sex="女性">B 的侄女</character>
+    <character designation="GF-B" sex="男性">B 的祖父</character>
+    <character designation="GM-B" sex="女性">B 的祖母</character>
+    <character designation="SF-B" sex="男性">B 的继父</character>
+    <character designation="SM-B" sex="女性">B 的继母</character>
+    <character designation="GCH-B" sex="任何">B 的孙辈</character>
+    <character designation="CH" sex="任何">一个孩子</character>
+    <character designation="AX" sex="男性">神秘的男性，或具有不寻常性格的人</character>
+    <character designation="BX" sex="女性">神秘的女性，或具有不寻常性格的女性</character>
+    <character designation="X" sex="无">无生命物体、神秘物体、不确定的数量</character>
+  </characters>
+  <subjects>
+    <subject number="1">
+      <description>恋爱中的人</description>
+    </subject>
+    <subject number="2">
+      <description>已婚人士</description>
+    </subject>
+    <subject number="3">
+      <description>无法无天的人</description>
+    </subject>
+    <subject number="4">
+      <description>一个犯错的人</description>
+    </subject>
+    <subject number="5">
+      <description>一位仁慈的人</description>
+    </subject>
+    <subject number="6">
+      <description>保护者</description>
+    </subject>
+    <subject number="7">
+      <description>一个有理想的人</description>
+    </subject>
+    <subject number="8">
+      <description>受义务影响的人</description>
+    </subject>
+    <subject number="9">
+      <description>遭受不利条件的人</description>
+    </subject>
+    <subject number="10">
+      <description>一个心怀怨恨的人</description>
+    </subject>
+    <subject number="11">
+      <description>被虚伪所左右的人</description>
+    </subject>
+    <subject number="12">
+      <description>一个微妙的人</description>
+    </subject>
+    <subject number="13">
+      <description>受神秘学和神秘事物影响的人</description>
+    </subject>
+    <subject number="14">
+      <description>一个正常人</description>
+    </subject>
+    <subject number="15">
+      <description>任何人</description>
+    </subject>
+  </subjects>
+  <predicates>
+    <predicate number="1">
+      <description>在承诺获得高成就奖励的情况下从事一项困难的事业</description>
+      <conflict-link ref="110" category="爱情与求爱" subcategory="爱情的不幸" />
+    </predicate>
+    <predicate number="2">
+      <description>在某些义务不允许爱情的时候坠入爱河</description>
+      <conflict-link ref="16a" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="16b" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="119" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="271" category="爱情与求爱" subcategory="爱情的拒绝" />
+    </predicate>
+    <predicate number="3">
+      <description>寻求通过勇气考验来证明爱的力量</description>
+      <conflict-link ref="175" category="爱情与求爱" subcategory="爱情的不幸" />
+    </predicate>
+    <predicate number="4">
+      <description>在爱情中被过度的幻想所驱使而做出错误的判断</description>
+      <conflict-link ref="148" category="爱情与求爱" subcategory="爱情的不幸" />
+    </predicate>
+    <predicate number="5">
+      <description>陷入一段无望的恋情，并试图在令人沮丧的处境中取得最好的结果</description>
+      <conflict-link ref="168" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="313" category="爱情与求爱" subcategory="爱情的拒绝" />
+    </predicate>
+    <predicate number="6">
+      <description>在对爱的追求中，挑战“东是东，西是西，永不相交”这一永恒真理</description>
+      <conflict-link ref="331" category="爱情与求爱" subcategory="爱情的拒绝" />
+    </predicate>
+    <predicate number="7">
+      <description>陷入一段遭遇不可预见的障碍的恋情</description>
+      <conflict-link ref="333" category="爱情与求爱" subcategory="爱情的拒绝" />
+    </predicate>
+    <predicate number="8">
+      <description>面对这样一种情况：财富取决于恋爱关系中的某种行动</description>
+      <conflict-link ref="117" category="爱情与求爱" subcategory="爱情的不幸" />
+    </predicate>
+    <predicate number="9">
+      <description>面临一场考验，如果拥有更多的物质财富，爱情就会消失</description>
+      <conflict-link ref="116" category="爱情与求爱" subcategory="爱情的不幸" />
+    </predicate>
+    <predicate number="10">
+      <description>因错误判断而遭受疏远</description>
+      <conflict-link ref="105" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="369" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="386" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="391" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="399" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="418" category="婚姻生活" subcategory="婚姻" />
+    </predicate>
+    <predicate number="11">
+      <description>面对这样的情况，只有勇气和奉献才能挽救心爱之人的命运</description>
+      <conflict-link ref="179a" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="179b" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="179c" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="545" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="1462" category="企业" subcategory="启示录" />
+    </predicate>
+    <predicate number="12">
+      <description>因爱情不忠而陷入不幸</description>
+      <conflict-link ref="337a" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="337b" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="547" category="婚姻生活" subcategory="婚姻" />
+    </predicate>
+    <predicate number="13">
+      <description>试图用狡猾手段逃避不幸</description>
+      <conflict-link ref="96" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="244" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="457" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="650" category="企业" subcategory="不幸" />
+      <conflict-link ref="1247" category="企业" subcategory="狡猾" />
+      <conflict-link ref="1373" category="企业" subcategory="神秘" />
+    </predicate>
+    <predicate number="14">
+      <description>因阴谋家的诡计而陷入不幸</description>
+      <conflict-link ref="471" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="1260a" category="企业" subcategory="狡猾" />
+      <conflict-link ref="1260b" category="企业" subcategory="狡猾" />
+      <conflict-link ref="660a" category="企业" subcategory="不幸" />
+      <conflict-link ref="660b" category="企业" subcategory="不幸" />
+    </predicate>
+    <predicate number="15">
+      <description>在不幸中找到支撑力量</description>
+      <conflict-link ref="12a" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="12b" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="106" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="265a" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="265b" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="360a" category="爱情与求爱" subcategory="婚姻" />
+      <conflict-link ref="360b" category="爱情与求爱" subcategory="婚姻" />
+      <conflict-link ref="496a" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="496b" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="496c" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="815a" category="企业" subcategory="乐于助人" />
+      <conflict-link ref="815b" category="企业" subcategory="乐于助人" />
+      <conflict-link ref="874" category="企业" subcategory="交付" />
+      <conflict-link ref="1051" category="企业" subcategory="机会" />
+    </predicate>
+    <predicate number="16">
+      <description>被一个坦诚承认自己犯罪秘密的人从不幸中解救出来</description>
+      <conflict-link ref="831" category="企业" subcategory="乐于助人" />
+    </predicate>
+    <predicate number="17">
+      <description>耐心忍受不幸，光荣地寻求实现珍视的目标</description>
+      <conflict-link ref="934" category="企业" subcategory="理想主义" />
+    </predicate>
+    <predicate number="18">
+      <description>反抗控制个人能力并使其屈服的权力</description>
+      <conflict-link ref="674" category="企业" subcategory="不幸" />
+    </predicate>
+    <predicate number="19">
+      <description>遭遇不幸，被流放到原始、孤立、野蛮的环境中</description>
+      <conflict-link ref="685" category="企业" subcategory="不幸" />
+    </predicate>
+    <predicate number="20">
+      <description>陷入预示不幸的情况</description>
+      <conflict-link ref="24a" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="24b" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="24c" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="24d" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="24e" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="153" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="196" category="爱情与求爱" subcategory="求婚" />
+      <conflict-link ref="280a" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="280b" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="365a" category="爱情与求爱" subcategory="婚姻" />
+      <conflict-link ref="365b" category="爱情与求爱" subcategory="婚姻" />
+      <conflict-link ref="365c" category="爱情与求爱" subcategory="婚姻" />
+      <conflict-link ref="365d" category="爱情与求爱" subcategory="婚姻" />
+      <conflict-link ref="571" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="956" category="企业" subcategory="理想主义" />
+      <conflict-link ref="1026" category="企业" subcategory="必要性" />
+      <conflict-link ref="1036" category="企业" subcategory="机会" />
+      <conflict-link ref="1122" category="企业" subcategory="个人限制" />
+      <conflict-link ref="1295" category="企业" subcategory="违规" />
+      <conflict-link ref="695a" category="企业" subcategory="不幸" />
+      <conflict-link ref="695b" category="企业" subcategory="不幸" />
+      <conflict-link ref="793a" category="企业" subcategory="错误判断" />
+      <conflict-link ref="793b" category="企业" subcategory="错误判断" />
+      <conflict-link ref="887a" category="企业" subcategory="交付" />
+      <conflict-link ref="887b" category="企业" subcategory="交付" />
+      <conflict-link ref="997a" category="企业" subcategory="义务" />
+      <conflict-link ref="997b" category="企业" subcategory="义务" />
+      <conflict-link ref="1285a" category="企业" subcategory="狡猾" />
+      <conflict-link ref="1285b" category="企业" subcategory="狡猾" />
+      <conflict-link ref="1285c" category="企业" subcategory="狡猾" />
+      <conflict-link ref="1438a" category="企业" subcategory="神秘" />
+      <conflict-link ref="1438b" category="企业" subcategory="神秘" />
+      <conflict-link ref="1438c" category="企业" subcategory="神秘" />
+      <conflict-link ref="1460" category="企业" subcategory="启示录" />
+    </predicate>
+    <predicate number="21">
+      <description>因错误判断而陷入不幸</description>
+      <conflict-link ref="40a" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="40b" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="182a" category="爱情与求爱" subcategory="求婚" />
+      <conflict-link ref="182b" category="爱情与求爱" subcategory="求婚" />
+      <conflict-link ref="205" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="342" category="爱情与求爱" subcategory="婚姻" />
+      <conflict-link ref="369" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="595" category="企业" subcategory="不幸" />
+      <conflict-link ref="747" category="企业" subcategory="错误判断" />
+      <conflict-link ref="804" category="企业" subcategory="有用性" />
+      <conflict-link ref="851" category="企业" subcategory="交付" />
+      <conflict-link ref="897" category="企业" subcategory="理想主义" />
+      <conflict-link ref="979" category="企业" subcategory="义务" />
+      <conflict-link ref="1023" category="企业" subcategory="必要性" />
+      <conflict-link ref="1034" category="企业" subcategory="机会" />
+      <conflict-link ref="1057a" category="企业" subcategory="个人限制" />
+      <conflict-link ref="1057b" category="企业" subcategory="个人限制" />
+      <conflict-link ref="1290a" category="企业" subcategory="违规" />
+      <conflict-link ref="1290b" category="企业" subcategory="违规" />
+      <conflict-link ref="1310" category="企业" subcategory="复仇" />
+      <conflict-link ref="1330" category="企业" subcategory="神秘" />
+    </predicate>
+    <predicate number="22">
+      <description>因错误判断而走上错误的道路</description>
+      <conflict-link ref="255" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="484a" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="484b" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="768" category="企业" subcategory="错误判断" />
+    </predicate>
+    <predicate number="23">
+      <description>因错误判断和怀疑而卷入复杂事件</description>
+      <conflict-link ref="21" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="177" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="328" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="365a" category="爱情与求爱" subcategory="婚姻" />
+      <conflict-link ref="365b" category="爱情与求爱" subcategory="婚姻" />
+      <conflict-link ref="365c" category="爱情与求爱" subcategory="婚姻" />
+      <conflict-link ref="365d" category="爱情与求爱" subcategory="婚姻" />
+      <conflict-link ref="538" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="786" category="企业" subcategory="错误判断" />
+    </predicate>
+    <predicate number="24">
+      <description>在开展企业时成为错误判断的受害者</description>
+      <conflict-link ref="794" category="企业" subcategory="错误判断" />
+    </predicate>
+    <predicate number="25">
+      <description>寻求拯救被指控犯有罪行的人</description>
+      <conflict-link ref="122" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="820" category="企业" subcategory="乐于助人" />
+      <conflict-link ref="894" category="企业" subcategory="交付" />
+    </predicate>
+    <predicate number="26">
+      <description>暗中寻求保护他人免受危险</description>
+      <conflict-link ref="558" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="825" category="企业" subcategory="乐于助人" />
+      <conflict-link ref="671" category="企业" subcategory="不幸" />
+    </predicate>
+    <predicate number="27">
+      <description>拒绝泄露他人的秘密，并坦然面对因此而遭受的迫害</description>
+      <conflict-link ref="824" category="企业" subcategory="乐于助人" />
+    </predicate>
+    <predicate number="28">
+      <description>面对一位受人尊敬的人遭遇不幸的情况，需要勇气和明智的进取心</description>
+      <conflict-link ref="125a" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="125b" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="125c" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="836" category="企业" subcategory="乐于助人" />
+    </predicate>
+    <predicate number="29">
+      <description>帮助他人向世界隐瞒致命的秘密</description>
+      <conflict-link ref="147" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="537" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="667" category="企业" subcategory="不幸" />
+      <conflict-link ref="1070" category="企业" subcategory="个人限制" />
+      <conflict-link ref="1160" category="企业" subcategory="模拟" />
+    </predicate>
+    <predicate number="30">
+      <description>全心全意为需要帮助的不幸者提供服务并提供最有价值的援助</description>
+      <conflict-link ref="845" category="企业" subcategory="乐于助人" />
+    </predicate>
+    <predicate number="31">
+      <description>过着孤独、无趣的生活并寻求陪伴</description>
+      <conflict-link ref="910" category="企业" subcategory="理想主义" />
+    </predicate>
+    <predicate number="32">
+      <description>因崇高理想主义而寻求隐藏身份</description>
+      <conflict-link ref="917" category="企业" subcategory="理想主义" />
+    </predicate>
+    <predicate number="33">
+      <description>秘密地、出于高尚的动机抵抗一项被认为不光彩的命令</description>
+      <conflict-link ref="958" category="企业" subcategory="理想主义" />
+    </predicate>
+    <predicate number="34">
+      <description>着手进行起义，希望改善某些邪恶状况</description>
+      <conflict-link ref="949a" category="企业" subcategory="理想主义" />
+      <conflict-link ref="949b" category="企业" subcategory="理想主义" />
+    </predicate>
+    <predicate number="35">
+      <description>卷入一场挑战珍贵理想的价值的复杂事件</description>
+      <conflict-link ref="292" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="922a" category="企业" subcategory="理想主义" />
+      <conflict-link ref="922b" category="企业" subcategory="理想主义" />
+    </predicate>
+    <predicate number="36">
+      <description>经历一次导致性格发生显著变化的经历</description>
+      <conflict-link ref="152a" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="152b" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="680a" category="企业" subcategory="不幸" />
+      <conflict-link ref="680b" category="企业" subcategory="不幸" />
+      <conflict-link ref="963" category="企业" subcategory="理想主义" />
+    </predicate>
+    <predicate number="37">
+      <description>克服困难，实现梦想</description>
+      <conflict-link ref="563a" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="563b" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="563c" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="965" category="企业" subcategory="理想主义" />
+      <conflict-link ref="1107a" category="企业" subcategory="个人限制" />
+      <conflict-link ref="1107b" category="企业" subcategory="个人限制" />
+    </predicate>
+    <predicate number="38">
+      <description>犯下严重错误并暗中寻求摆脱其恶果</description>
+      <conflict-link ref="987" category="企业" subcategory="义务" />
+    </predicate>
+    <predicate number="39">
+      <description>为了履行义务而放弃所珍视的抱负</description>
+      <conflict-link ref="123" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="282a" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="282b" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="508" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="989" category="企业" subcategory="义务" />
+    </predicate>
+    <predicate number="40">
+      <description>开展一项义务与另一项义务相冲突的事业</description>
+      <conflict-link ref="287" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="517" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="1011" category="企业" subcategory="义务" />
+    </predicate>
+    <predicate number="41">
+      <description>发现义务与抱负、倾向或必要性不符</description>
+      <conflict-link ref="19a" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="19b" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="127a" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="127b" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="294a" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="294b" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="521" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="1000" category="企业" subcategory="义务" />
+    </predicate>
+    <predicate number="42">
+      <description>在努力光荣地履行义务时遭遇不幸</description>
+      <conflict-link ref="1018" category="企业" subcategory="义务" />
+    </predicate>
+    <predicate number="43">
+      <description>努力克服开展企业过程中的个人局限性</description>
+      <conflict-link ref="835" category="企业" subcategory="乐于助人" />
+      <conflict-link ref="1071" category="企业" subcategory="个人限制" />
+    </predicate>
+    <predicate number="44">
+      <description>寻求以不寻常的方法来克服个人的局限性</description>
+      <conflict-link ref="191" category="爱情与求爱" subcategory="求婚" />
+      <conflict-link ref="1101" category="企业" subcategory="个人限制" />
+    </predicate>
+    <predicate number="45">
+      <description>力求推动企业发展，却遭遇家庭情感的阻碍</description>
+      <conflict-link ref="1138" category="企业" subcategory="个人限制" />
+    </predicate>
+    <predicate number="46">
+      <description>寻求对真实或虚构的严重错误进行报复</description>
+      <conflict-link ref="567" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="1312" category="企业" subcategory="复仇" />
+    </predicate>
+    <predicate number="47">
+      <description>找到（显然）一个令人垂涎的物品，并获得（显然）该物品</description>
+      <conflict-link ref="1165" category="企业" subcategory="模拟" />
+    </predicate>
+    <predicate number="48">
+      <description>在一个非常诚实的企业中扮演罪犯的角色</description>
+      <conflict-link ref="1167" category="企业" subcategory="模拟" />
+    </predicate>
+    <predicate number="49">
+      <description>在开展某项事业时假设一个虚构的角色</description>
+      <conflict-link ref="1173" category="企业" subcategory="模拟" />
+    </predicate>
+    <predicate number="50">
+      <description>受不寻常动机驱使而从事狡猾的事业</description>
+      <conflict-link ref="1a" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="1b" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="1c" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="1d" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="1e" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="1f" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="1g" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="1h" category="爱情与求爱" subcategory="爱情的开始" />
+      <conflict-link ref="66a" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="66b" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="66c" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="185" category="爱情与求爱" subcategory="求婚" />
+      <conflict-link ref="230" category="爱情与求爱" subcategory="爱情的拒绝" />
+      <conflict-link ref="347a" category="爱情与求爱" subcategory="婚姻" />
+      <conflict-link ref="347b" category="爱情与求爱" subcategory="婚姻" />
+      <conflict-link ref="419" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="813" category="企业" subcategory="乐于助人" />
+      <conflict-link ref="863a" category="企业" subcategory="交付" />
+      <conflict-link ref="863b" category="企业" subcategory="交付" />
+      <conflict-link ref="863c" category="企业" subcategory="交付" />
+      <conflict-link ref="932" category="企业" subcategory="理想主义" />
+      <conflict-link ref="1141" category="企业" subcategory="模拟" />
+      <conflict-link ref="1209a" category="企业" subcategory="狡猾" />
+      <conflict-link ref="1209b" category="企业" subcategory="狡猾" />
+      <conflict-link ref="1209c" category="企业" subcategory="狡猾" />
+      <conflict-link ref="1365" category="企业" subcategory="神秘" />
+    </predicate>
+    <predicate number="51">
+      <description>设计一个聪明且似是而非的谎言，以推进某些雄心勃勃的计划</description>
+      <conflict-link ref="1277a" category="企业" subcategory="狡猾" />
+      <conflict-link ref="1277b" category="企业" subcategory="狡猾" />
+    </predicate>
+    <predicate number="52">
+      <description>遇到潜在的违法者并试图阻止违法行为</description>
+      <conflict-link ref="1275" category="企业" subcategory="狡猾" />
+    </predicate>
+    <predicate number="53">
+      <description>反对狡猾阴谋家的计划</description>
+      <conflict-link ref="834" category="企业" subcategory="乐于助人" />
+      <conflict-link ref="1280" category="企业" subcategory="狡猾" />
+    </predicate>
+    <predicate number="54">
+      <description>卷入与拥有神秘力量的物体有关的令人费解的复杂情况</description>
+      <conflict-link ref="1379" category="企业" subcategory="神秘" />
+    </predicate>
+    <predicate number="55">
+      <description>卷入一场神秘的复杂事件，并试图充分利用一次奇异的经历</description>
+      <conflict-link ref="1385" category="企业" subcategory="神秘" />
+    </predicate>
+    <predicate number="56">
+      <description>寻求测试神秘交流的价值并卷入奇怪的复杂情况</description>
+      <conflict-link ref="1394" category="企业" subcategory="神秘" />
+    </predicate>
+    <predicate number="57">
+      <description>试图解开一个令人费解的复杂问题</description>
+      <conflict-link ref="174" category="爱情与求爱" subcategory="爱情的不幸" />
+      <conflict-link ref="560" category="婚姻生活" subcategory="婚姻" />
+      <conflict-link ref="833" category="企业" subcategory="乐于助人" />
+      <conflict-link ref="1399" category="企业" subcategory="神秘" />
+      <conflict-link ref="1460" category="企业" subcategory="启示录" />
+    </predicate>
+    <predicate number="58">
+      <description>从事一项企业然后神秘消失</description>
+      <conflict-link ref="1414a" category="企业" subcategory="神秘" />
+      <conflict-link ref="1414b" category="企业" subcategory="神秘" />
+    </predicate>
+    <predicate number="59">
+      <description>参与一项神秘的事业并涉足神秘学和奇幻事物</description>
+      <conflict-link ref="1418a" category="企业" subcategory="神秘" />
+      <conflict-link ref="1418b" category="企业" subcategory="神秘" />
+    </predicate>
+    <predicate number="60">
+      <description>因神秘事件引起的好奇心而参与一项奇怪的事业</description>
+      <conflict-link ref="1429" category="企业" subcategory="神秘" />
+    </predicate>
+    <predicate number="61">
+      <description>意识到一个需要采取果断行动的重要秘密</description>
+      <conflict-link ref="802a" category="企业" subcategory="错误判断" />
+      <conflict-link ref="802b" category="企业" subcategory="错误判断" />
+      <conflict-link ref="1447" category="企业" subcategory="启示录" />
+    </predicate>
+    <predicate number="62">
+      <description>卷入任何形式的复杂情况</description>
+    </predicate>
+  </predicates>
+  <outcomes>
+    <outcome number="1">
+      <description>因不幸的举动而付出惨痛的代价。</description>
+    </outcome>
+    <outcome number="2">
+      <description>从严重的纠缠中快乐地走出来。</description>
+    </outcome>
+    <outcome number="3">
+      <description>挫败有罪的阴谋并挫败巧妙的阴谋。</description>
+    </outcome>
+    <outcome number="4">
+      <description>承担直接导致灾难的角色。</description>
+    </outcome>
+    <outcome number="5">
+      <description>历经磨难，获得丰厚智慧。</description>
+    </outcome>
+    <outcome number="6">
+      <description>为完成某项任务而做出最大的牺牲。</description>
+    </outcome>
+    <outcome number="7">
+      <description>当某些观点被揭露为谬误时，推翻该观点。</description>
+    </outcome>
+    <outcome number="8">
+      <description>取得精神上的胜利。</description>
+    </outcome>
+    <outcome number="9">
+      <description>在艰苦的事业中取得成功和幸福。</description>
+    </outcome>
+    <outcome number="10">
+      <description>遇到错误并得到纠正的经历。</description>
+    </outcome>
+    <outcome number="11">
+      <description>发现试图表现得与现实中不一样是愚蠢的。</description>
+    </outcome>
+    <outcome number="12">
+      <description>从严重的纠缠中拯救完整性。</description>
+    </outcome>
+    <outcome number="13">
+      <description>最终来到谜团的空白墙。</description>
+    </outcome>
+    <outcome number="14">
+      <description>实现完整且永久的角色转换。</description>
+    </outcome>
+    <outcome number="15">
+      <description>迎接任何命运，无论是好是坏。</description>
+    </outcome>
+  </outcomes>
+  <conflicts>
+    <conflict id="1a" category="爱情与求爱" subcategory="爱情的开始">
+      <permutations>
+        <permutation number="1">
+          <description><character-link ref="A">A</character-link>，贫穷，爱上了富有的贵族<character-link ref="B">
+            B</character-link>。</description>
+        </permutation>
+        <permutation number="2">
+          <description><character-link ref="A">A</character-link>，贫穷，爱上富有的<character-link ref="B">B</character-link>
+            ，假装自己是个有钱人。</description>
+        </permutation>
+      </permutations>
+      <lead-ups>
+        <group mode="choose">
+          <conflict-link ref="112" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="117" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="148" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="656" category="企业" subcategory="不幸" />
+        </group>
+      </lead-ups>
+      <carry-ons>
+        <group mode="choose">
+          <conflict-link ref="187" category="爱情与求爱" subcategory="求婚" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="228" category="爱情与求爱" subcategory="爱情的拒绝" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="233" category="爱情与求爱" subcategory="爱情的拒绝" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="347a" category="爱情与求爱" subcategory="婚姻" permutations="1" />
+        </group>
+      </carry-ons>
+    </conflict>
+    <conflict id="1b" category="爱情与求爱" subcategory="爱情的开始">
+      <permutations>
+        <permutation number="1">
+          <description><character-link ref="A">A</character-link>，出身卑微，爱上了贵族<character-link ref="B">
+            B</character-link>。</description>
+        </permutation>
+        <permutation number="2">
+          <description><character-link ref="A">A</character-link>，出身卑微，爱上了贵族<character-link ref="B">
+            B</character-link>，假装自己是一位拥有很高社会地位的人。</description>
+        </permutation>
+      </permutations>
+      <lead-ups>
+        <group mode="choose">
+          <conflict-link ref="171" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="734" category="企业" subcategory="不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1106" category="企业" subcategory="个人限制" permutations="1">
+            <transform 从="B" 到="A" />
+          </conflict-link>
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1146" category="企业" subcategory="模拟" />
+        </group>
+      </lead-ups>
+      <carry-ons>
+        <group mode="choose">
+          <conflict-link ref="139" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="153" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="209" category="爱情与求爱" subcategory="爱情的拒绝" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1200" category="企业" subcategory="模拟" />
+        </group>
+      </carry-ons>
+    </conflict>
+    <conflict id="1c" category="爱情与求爱" subcategory="爱情的开始">
+      <permutations>
+        <permutation number="1">
+          <description><character-link ref="A">A</character-link> 爱上了 <character-link ref="B">B</character-link>
+            ，却发现 <character-link ref="B">B</character-link> 认为他太完美，无法获得婚姻幸福。</description>
+        </permutation>
+        <permutation number="2">
+          <description><character-link ref="B">B</character-link> 认为她的爱人 <character-link ref="A">A</character-link>
+            太过完美，无法获得婚姻幸福；因此 <character-link ref="A">A</character-link> 扮演了一个“硬汉”角色，以证明他并不像看上去那么完美。</description>
+        </permutation>
+      </permutations>
+      <lead-ups>
+        <group mode="choose">
+          <conflict-link ref="918a" category="企业" subcategory="理想主义" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="926" category="企业" subcategory="理想主义" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="928a" category="企业" subcategory="理想主义" />
+        </group>
+      </lead-ups>
+      <carry-ons>
+        <group mode="choose">
+          <conflict-link ref="1167" category="企业" subcategory="模拟" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1170" category="企业" subcategory="模拟" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1216" category="企业" subcategory="狡猾" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1227a" category="企业" subcategory="狡猾" />
+          <conflict-link ref="1227b" category="企业" subcategory="狡猾" />
+          <conflict-link ref="1227c" category="企业" subcategory="狡猾" />
+        </group>
+      </carry-ons>
+    </conflict>
+    <conflict id="1d" category="爱情与求爱" subcategory="爱情的开始">
+      <permutations>
+        <permutation number="1">
+          <description><character-link ref="A">A</character-link>，年长者，爱上了年轻的<character-link ref="B">
+            B</character-link>。</description>
+        </permutation>
+        <permutation number="2">
+          <description><character-link ref="A">A</character-link>，老人，爱上了年轻的<character-link ref="B">B</character-link>
+            ，试图通过模仿年轻人来推进他们的恋情。</description>
+        </permutation>
+      </permutations>
+      <lead-ups>
+        <group mode="choose">
+          <conflict-link ref="148" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="149" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="160" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+      </lead-ups>
+      <carry-ons>
+        <group mode="choose">
+          <conflict-link ref="40a" category="爱情与求爱" subcategory="爱情的不幸" />
+          <conflict-link ref="40b" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="75b" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="78" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="97" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="156" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="330a" category="爱情与求爱" subcategory="爱情的拒绝" />
+        </group>
+      </carry-ons>
+    </conflict>
+    <conflict id="1e" category="爱情与求爱" subcategory="爱情的开始">
+      <permutations>
+        <permutation number="1">
+          <description><character-link ref="A">A</character-link>，一个骗子、不法之徒、赌徒，为了传播他与<character-link
+              ref="B">B</character-link>的恋情，他假装自己是一个诚实的人。</description>
+        </permutation>
+      </permutations>
+      <lead-ups>
+        <group mode="choose">
+          <conflict-link ref="59" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1146" category="企业" subcategory="模拟" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1175a" category="企业" subcategory="模拟" />
+        </group>
+      </lead-ups>
+      <carry-ons>
+        <group mode="choose">
+          <conflict-link ref="280a" category="爱情与求爱" subcategory="爱情的拒绝">
+            <transform 从="A" 到="A-3" />
+          </conflict-link>
+          <conflict-link ref="280b" category="爱情与求爱" subcategory="爱情的拒绝">
+            <transform 从="A" 到="A-3" />
+          </conflict-link>
+        </group>
+        <group mode="include">
+          <conflict-link ref="318" category="爱情与求爱" subcategory="爱情的拒绝" />
+          <conflict-link ref="236" category="爱情与求爱" subcategory="爱情的拒绝" />
+          <conflict-link ref="267" category="爱情与求爱" subcategory="爱情的拒绝" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="252a" category="爱情与求爱" subcategory="爱情的拒绝" />
+        </group>
+      </carry-ons>
+    </conflict>
+    <conflict id="1f" category="爱情与求爱" subcategory="爱情的开始">
+      <permutations>
+        <permutation number="1">
+          <description><character-link ref="A">A</character-link> 爱上了致力于科学研究的 <character-link
+              ref="B">B</character-link>。</description>
+        </permutation>
+        <permutation number="2">
+          <description><character-link ref="A">A</character-link> 对科学一无所知，却假装从事科学研究。</description>
+        </permutation>
+      </permutations>
+      <lead-ups>
+        <group mode="choose">
+          <conflict-link ref="230" category="爱情与求爱" subcategory="爱情的拒绝" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1060" category="企业" subcategory="个人限制" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1101" category="企业" subcategory="个人限制" />
+        </group>
+      </lead-ups>
+      <carry-ons>
+        <group mode="choose">
+          <conflict-link ref="179a" category="爱情与求爱" subcategory="爱情的不幸" />
+          <conflict-link ref="179b" category="爱情与求爱" subcategory="爱情的不幸" />
+          <conflict-link ref="179c" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="181a" category="爱情与求爱" subcategory="爱情的不幸" />
+          <conflict-link ref="181b" category="爱情与求爱" subcategory="爱情的不幸" />
+          <conflict-link ref="181c" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+      </carry-ons>
+    </conflict>
+    <conflict id="1g" category="爱情与求爱" subcategory="爱情的开始">
+      <permutations>
+        <permutation number="1">
+          <description><character-link ref="A">A</character-link>爱上了浪漫的<character-link ref="B">B</character-link>
+            。</description>
+        </permutation>
+        <permutation number="2">
+          <description><character-link ref="A">A</character-link>，爱上了浪漫的<character-link ref="B">B</character-link>
+            ，假装自己是个英雄。</description>
+        </permutation>
+      </permutations>
+      <lead-ups>
+        <group mode="choose">
+          <conflict-link ref="234a" category="爱情与求爱" subcategory="爱情的拒绝" permutations="1" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1061" category="企业" subcategory="个人限制" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1150" category="企业" subcategory="模拟" />
+        </group>
+      </lead-ups>
+      <carry-ons>
+        <group mode="choose">
+          <conflict-link ref="234a" category="爱情与求爱" subcategory="爱情的拒绝" permutations="2" />
+        </group>
+        <group mode="include">
+          <conflict-link ref="1150" category="企业" subcategory="模拟" />
+          <conflict-link ref="851" category="企业" subcategory="交付" />
+          <conflict-link ref="885a" category="企业" subcategory="交付" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1227b" category="企业" subcategory="狡猾" />
+          <conflict-link ref="1227c" category="企业" subcategory="狡猾" />
+        </group>
+      </carry-ons>
+    </conflict>
+    <conflict id="1h" category="爱情与求爱" subcategory="爱情的开始">
+      <permutations>
+        <permutation number="1">
+          <description><character-link ref="A">A</character-link> 与他的爱人 <character-link ref="B">B</character-link>
+            吵架，并担心自己会失去她的爱。</description>
+        </permutation>
+        <permutation number="2">
+          <description><character-link ref="A">A</character-link>，担心自己会失去<character-link ref="B">B</character-link>
+            的爱，假装服毒自杀。</description>
+        </permutation>
+      </permutations>
+      <lead-ups>
+        <group mode="choose">
+          <conflict-link ref="43" category="爱情与求爱" subcategory="爱情的不幸" permutations="1" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="101b" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="898" category="企业" subcategory="理想主义" permutations="1" />
+        </group>
+      </lead-ups>
+      <carry-ons>
+        <group mode="choose">
+          <conflict-link ref="249" category="爱情与求爱" subcategory="爱情的拒绝" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="262a" category="爱情与求爱" subcategory="爱情的拒绝" />
+          <conflict-link ref="262b" category="爱情与求爱" subcategory="爱情的拒绝" />
+          <conflict-link ref="262c" category="爱情与求爱" subcategory="爱情的拒绝" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1461b" category="企业" subcategory="启示录" />
+        </group>
+      </carry-ons>
+    </conflict>
+    <conflict id="2a" category="爱情与求爱" subcategory="爱情的开始">
+      <permutations>
+        <permutation number="1">
+          <description><character-link ref="A">A</character-link>，一个贫穷的职员，资助了上流社会的“艳遇”。</description>
+        </permutation>
+        <permutation number="2">
+          <description><character-link ref="A">A</character-link> 是一位贫穷的职员，他资助自己在上流社会“放纵”一时，遇到了富有的贵族 <character-link
+              ref="B">B</character-link> ，并且他们坠入了爱河。</description>
+          <includes>
+            <group mode="choose">
+              <conflict-link ref="1146" category="企业" subcategory="模拟">
+                <transform 从="A" 到="B" />
+              </conflict-link>
+            </group>
+            <group mode="choose">
+              <conflict-link ref="1187" category="企业" subcategory="模拟">
+                <transform 从="A" 到="B" />
+              </conflict-link>
+            </group>
+          </includes>
+        </permutation>
+      </permutations>
+      <lead-ups>
+        <group mode="choose">
+          <conflict-link ref="949a" category="企业" subcategory="理想主义" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="954" category="企业" subcategory="理想主义" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="968" category="企业" subcategory="理想主义" />
+        </group>
+      </lead-ups>
+      <carry-ons>
+        <group mode="choose">
+          <conflict-link ref="1461a" category="企业" subcategory="启示录">
+            <transform 从="A" 到="B" />
+          </conflict-link>
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1461a" category="企业" subcategory="启示录" />
+          <conflict-link ref="1461c" category="企业" subcategory="启示录" />
+        </group>
+      </carry-ons>
+    </conflict>
+    <conflict id="2b" category="爱情与求爱" subcategory="爱情的开始">
+      <permutations>
+        <permutation number="1">
+          <description><character-link ref="A">A</character-link>，一名使用假名的逃犯，爱上了<character-link
+              ref="B">B</character-link>。</description>
+        </permutation>
+        <permutation number="2">
+          <description><character-link ref="A">A</character-link> 狡猾地从事着一项秘密事业，爱上了同样从事着狡猾事业的 <character-link
+              ref="B">B</character-link>。</description>
+          <includes>
+            <group mode="choose">
+              <conflict-link ref="1146" category="企业" subcategory="模拟">
+                <transform 从="A" 到="B" />
+              </conflict-link>
+            </group>
+            <group mode="choose">
+              <conflict-link ref="1169" category="企业" subcategory="模拟">
+                <transform 从="A" 到="B" />
+              </conflict-link>
+            </group>
+          </includes>
+        </permutation>
+      </permutations>
+      <lead-ups>
+        <group mode="choose">
+          <conflict-link ref="1146" category="企业" subcategory="模拟" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1175a" category="企业" subcategory="模拟" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1197" category="企业" subcategory="模拟" />
+        </group>
+      </lead-ups>
+      <carry-ons>
+        <group mode="choose">
+          <conflict-link ref="91" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="224" category="爱情与求爱" subcategory="爱情的拒绝" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="233" category="爱情与求爱" subcategory="爱情的拒绝" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="876a" category="企业" subcategory="交付" />
+        </group>
+      </carry-ons>
+    </conflict>
+    <conflict id="2c" category="爱情与求爱" subcategory="爱情的开始">
+      <permutations>
+        <permutation number="1">
+          <description><character-link ref="A">A</character-link>
+            ，一个“懒惰的富人”，通过以城市“硬汉”的身份频繁出入贫民窟来满足他对冒险的热爱。</description>
+        </permutation>
+        <permutation number="2">
+          <description><character-link ref="A">A</character-link>，伪装成城市“硬汉”，遇见了<character-link
+              ref="B">B</character-link>，他们坠入了爱河。</description>
+        </permutation>
+      </permutations>
+      <lead-ups>
+        <group mode="choose">
+          <conflict-link ref="232" category="爱情与求爱" subcategory="爱情的拒绝" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="420" category="婚姻生活" subcategory="婚姻" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="818b" category="企业" subcategory="乐于助人" />
+        </group>
+      </lead-ups>
+      <carry-ons>
+        <group mode="choose">
+          <conflict-link ref="114" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="220" category="爱情与求爱" subcategory="爱情的拒绝" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="358" category="爱情与求爱" subcategory="婚姻" />
+        </group>
+      </carry-ons>
+    </conflict>
+    <conflict id="2d" category="爱情与求爱" subcategory="爱情的开始">
+      <permutations>
+        <permutation number="1">
+          <description><character-link ref="A">A</character-link> 被 <character-link ref="B">B</character-link>
+            误认为 <character-link ref="A-8">A-8</character-link>。<character-link ref="B">B</character-link>
+            曾与 <character-link ref="A-8">A-8</character-link> 通信，但从未见过他。</description>
+        </permutation>
+        <permutation number="2">
+          <description><character-link ref="A">A</character-link> 爱上了 <character-link ref="B">B</character-link>
+            ，假装自己是 <character-link ref="A-8">A-8</character-link>。</description>
+        </permutation>
+      </permutations>
+      <lead-ups>
+        <group mode="choose">
+          <conflict-link ref="818a" category="企业" subcategory="乐于助人" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1197" category="企业" subcategory="模拟" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1198" category="企业" subcategory="模拟" />
+        </group>
+      </lead-ups>
+      <carry-ons>
+        <group mode="choose">
+          <conflict-link ref="82a" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="97" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="822" category="企业" subcategory="乐于助人" />
+        </group>
+      </carry-ons>
+    </conflict>
+    <conflict id="2e" category="爱情与求爱" subcategory="爱情的开始">
+      <permutations>
+        <permutation number="1">
+          <description><character-link ref="B">B</character-link>
+            富有，投入大量时间进行安置工作；在开展慈善事业时，她假装自己是一名售货员。</description>
+        </permutation>
+        <permutation number="2">
+          <description><character-link ref="B">B</character-link> 在假扮为售货员时遇到了 <character-link
+              ref="A">A</character-link>，并且他们坠入了爱河。</description>
+        </permutation>
+      </permutations>
+      <lead-ups>
+        <group mode="choose">
+          <conflict-link ref="1170" category="企业" subcategory="模拟" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1329" category="企业" subcategory="复仇" />
+        </group>
+      </lead-ups>
+      <carry-ons>
+        <group mode="choose">
+          <conflict-link ref="115" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="336b" category="爱情与求爱" subcategory="爱情的拒绝" />
+        </group>
+        <group mode="include">
+          <conflict-link ref="1461a" category="企业" subcategory="启示录">
+            <transform 从="A" 到="B" />
+          </conflict-link>
+          <conflict-link ref="358" category="爱情与求爱" subcategory="婚姻" permutations="3" />
+        </group>
+      </carry-ons>
+    </conflict>
+    <conflict id="2f" category="爱情与求爱" subcategory="爱情的开始">
+      <permutations>
+        <permutation number="1">
+          <description><character-link ref="B">B</character-link>
+            ，贫穷、卑微却又浪漫，意外地获得了一小笔钱；有了这笔钱，她暂时假装自己是富有的贵族。</description>
+        </permutation>
+        <permutation number="2">
+          <description><character-link ref="B">B</character-link>，贫穷卑微却假装富有贵族，遇到了富有而有影响力的<character-link
+              ref="A">A</character-link>并坠入爱河。</description>
+          <includes>
+            <group mode="choose">
+              <conflict-link ref="1163c" category="企业" subcategory="模拟" />
+            </group>
+          </includes>
+        </permutation>
+      </permutations>
+      <lead-ups>
+        <group mode="choose">
+          <conflict-link ref="916" category="企业" subcategory="理想主义" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="974" category="企业" subcategory="理想主义" />
+        </group>
+      </lead-ups>
+      <carry-ons>
+        <group mode="choose">
+          <conflict-link ref="117" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="152a" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+      </carry-ons>
+    </conflict>
+    <conflict id="2g" category="爱情与求爱" subcategory="爱情的开始">
+      <permutations>
+        <permutation number="1">
+          <description><character-link ref="B">B</character-link> 是一名女仆，她使用富有女主人的衣柜，假装成一位杰出的人物。</description>
+        </permutation>
+        <permutation number="2">
+          <description><character-link ref="B">B</character-link>，贫穷却假装富有和贵族，遇到了富有和有影响力的<character-link
+              ref="A">A</character-link>并且他们坠入了爱河。</description>
+          <includes>
+            <group mode="choose">
+              <conflict-link ref="1148a" category="企业" subcategory="模拟" />
+            </group>
+          </includes>
+        </permutation>
+      </permutations>
+      <lead-ups>
+        <group mode="choose">
+          <conflict-link ref="850a" category="企业" subcategory="乐于助人" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1159" category="企业" subcategory="模拟">
+            <transform 从="A-4" 到="A" />
+          </conflict-link>
+        </group>
+      </lead-ups>
+      <carry-ons>
+        <group mode="choose">
+          <conflict-link ref="885a" category="企业" subcategory="交付" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1060" category="企业" subcategory="个人限制" />
+        </group>
+      </carry-ons>
+    </conflict>
+    <conflict id="2h" category="爱情与求爱" subcategory="爱情的开始">
+      <permutations>
+        <permutation number="1">
+          <description><character-link ref="B">B</character-link>，一名罪犯，使用化名并利用偷来的资金逃避法律制裁。</description>
+        </permutation>
+        <permutation number="2">
+          <description><character-link ref="B">B</character-link>，一个伪装的罪犯，遇见了<character-link ref="A">
+            A</character-link> 并且他们坠入了爱河。</description>
+          <includes>
+            <group mode="choose">
+              <conflict-link ref="1169" category="企业" subcategory="模拟" />
+            </group>
+            <group mode="choose">
+              <conflict-link ref="1175a" category="企业" subcategory="模拟" />
+            </group>
+            <group mode="choose">
+              <conflict-link ref="1181" category="企业" subcategory="模拟" />
+            </group>
+          </includes>
+        </permutation>
+      </permutations>
+      <lead-ups>
+        <group mode="choose">
+          <conflict-link ref="876a" category="企业" subcategory="交付" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1244a" category="企业" subcategory="狡猾" />
+        </group>
+      </lead-ups>
+      <carry-ons>
+        <group mode="choose">
+          <conflict-link ref="97" category="爱情与求爱" subcategory="爱情的不幸" />
+        </group>
+        <group mode="choose">
+          <conflict-link ref="1208" category="企业" subcategory="模拟" />
+        </group>
+      </carry-ons>
+    </conflict>
+  </conflicts>
+</plotto>
