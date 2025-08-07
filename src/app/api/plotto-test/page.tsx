@@ -14,7 +14,10 @@ export default function PlottoTestPage() {
   const [selectedPredicate, setSelectedPredicate] = useState<PlottoPredicate | null>(null);
   const [selectedOutcome, setSelectedOutcome] = useState<PlottoOutcome | null>(null);
   const [selectedConflict, setSelectedConflict] = useState<PlottoConflict | null>(null);
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<Array<{
+    type: 'character' | 'subject' | 'predicate' | 'outcome' | 'conflict';
+    data: unknown;
+  }>>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -138,19 +141,19 @@ export default function PlottoTestPage() {
                 <div key={index} className="mb-2 p-2 bg-white rounded border">
                   <span className="font-medium">{result.type}:</span>
                   {result.type === 'character' && (
-                    <span>{result.data.designation} - {result.data.description}</span>
+                    <span>{(result.data as { designation: string; description: string }).designation} - {(result.data as { designation: string; description: string }).description}</span>
                   )}
                   {result.type === 'subject' && (
-                    <span>#{result.data.number} - {result.data.description}</span>
+                    <span>#{(result.data as { number: number; description: string }).number} - {(result.data as { number: number; description: string }).description}</span>
                   )}
                   {result.type === 'predicate' && (
-                    <span>#{result.data.number} - {result.data.description}</span>
+                    <span>#{(result.data as { number: number; description: string }).number} - {(result.data as { number: number; description: string }).description}</span>
                   )}
                   {result.type === 'outcome' && (
-                    <span>#{result.data.number} - {result.data.description}</span>
+                    <span>#{(result.data as { number: number; description: string }).number} - {(result.data as { number: number; description: string }).description}</span>
                   )}
                   {result.type === 'conflict' && (
-                    <span>{result.data.id} ({result.data.category}/{result.data.subcategory})</span>
+                    <span>{(result.data as { id: string; category: string; subcategory: string }).id} ({(result.data as { id: string; category: string; subcategory: string }).category}/{(result.data as { id: string; category: string; subcategory: string }).subcategory})</span>
                   )}
                 </div>
               ))}

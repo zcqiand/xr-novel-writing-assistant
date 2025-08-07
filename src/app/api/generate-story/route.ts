@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AIStoryGenerator, AIStoryRequest } from '@/lib/ai-story-generator';
-import { Models } from 'openai/resources';
+// TODO: 验证 Models 导入是否需要使用
+// import { Models } from 'openai/resources';
 
 // 环境变量配置
 const config = {

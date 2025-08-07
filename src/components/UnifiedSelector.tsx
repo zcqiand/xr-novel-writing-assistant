@@ -82,6 +82,7 @@ export default function UnifiedSelector({
   const [recommendedConflicts, setRecommendedConflicts] = useState<Conflict[]>([]);
   const [leadUpConflicts, setLeadUpConflicts] = useState<Conflict[]>([]);
   const [carryOnConflicts, setCarryOnConflicts] = useState<Conflict[]>([]);
+  // TODO: 验证这些状态变量是否需要使用 - 暂时保留以备将来UI扩展
   const [showLeadUpConflicts, setShowLeadUpConflicts] = useState(false);
   const [showCarryOnConflicts, setShowCarryOnConflicts] = useState(false);
 
@@ -134,7 +135,9 @@ export default function UnifiedSelector({
 
         // 获取前置冲突
         if (conflict.leadUps && conflict.leadUps.length > 0) {
-          conflict.leadUps.forEach((group, groupIndex) => {
+          conflict.leadUps.forEach((group, _groupIndex) => {
+            // TODO: 验证 groupIndex 参数是否需要使用
+            console.log('🔍 [UnifiedSelector] leadUps groupIndex 未使用:', _groupIndex);
 
             group.conflictLinks.forEach(link => {
               const linkedConflict = conflicts.find(c => c.id === link.ref);
@@ -156,7 +159,9 @@ export default function UnifiedSelector({
 
         // 获取后续冲突
         if (conflict.carryOns && conflict.carryOns.length > 0) {
-          conflict.carryOns.forEach((group, groupIndex) => {
+          conflict.carryOns.forEach((group, _groupIndex) => {
+            // TODO: 验证 groupIndex 参数是否需要使用
+            console.log('🔍 [UnifiedSelector] carryOns groupIndex 未使用:', _groupIndex);
 
             group.conflictLinks.forEach(link => {
               const linkedConflict = conflicts.find(c => c.id === link.ref);

@@ -73,7 +73,7 @@ export interface PlottoData {
 
 export interface PlottoSearchResult {
   type: 'character' | 'subject' | 'predicate' | 'outcome' | 'conflict';
-  data: any;
+  data: unknown;
 }
 
 export interface PlottoSearchResponse {

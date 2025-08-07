@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
  * GET /api/generate-story/test
  * 测试API端点，不需要API密钥
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     return NextResponse.json({
       success: true,
@@ -37,7 +37,9 @@ export async function POST(request: NextRequest) {
   try {
     // 解析请求体
     const body = await request.json();
-    const { theme, plot, conflict, outcome, style, length } = body;
+    const { theme, plot, conflict, outcome, style, _length } = body;
+    // TODO: 验证 length 参数是否需要使用
+    console.log('🔍 [generate-story-test] length 参数被解构但未使用:', _length);
 
     // 模拟AI生成的故事
     const mockStory = `这是一个基于您提供的故事元素生成的模拟故事：

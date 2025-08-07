@@ -3,6 +3,7 @@ import { PlottoParser } from '@/lib/plotto-parser';
 import fs from 'fs/promises';
 import path from 'path';
 
+
 /**
  * GET /api/plotto
  * 获取Plotto数据的API端点
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
     const plottoData = parser.getParsedData();
 
     // 根据请求类型返回相应的数据
-    let responseData: any;
+    let responseData: unknown;
 
     switch (type) {
       case 'characters':
@@ -132,7 +133,10 @@ export async function POST(request: NextRequest) {
     const plottoData = parser.getParsedData();
 
     // 搜索逻辑
-    const searchResults: any[] = [];
+    const searchResults: Array<{
+      type: 'character' | 'subject' | 'predicate' | 'outcome' | 'conflict';
+      data: unknown;
+    }> = [];
     const searchQuery = query.toLowerCase();
 
     // 搜索角色
@@ -206,7 +210,7 @@ export async function POST(request: NextRequest) {
     const filteredResults = category ?
       searchResults.filter(result => {
         if (result.type === 'conflict') {
-          return result.data.category === category;
+          return (result.data as { category: string }).category === category;
         }
         return true;
       }) : searchResults;
@@ -215,7 +219,7 @@ export async function POST(request: NextRequest) {
     const finalResults = subcategory ?
       filteredResults.filter(result => {
         if (result.type === 'conflict') {
-          return result.data.subcategory === subcategory;
+          return (result.data as { subcategory: string }).subcategory === subcategory;
         }
         return true;
       }) : filteredResults;
