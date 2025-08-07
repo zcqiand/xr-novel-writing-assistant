@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     // 模拟AI生成的故事
     const mockStory = `这是一个基于您提供的故事元素生成的模拟故事：
 
-**主题：** ${theme || '未指定主题'}
+**主角类型：** ${theme || '未指定主角类型'}
 **情节：** ${plot || '未指定情节'}
 **冲突：** ${conflict || '未指定冲突'}
 **结局：** ${outcome || '未指定结局'}

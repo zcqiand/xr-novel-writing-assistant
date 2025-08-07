@@ -135,7 +135,7 @@ export default function PlottoTestPage() {
 
         {searchResults.length > 0 && (
           <div>
-            <h3 className="font-semibold mb-2">搜索结果 ({searchResults.length})</h3>
+            <h3 className="font-semibold mb-2">搜索结局 ({searchResults.length})</h3>
             <div className="max-h-40 overflow-y-auto border rounded p-2">
               {searchResults.map((result, index) => (
                 <div key={index} className="mb-2 p-2 bg-white rounded border">
@@ -169,15 +169,15 @@ export default function PlottoTestPage() {
           <p className="text-2xl">{characters.length}</p>
         </div>
         <div className="bg-green-100 p-4 rounded">
-          <h3 className="font-semibold">主题数量</h3>
+          <h3 className="font-semibold">主角类型数量</h3>
           <p className="text-2xl">{subjects.length}</p>
         </div>
         <div className="bg-yellow-100 p-4 rounded">
-          <h3 className="font-semibold">谓词数量</h3>
+          <h3 className="font-semibold">情节数量</h3>
           <p className="text-2xl">{predicates.length}</p>
         </div>
         <div className="bg-purple-100 p-4 rounded">
-          <h3 className="font-semibold">结果数量</h3>
+          <h3 className="font-semibold">结局数量</h3>
           <p className="text-2xl">{outcomes.length}</p>
         </div>
         <div className="bg-red-100 p-4 rounded">
@@ -186,7 +186,7 @@ export default function PlottoTestPage() {
         </div>
       </div>
 
-      {/* 随机选择的结果 */}
+      {/* 随机选择的结局 */}
       {(selectedCharacter || selectedSubject || selectedPredicate || selectedOutcome || selectedConflict) && (
         <div className="mb-6 p-4 bg-indigo-100 rounded">
           <h2 className="text-xl font-semibold mb-3">随机选择的故事元素</h2>
@@ -201,21 +201,21 @@ export default function PlottoTestPage() {
             )}
             {selectedSubject && (
               <div className="bg-white p-3 rounded border">
-                <h3 className="font-medium text-green-600">主题</h3>
+                <h3 className="font-medium text-green-600">主角类型</h3>
                 <p><strong>编号:</strong> #{selectedSubject.number}</p>
                 <p><strong>描述:</strong> {selectedSubject.description}</p>
               </div>
             )}
             {selectedPredicate && (
               <div className="bg-white p-3 rounded border">
-                <h3 className="font-medium text-yellow-600">谓词</h3>
+                <h3 className="font-medium text-yellow-600">情节</h3>
                 <p><strong>编号:</strong> #{selectedPredicate.number}</p>
                 <p><strong>描述:</strong> {selectedPredicate.description}</p>
               </div>
             )}
             {selectedOutcome && (
               <div className="bg-white p-3 rounded border">
-                <h3 className="font-medium text-purple-600">结果</h3>
+                <h3 className="font-medium text-purple-600">结局</h3>
                 <p><strong>编号:</strong> #{selectedOutcome.number}</p>
                 <p><strong>描述:</strong> {selectedOutcome.description}</p>
               </div>
@@ -248,9 +248,9 @@ export default function PlottoTestPage() {
           </div>
         </div>
 
-        {/* 主题列表 */}
+        {/* 主角类型列表 */}
         <div className="bg-white p-4 rounded border">
-          <h2 className="text-xl font-semibold mb-3">主题列表</h2>
+          <h2 className="text-xl font-semibold mb-3">主角类型列表</h2>
           <div className="max-h-60 overflow-y-auto">
             {subjects.map((subject, index) => (
               <div key={index} className="mb-2 p-2 border-b">
@@ -260,9 +260,9 @@ export default function PlottoTestPage() {
           </div>
         </div>
 
-        {/* 谓词列表 */}
+        {/* 情节列表 */}
         <div className="bg-white p-4 rounded border">
-          <h2 className="text-xl font-semibold mb-3">谓词列表</h2>
+          <h2 className="text-xl font-semibold mb-3">情节列表</h2>
           <div className="max-h-60 overflow-y-auto">
             {predicates.slice(0, 10).map((predicate, index) => (
               <div key={index} className="mb-2 p-2 border-b">
@@ -270,7 +270,7 @@ export default function PlottoTestPage() {
               </div>
             ))}
             {predicates.length > 10 && (
-              <p className="text-sm text-gray-500">... 还有 {predicates.length - 10} 个谓词</p>
+              <p className="text-sm text-gray-500">... 还有 {predicates.length - 10} 个情节</p>
             )}
           </div>
         </div>

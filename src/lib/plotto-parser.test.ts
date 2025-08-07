@@ -17,9 +17,9 @@ const data = parser.getParsedData();
 // 输出一些基本信息来验证解析是否成功
 console.log('解析完成！');
 console.log('角色数量:', data.characters.length);
-console.log('主题数量:', data.subjects.length);
-console.log('谓词数量:', data.predicates.length);
-console.log('结果数量:', data.outcomes.length);
+console.log('主角类型数量:', data.subjects.length);
+console.log('情节数量:', data.predicates.length);
+console.log('结局数量:', data.outcomes.length);
 console.log('冲突数量:', data.conflicts.length);
 
 // 输出第一个角色的信息

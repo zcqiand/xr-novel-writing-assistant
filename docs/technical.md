@@ -5,9 +5,9 @@
 Plotto XML 文件包含以下主要元素：
 
 1. **characters（角色）**：定义故事中可能用到的各种角色，每个角色有 designation（标识符）和 sex（性别）属性。
-2. **subjects（主题）**：定义故事中人物的类型或状态，如"恋爱中的人"、"已婚人士"等。
-3. **predicates（谓词）**：描述情节的基本动作或状态，每个谓词关联多个冲突（conflicts）。
-4. **outcomes（结果）**：定义故事可能的结局或结果。
+2. **subjects（主角类型）**：定义故事中人物的类型或状态，如"恋爱中的人"、"已婚人士"等。
+3. **predicates（情节）**：描述情节的基本动作或状态，每个情节关联多个冲突（conflicts）。
+4. **outcomes（结局）**：定义故事可能的结局或结果。
 5. **conflicts（冲突）**：这是 Plotto 系统的核心，定义了具体的情节冲突，包含角色、情境和可能的发展方向。
 
 这些元素之间的关系：
@@ -26,15 +26,15 @@ interface Character {
 }
 ```
 
-### Subject（主题）
+### Subject（主角类型）
 ```typescript
 interface Subject {
-  number: number;       // 主题编号
-  description: string;  // 主题描述
+  number: number;       // 主角类型编号
+  description: string;  // 主角类型描述
 }
 ```
 
-### Predicate（谓词）
+### Predicate（情节）
 ```typescript
 interface ConflictLink {
   ref: string;          // 引用的冲突 ID
@@ -43,17 +43,17 @@ interface ConflictLink {
 }
 
 interface Predicate {
-  number: number;             // 谓词编号
-  description: string;        // 谓词描述
+  number: number;             // 情节编号
+  description: string;        // 情节描述
   conflictLinks: ConflictLink[]; // 关联的冲突链接
 }
 ```
 
-### Outcome（结果）
+### Outcome（结局）
 ```typescript
 interface Outcome {
-  number: number;       // 结果编号
-  description: string;  // 结果描述
+  number: number;       // 结局编号
+  description: string;  // 结局描述
 }
 ```
 

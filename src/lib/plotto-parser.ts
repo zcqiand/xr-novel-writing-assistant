@@ -6,8 +6,8 @@ export interface Character {
 }
 
 export interface Subject {
-  number: number;       // 主题编号
-  description: string;  // 主题描述
+  number: number;       // 主角类型编号
+  description: string;  // 主角类型描述
 }
 
 export interface ConflictLink {
@@ -19,14 +19,14 @@ export interface ConflictLink {
 }
 
 export interface Predicate {
-  number: number;             // 谓词编号
-  description: string;        // 谓词描述
+  number: number;             // 情节编号
+  description: string;        // 情节描述
   conflictLinks: ConflictLink[]; // 关联的冲突链接
 }
 
 export interface Outcome {
-  number: number;       // 结果编号
-  description: string;  // 结果描述
+  number: number;       // 结局编号
+  description: string;  // 结局描述
 }
 
 export interface CharacterLink {
@@ -133,7 +133,7 @@ export class PlottoParser {
   }
 
   /**
-   * 解析主题部分
+   * 解析主角类型部分
    */
   private parseSubjects(xmlDoc: Document): Subject[] {
     const subjects: Subject[] = [];
@@ -159,7 +159,7 @@ export class PlottoParser {
   }
 
   /**
-   * 解析谓词部分
+   * 解析情节部分
    */
   private parsePredicates(xmlDoc: Document): Predicate[] {
     const predicates: Predicate[] = [];
@@ -194,7 +194,7 @@ export class PlottoParser {
   }
 
   /**
-   * 解析结果部分
+   * 解析结局部分
    */
   private parseOutcomes(xmlDoc: Document): Outcome[] {
     const outcomes: Outcome[] = [];

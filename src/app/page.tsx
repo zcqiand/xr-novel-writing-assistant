@@ -8,7 +8,7 @@ import { PlottoParser } from "@/lib/plotto-parser";
 import { StoryGenerator } from "@/lib/story-generator";
 import { PlottoData, CharacterLink } from "@/lib/plotto-parser";
 
-// 主题接口定义
+// 主角类型接口定义
 interface Theme {
   id: string;
   description: string;
@@ -110,14 +110,14 @@ export default function Home() {
     try {
       // 检查是否选择了必要的故事元素
       if (!selectedTheme && !selectedElements.predicates && !selectedElements.conflicts.length && !selectedElements.outcomes.length) {
-        alert("请至少选择一个故事元素（主题、情节、冲突或结局）");
+        alert("请至少选择一个故事元素（主角类型、情节、冲突或结局）");
         return;
       }
 
-      // 创建新的选择元素，包含主角名称和主题选择
+      // 创建新的选择元素，包含主角名称和主角类型选择
       const newSelectedElements = {
         ...selectedElements,
-        // 如果选择了主题，更新subjects数组
+        // 如果选择了主角类型，更新subjects数组
         subjects: selectedTheme ? [selectedTheme.id] : selectedElements.subjects,
         // 将 predicates 转换为数组格式（兼容 StoryGenerator）
         predicates: selectedElements.predicates ? [selectedElements.predicates] : []
@@ -175,7 +175,7 @@ export default function Home() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            theme: themeDescription || '未指定主题',
+            theme: themeDescription || '未指定主角类型',
             plot: plotDescription || '未指定情节',
             conflict: conflictDescriptions || '未指定冲突',
             outcome: outcomeDescription || '未指定结局',

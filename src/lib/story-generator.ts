@@ -6,8 +6,8 @@ export interface Character {
 }
 
 export interface Subject {
-  number: number;       // 主题编号
-  description: string;  // 主题描述
+  number: number;       // 主角类型编号
+  description: string;  // 主角类型描述
 }
 
 export interface ConflictLink {
@@ -19,14 +19,14 @@ export interface ConflictLink {
 }
 
 export interface Predicate {
-  number: number;             // 谓词编号
-  description: string;        // 谓词描述
+  number: number;             // 情节编号
+  description: string;        // 情节描述
   conflictLinks: ConflictLink[]; // 关联的冲突链接
 }
 
 export interface Outcome {
-  number: number;       // 结果编号
-  description: string;  // 结果描述
+  number: number;       // 结局编号
+  description: string;  // 结局描述
 }
 
 export interface CharacterLink {
@@ -114,12 +114,12 @@ export class StoryGenerator {
       ? [this.plottoData.characters[Math.floor(Math.random() * this.plottoData.characters.length)].designation]
       : [];
 
-    // 随机选择一个主题
+    // 随机选择一个主角类型
     const randomSubject = this.plottoData.subjects.length > 0
       ? [this.plottoData.subjects[Math.floor(Math.random() * this.plottoData.subjects.length)].number.toString()]
       : [];
 
-    // 随机选择一个谓词
+    // 随机选择一个情节
     const randomPredicate = this.plottoData.predicates.length > 0
       ? [this.plottoData.predicates[Math.floor(Math.random() * this.plottoData.predicates.length)].number.toString()]
       : [];
@@ -129,7 +129,7 @@ export class StoryGenerator {
       ? [this.plottoData.conflicts[Math.floor(Math.random() * this.plottoData.conflicts.length)].id]
       : [];
 
-    // 随机选择一个结果
+    // 随机选择一个结局
     const randomOutcome = this.plottoData.outcomes.length > 0
       ? [this.plottoData.outcomes[Math.floor(Math.random() * this.plottoData.outcomes.length)].number.toString()]
       : [];
@@ -167,18 +167,18 @@ export class StoryGenerator {
       story += "\n";
     }
 
-    // 添加主题信息
+    // 添加主角类型信息
     if (selectedSubjects.length > 0) {
-      story += "故事主题：\n";
+      story += "主角类型：\n";
       selectedSubjects.forEach(subject => {
         story += `- ${subject.description}\n`;
       });
       story += "\n";
     }
 
-    // 添加谓词信息
+    // 添加情节信息
     if (selectedPredicates.length > 0) {
-      story += "情节发展：\n";
+      story += "情节：\n";
       selectedPredicates.forEach(predicate => {
         story += `- ${predicate.description}\n`;
       });
@@ -209,7 +209,7 @@ export class StoryGenerator {
 
     // 如果有冲突，尝试添加前置冲突和后续冲突
     if (selectedConflicts.length > 0) {
-      story += "情节发展：\n";
+      story += "情节：\n";
       selectedConflicts.forEach(conflict => {
         // 添加前置冲突信息
         if (conflict.leadUps && conflict.leadUps.length > 0) {

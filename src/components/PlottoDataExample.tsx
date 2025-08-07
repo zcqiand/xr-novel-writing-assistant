@@ -38,8 +38,8 @@ export default function PlottoDataExample() {
     setError(null);
     try {
       const results = await plottoClient.search(query);
-      console.log('搜索结果:', results);
-      // 这里可以处理搜索结果，比如显示在界面上
+      console.log('搜索结局:', results);
+      // 这里可以处理搜索结局，比如显示在界面上
     } catch (err) {
       setError(err instanceof Error ? err.message : '搜索失败');
     } finally {
@@ -56,9 +56,9 @@ export default function PlottoDataExample() {
       const specificCharacter = await plottoClient.getCharacter('A');
       console.log('角色A:', specificCharacter);
 
-      // 获取特定主题
+      // 获取特定主角类型
       const specificSubject = await plottoClient.getSubject(1);
-      console.log('主题1:', specificSubject);
+      console.log('主角类型1:', specificSubject);
 
       // 获取特定冲突
       const specificConflict = await plottoClient.getConflict('1a');
@@ -125,10 +125,10 @@ export default function PlottoDataExample() {
             </div>
           )}
 
-          {/* 主题卡片 */}
+          {/* 主角类型卡片 */}
           {subject && (
             <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-              <h3 className="text-lg font-semibold text-green-800 mb-2">主题</h3>
+              <h3 className="text-lg font-semibold text-green-800 mb-2">主角类型</h3>
               <div className="space-y-2">
                 <p><span className="font-medium">编号:</span> #{subject.number}</p>
                 <p><span className="font-medium">描述:</span> {subject.description}</p>
@@ -136,10 +136,10 @@ export default function PlottoDataExample() {
             </div>
           )}
 
-          {/* 谓词卡片 */}
+          {/* 情节卡片 */}
           {predicate && (
             <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-              <h3 className="text-lg font-semibold text-yellow-800 mb-2">谓词</h3>
+              <h3 className="text-lg font-semibold text-yellow-800 mb-2">情节</h3>
               <div className="space-y-2">
                 <p><span className="font-medium">编号:</span> #{predicate.number}</p>
                 <p><span className="font-medium">描述:</span> {predicate.description}</p>
@@ -148,10 +148,10 @@ export default function PlottoDataExample() {
             </div>
           )}
 
-          {/* 结果卡片 */}
+          {/* 结局卡片 */}
           {outcome && (
             <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-              <h3 className="text-lg font-semibold text-purple-800 mb-2">结果</h3>
+              <h3 className="text-lg font-semibold text-purple-800 mb-2">结局</h3>
               <div className="space-y-2">
                 <p><span className="font-medium">编号:</span> #{outcome.number}</p>
                 <p><span className="font-medium">描述:</span> {outcome.description}</p>
@@ -211,7 +211,7 @@ const conflicts = await plottoClient.getConflicts();`}
               {`// 获取特定角色
 const character = await plottoClient.getCharacter('A');
 
-// 获取特定主题
+// 获取特定主角类型
 const subject = await plottoClient.getSubject(1);
 
 // 获取特定冲突

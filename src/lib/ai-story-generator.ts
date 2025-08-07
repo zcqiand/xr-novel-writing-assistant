@@ -63,7 +63,7 @@ export class AIStoryGenerator {
       console.log('时间:', new Date().toISOString());
       console.log('模型: z-ai/glm-4.5-air:free');
       console.log('请求参数:', JSON.stringify(request, null, 2));
-      console.log('系统提示:', `你是一个专业的小说写作助手，擅长根据用户提供的故事元素创作出生动有趣的故事。请根据用户提供的主题、情节、冲突和结局，创作一个完整的故事。故事应该：
+      console.log('系统提示:', `你是一个专业的小说写作助手，擅长根据用户提供的故事元素创作出生动有趣的故事。请根据用户提供的主角类型、情节、冲突和结局，创作一个完整的故事。故事应该：
 1. 情节连贯，逻辑清晰
 2. 人物形象鲜明
 3. 冲突设置合理
@@ -78,7 +78,7 @@ export class AIStoryGenerator {
         messages: [
           {
             role: "system",
-            content: `你是一个专业的小说写作助手，擅长根据用户提供的故事元素创作出生动有趣的故事。请根据用户提供的主题、情节、冲突和结局，创作一个完整的故事。故事应该：
+            content: `你是一个专业的小说写作助手，擅长根据用户提供的故事元素创作出生动有趣的故事。请根据用户提供的主角类型、情节、冲突和结局，创作一个完整的故事。故事应该：
 1. 情节连贯，逻辑清晰
 2. 人物形象鲜明
 3. 冲突设置合理
@@ -165,8 +165,8 @@ export class AIStoryGenerator {
 
     return `请根据以下故事元素创作一个${lengthDescription}的故事：
 
-故事主题：${theme}
-情节发展：${plot}
+主角类型：${theme}
+情节：${plot}
 主要冲突：${conflict}
 故事结局：${outcome}
 写作风格：${styleDescription}

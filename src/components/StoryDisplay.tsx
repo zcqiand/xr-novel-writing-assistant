@@ -28,10 +28,10 @@ export default function StoryDisplay({ story }: StoryDisplayProps) {
       if (line.includes('角色介绍：')) {
         currentSection = 'characters';
         sections.characters += line + '\n';
-      } else if (line.includes('故事主题：')) {
+      } else if (line.includes('主角类型：')) {
         currentSection = 'subjects';
         sections.subjects += line + '\n';
-      } else if (line.includes('情节发展：')) {
+      } else if (line.includes('情节：')) {
         currentSection = 'predicates';
         sections.predicates += line + '\n';
       } else if (line.includes('主要冲突：')) {
@@ -95,8 +95,8 @@ export default function StoryDisplay({ story }: StoryDisplayProps) {
 
       <div className="space-y-6">
         {renderSection('角色介绍', sections.characters, 'border-purple-500')}
-        {renderSection('故事主题', sections.subjects, 'border-blue-500')}
-        {renderSection('情节发展', sections.predicates, 'border-green-500')}
+        {renderSection('主角类型', sections.subjects, 'border-blue-500')}
+        {renderSection('情节', sections.predicates, 'border-green-500')}
         {renderSection('主要冲突', sections.conflicts, 'border-red-500')}
         {renderSection('故事结局', sections.outcomes, 'border-yellow-500')}
         {renderSection('前置冲突', sections.leadUps, 'border-indigo-500')}

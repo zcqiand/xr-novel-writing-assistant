@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     // 验证必需字段
     if (!theme || !plot || !conflict || !outcome) {
       return NextResponse.json(
-        { error: '缺少必需的故事元素：主题、情节、冲突、结局' },
+        { error: '缺少必需的故事元素：主角类型、情节、冲突、结局' },
         { status: 400 }
       );
     }

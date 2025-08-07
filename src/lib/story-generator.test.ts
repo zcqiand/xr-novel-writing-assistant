@@ -28,10 +28,10 @@ console.log('\n');
 console.log('=== 指定元素生成故事 ===');
 const selectedElements = {
   characters: ['A', 'B'], // 选择角色 A 和 B
-  subjects: ['1'], // 选择主题 1 (恋爱中的人)
-  predicates: ['1'], // 选择谓词 1
+  subjects: ['1'], // 选择主角类型 1 (恋爱中的人)
+  predicates: ['1'], // 选择情节 1
   conflicts: ['1a'], // 选择冲突 1a
-  outcomes: ['1'] // 选择结果 1
+  outcomes: ['1'] // 选择结局 1
 };
 
 storyGenerator.generateStory(selectedElements);

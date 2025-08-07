@@ -28,10 +28,10 @@ console.log('\n');
 console.log('=== 指定元素生成故事 ===');
 const selectedElements = {
   characters: ['A', 'B'], // 选择角色 A 和 B
-  subjects: ['1'], // 选择主题 1 (恋爱中的人)
-  predicates: ['2'], // 选择谓词 2 (在某些义务不允许爱情的时候坠入爱河)
+  subjects: ['1'], // 选择主角类型 1 (恋爱中的人)
+  predicates: ['2'], // 选择情节 2 (在某些义务不允许爱情的时候坠入爱河)
   conflicts: ['1a'], // 选择冲突 1a
-  outcomes: ['9'] // 选择结果 9 (在艰苦的事业中取得成功和幸福)
+  outcomes: ['9'] // 选择结局 9 (在艰苦的事业中取得成功和幸福)
 };
 
 storyGenerator.generateStory(selectedElements);
@@ -54,10 +54,10 @@ console.log(storyGenerator.getGeneratedStory());
 console.log('\n=== 选择带有前置冲突和后续冲突的冲突 ===');
 const selectedElements3 = {
   characters: ['A', 'B'], // 选择角色 A 和 B
-  subjects: ['1'], // 选择主题 1 (恋爱中的人)
-  predicates: ['2'], // 选择谓词 2
+  subjects: ['1'], // 选择主角类型 1 (恋爱中的人)
+  predicates: ['2'], // 选择情节 2
   conflicts: ['1a'], // 选择冲突 1a
-  outcomes: ['2'] // 选择结果 2 (从严重的纠缠中快乐地走出来)
+  outcomes: ['2'] // 选择结局 2 (从严重的纠缠中快乐地走出来)
 };
 
 storyGenerator.generateStory(selectedElements3);
