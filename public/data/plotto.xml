@@ -2,8 +2,8 @@
 <plotto>
   <characters>
     <character designation="A" sex="男性">男性主角</character>
-    <character designation="A-2" sex="男性">A 的男性朋友</character>
-    <character designation="A-3" sex="男性">A 的男性对手或敌人</character>
+    <character designation="A-2" sex="男性">男性主角的男性朋友</character>
+    <character designation="A-3" sex="男性">男性主角的男性对手或敌人</character>
     <character designation="A-4" sex="男性">男性陌生人</character>
     <character designation="A-5" sex="男性">男性罪犯</character>
     <character designation="A-6" sex="男性">男性执法人员</character>
@@ -11,46 +11,46 @@
     <character designation="A-8" sex="男性">男性效用符号</character>
     <character designation="A-9" sex="男性">男性上司，雇主，权威人士</character>
     <character designation="B" sex="女性">女性主角</character>
-    <character designation="B-2" sex="女性">B 的女性朋友</character>
-    <character designation="B-3" sex="女性">B 的女性对手或敌人</character>
+    <character designation="B-2" sex="女性">女性主角的女性朋友</character>
+    <character designation="B-3" sex="女性">女性主角的女性对手或敌人</character>
     <character designation="B-4" sex="女性">女性陌生人</character>
     <character designation="B-5" sex="女性">女性罪犯</character>
     <character designation="B-6" sex="女性">女性执法人员</character>
     <character designation="B-7" sex="女性">女性下级，员工</character>
     <character designation="B-8" sex="女性">女性效用符号</character>
     <character designation="B-9" sex="女性">女性上司，雇主。一位权威人士</character>
-    <character designation="FA" sex="男性">A 的父亲</character>
-    <character designation="MA" sex="女性">A 的母亲</character>
-    <character designation="BR-A" sex="男性">A 的兄弟</character>
-    <character designation="SR-A" sex="女性">A 的姐妹</character>
-    <character designation="SN-A" sex="男性">A 的儿子</character>
-    <character designation="DA" sex="女性">A 的女儿</character>
-    <character designation="UA" sex="男性">A 叔叔</character>
-    <character designation="AU-A" sex="女性">A 的姑姑</character>
-    <character designation="CN-A" sex="男性">A 的堂兄弟</character>
-    <character designation="NW-A" sex="男性">A 的侄子</character>
-    <character designation="NC-A" sex="女性">A 的侄女</character>
-    <character designation="GF-A" sex="男性">A 的祖父</character>
-    <character designation="GM-A" sex="女性">A 的祖母</character>
-    <character designation="SF-A" sex="男性">A 的继父</character>
-    <character designation="SM-A" sex="女性">A 的继母</character>
-    <character designation="GCH-A" sex="任何">A 的孙辈</character>
-    <character designation="FB" sex="男性">B 的父亲</character>
-    <character designation="MB" sex="女性">B 的母亲</character>
-    <character designation="BR-B" sex="男性">B 的兄弟</character>
-    <character designation="SR-B" sex="女性">B 的姐妹</character>
-    <character designation="SN-B" sex="男性">B 的儿子</character>
-    <character designation="DB" sex="女性">B 的女儿</character>
-    <character designation="UB" sex="男性">B 叔叔</character>
-    <character designation="AU-B" sex="女性">B 的姑姑</character>
-    <character designation="CN-B" sex="女性">B 的表妹</character>
-    <character designation="NW-B" sex="男性">B 的侄子</character>
-    <character designation="NC-B" sex="女性">B 的侄女</character>
-    <character designation="GF-B" sex="男性">B 的祖父</character>
-    <character designation="GM-B" sex="女性">B 的祖母</character>
-    <character designation="SF-B" sex="男性">B 的继父</character>
-    <character designation="SM-B" sex="女性">B 的继母</character>
-    <character designation="GCH-B" sex="任何">B 的孙辈</character>
+    <character designation="FA" sex="男性">男性主角的父亲</character>
+    <character designation="MA" sex="女性">男性主角的母亲</character>
+    <character designation="BR-A" sex="男性">男性主角的兄弟</character>
+    <character designation="SR-A" sex="女性">男性主角的姐妹</character>
+    <character designation="SN-A" sex="男性">男性主角的儿子</character>
+    <character designation="DA" sex="女性">男性主角的女儿</character>
+    <character designation="UA" sex="男性">男性主角的叔叔</character>
+    <character designation="AU-A" sex="女性">男性主角的姑姑</character>
+    <character designation="CN-A" sex="男性">男性主角的堂兄弟</character>
+    <character designation="NW-A" sex="男性">男性主角的侄子</character>
+    <character designation="NC-A" sex="女性">男性主角的侄女</character>
+    <character designation="GF-A" sex="男性">男性主角的祖父</character>
+    <character designation="GM-A" sex="女性">男性主角的祖母</character>
+    <character designation="SF-A" sex="男性">男性主角的继父</character>
+    <character designation="SM-A" sex="女性">男性主角的继母</character>
+    <character designation="GCH-A" sex="任何">男性主角的孙辈</character>
+    <character designation="FB" sex="男性">女性主角的父亲</character>
+    <character designation="MB" sex="女性">女性主角的母亲</character>
+    <character designation="BR-B" sex="男性">女性主角的兄弟</character>
+    <character designation="SR-B" sex="女性">女性主角的姐妹</character>
+    <character designation="SN-B" sex="男性">女性主角的儿子</character>
+    <character designation="DB" sex="女性">女性主角的女儿</character>
+    <character designation="UB" sex="男性">女性主角的叔叔</character>
+    <character designation="AU-B" sex="女性">女性主角的姑姑</character>
+    <character designation="CN-B" sex="女性">女性主角的表妹</character>
+    <character designation="NW-B" sex="男性">女性主角的侄子</character>
+    <character designation="NC-B" sex="女性">女性主角的侄女</character>
+    <character designation="GF-B" sex="男性">女性主角的祖父</character>
+    <character designation="GM-B" sex="女性">女性主角的祖母</character>
+    <character designation="SF-B" sex="男性">女性主角的继父</character>
+    <character designation="SM-B" sex="女性">女性主角的继母</character>
+    <character designation="GCH-B" sex="任何">女性主角的孙辈</character>
     <character designation="CH" sex="任何">一个孩子</character>
     <character designation="AX" sex="男性">神秘的男性，或具有不寻常性格的人</character>
     <character designation="BX" sex="女性">神秘的女性，或具有不寻常性格的女性</character>
@@ -6361,7 +6361,7 @@
         </group>
         <group mode="choose">
           <conflict-link ref="585a" category="婚姻生活" subcategory="婚姻">
-            <transform from="A 的妻子" to="A 的爱人" />
+            <transform from="男性主角的妻子" to="男性主角的爱人" />
           </conflict-link>
         </group>
       </lead-ups>

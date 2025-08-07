@@ -230,20 +230,47 @@ export default function Home() {
 
   // 替换描述中的角色标识符为角色描述
   const replaceCharacterReferences = (description: string, characterLinks: CharacterLink[]): string => {
-    if (!characterLinks || characterLinks.length === 0) {
+    if (!plottoData?.characters || plottoData.characters.length === 0) {
       return description;
     }
 
     let result = description;
 
-    // 遍历所有角色链接
-    characterLinks.forEach(link => {
-      const character = plottoData?.characters.find(char => char.designation === link.ref);
-      if (character) {
-        // 用角色描述替换角色标识符
-        result = result.replace(new RegExp(`\\b${link.ref}\\b`, 'g'), character.description);
-      }
+    // 创建所有可用角色的映射，优先使用 characterLinks 中的角色
+    const characterMap = new Map<string, string>();
+
+    // 首先添加所有在 XML 中定义的角色
+    plottoData.characters.forEach(character => {
+      characterMap.set(character.designation, character.description);
     });
+
+    // 如果有 characterLinks，优先使用这些角色（可能包含动态转换的角色）
+    if (characterLinks && characterLinks.length > 0) {
+      characterLinks.forEach(link => {
+        if (link.ref) {
+          // 从 XML 角色定义中查找描述
+          const character = plottoData.characters.find(char => char.designation === link.ref);
+          if (character) {
+            characterMap.set(link.ref, character.description);
+          }
+        }
+      });
+    }
+
+    // 按长度倒序排序角色标识符，确保长的标识符优先匹配（如 A-2 在 A 之前匹配）
+    const sortedDesignations = Array.from(characterMap.keys()).sort((a, b) => b.length - a.length);
+
+    for (const designation of sortedDesignations) {
+      const characterDescription = characterMap.get(designation);
+      if (!designation || !characterDescription) continue;
+
+      // 转义正则表达式中的特殊字符
+      const escapedRef = designation.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regexPattern = `\\b${escapedRef}\\b`;
+
+      // 执行替换
+      result = result.replace(new RegExp(regexPattern, 'g'), characterDescription);
+    }
 
     return result;
   };
