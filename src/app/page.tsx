@@ -37,6 +37,30 @@ interface TransformedElement {
   name: string;
   description: string;
   details?: string;
+  leadUps?: Array<{
+    mode: string;
+    conflictLinks: Array<{
+      ref: string;
+      category: string;
+      subcategory: string;
+    }>;
+  }>;
+  carryOns?: Array<{
+    mode: string;
+    conflictLinks: Array<{
+      ref: string;
+      category: string;
+      subcategory: string;
+    }>;
+  }>;
+  includes?: Array<{
+    mode: string;
+    conflictLinks: Array<{
+      ref: string;
+      category: string;
+      subcategory: string;
+    }>;
+  }>;
 }
 
 // 选择的元素类型
@@ -317,6 +341,8 @@ export default function Home() {
           : "无详细描述",
         leadUps: conf.leadUps,
         carryOns: conf.carryOns
+        ,
+        includes: conf.includes
       })),
       outcomes: plottoData.outcomes.map(outcome => ({
         id: outcome.number.toString(),
