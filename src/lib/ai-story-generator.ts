@@ -1584,28 +1584,43 @@ async function assembleFullBook(
  * @returns Markdown格式的书籍内容
  */
 function generateBookMarkdown(fullBookContent: FullBookContent): string {
+  console.log('=== generateBookMarkdown 调试日志 ===');
+  console.log('时间:', new Date().toISOString());
+  console.log('书籍标题:', fullBookContent.title);
+  console.log('章节数量:', fullBookContent.chapters.length);
+
   let markdown = `# ${fullBookContent.title}\n\n`;
 
   for (const chapter of fullBookContent.chapters) {
+    console.log(`处理章节: ${chapter.title} (${chapter.chapterNumber})`);
+    console.log(`场景数量: ${chapter.scenes.length}`);
+
     markdown += `## ${chapter.title}\n\n`;
 
     for (const scene of chapter.scenes) {
-      markdown += `### ${scene.title}\n`;
+      console.log(`场景 ${scene.sceneNumber}: ${scene.title}`);
+      console.log(`连续性注释数量: ${scene.continuityNotes?.length || 0}`);
+      console.log(`连续性注释内容:`, scene.continuityNotes);
+
+      // 修复：移除场景标题 - 问题1解决
+      // markdown += `### ${scene.title}\n`;
       markdown += `${scene.fullContent}\n\n`;
 
-      // 添加连续性注释
-      if (scene.continuityNotes && scene.continuityNotes.length > 0) {
-        markdown += `[连续性注释]\n`;
-        for (const note of scene.continuityNotes) {
-          markdown += `- ${note}\n`;
-        }
-        markdown += '\n';
-      }
+      // 修复：移除连续性注释 - 问题2解决
+      // if (scene.continuityNotes && scene.continuityNotes.length > 0) {
+      //   console.log('⚠️ 添加连续性注释到完整书籍中');
+      //   markdown += `[连续性注释]\n`;
+      //   for (const note of scene.continuityNotes) {
+      //     markdown += `- ${note}\n`;
+      //   }
+      //   markdown += '\n';
+      // }
     }
 
     markdown += '\n---\n\n';
   }
 
+  console.log('=== generateBookMarkdown 完成，已移除场景标题和连续性注释 ===');
   return markdown;
 }
 
