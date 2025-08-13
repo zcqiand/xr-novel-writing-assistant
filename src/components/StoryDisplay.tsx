@@ -9,6 +9,14 @@ export default function StoryDisplay({ story }: StoryDisplayProps) {
   const parseStory = (storyText: string) => {
     if (!storyText) return null;
 
+    // 尝试解析Markdown格式的书籍内容
+    if (storyText.startsWith('# ')) {
+      const lines = storyText.split('\n');
+      const title = lines[0].substring(2); // 移除 "# " 前缀
+      const content = lines.slice(1).join('\n');
+      return { title, content };
+    }
+
     const sections = {
       characters: '',
       subjects: '',
@@ -59,9 +67,9 @@ export default function StoryDisplay({ story }: StoryDisplayProps) {
     return sections;
   };
 
-  const sections = parseStory(story);
+  const parsedContent = parseStory(story);
 
-  if (!sections) {
+  if (!parsedContent) {
     return null;
   }
 
@@ -87,6 +95,20 @@ export default function StoryDisplay({ story }: StoryDisplayProps) {
     );
   };
 
+  // 如果是书籍内容，显示标题和内容
+  if ('title' in parsedContent && 'content' in parsedContent) {
+    return (
+      <div className="bg-white rounded-xl shadow-lg p-6 mb-12">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-purple-200">
+          {parsedContent.title}
+        </h2>
+        <div className="whitespace-pre-wrap text-gray-700">
+          {parsedContent.content}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 mb-12">
       <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-purple-200">
@@ -94,18 +116,18 @@ export default function StoryDisplay({ story }: StoryDisplayProps) {
       </h2>
 
       <div className="space-y-6">
-        {renderSection('角色介绍', sections.characters, 'border-purple-500')}
-        {renderSection('主角类型', sections.subjects, 'border-blue-500')}
-        {renderSection('情节', sections.predicates, 'border-green-500')}
-        {renderSection('主要冲突', sections.conflicts, 'border-red-500')}
-        {renderSection('故事结局', sections.outcomes, 'border-yellow-500')}
-        {renderSection('前置冲突', sections.leadUps, 'border-indigo-500')}
-        {renderSection('后续冲突', sections.carryOns, 'border-pink-500')}
-        {renderSection('包含冲突', sections.includes, 'border-teal-500')}
+        {renderSection('角色介绍', parsedContent.characters, 'border-purple-500')}
+        {renderSection('主角类型', parsedContent.subjects, 'border-blue-500')}
+        {renderSection('情节', parsedContent.predicates, 'border-green-500')}
+        {renderSection('主要冲突', parsedContent.conflicts, 'border-red-500')}
+        {renderSection('故事结局', parsedContent.outcomes, 'border-yellow-500')}
+        {renderSection('前置冲突', parsedContent.leadUps, 'border-indigo-500')}
+        {renderSection('后续冲突', parsedContent.carryOns, 'border-pink-500')}
+        {renderSection('包含冲突', parsedContent.includes, 'border-teal-500')}
       </div>
 
-      {story && !sections.characters && !sections.subjects && !sections.predicates &&
-        !sections.conflicts && !sections.outcomes && (
+      {story && !parsedContent.characters && !parsedContent.subjects && !parsedContent.predicates &&
+        !parsedContent.conflicts && !parsedContent.outcomes && (
           <div className="whitespace-pre-wrap text-gray-700">
             {story}
           </div>

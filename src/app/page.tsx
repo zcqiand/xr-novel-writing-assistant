@@ -85,6 +85,8 @@ export default function Home() {
   const [generatedStory, setGeneratedStory] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null);
+  const [generationStage, setGenerationStage] = useState<'idle' | 'outline' | 'scenes' | 'paragraphs' | 'full' | 'assemble'>('idle');
+  const [progress, setProgress] = useState(0);
 
   // 初始化数据
   useEffect(() => {
@@ -129,36 +131,89 @@ export default function Home() {
       return;
     }
 
+    // 检查是否选择了必要的故事元素
+    if (!selectedTheme && !selectedElements.predicates && !selectedElements.conflicts.length && !selectedElements.outcomes.length) {
+      alert("请至少选择一个故事元素（主角类型、情节、冲突或结局）");
+      return;
+    }
+
     setIsGenerating(true);
+    setGenerationStage('outline');
+    setProgress(25);
 
     try {
-      // 检查是否选择了必要的故事元素
-      if (!selectedTheme && !selectedElements.predicates && !selectedElements.conflicts.length && !selectedElements.outcomes.length) {
-        alert("请至少选择一个故事元素（主角类型、情节、冲突或结局）");
-        return;
-      }
+      // 第一回合：生成大纲
+      const outlineRes = await fetch('/api/generate-story?stage=outline', { method: 'POST' });
+      const outlineData = await outlineRes.json();
 
-      // 创建新的选择元素，包含主角名称和主角类型选择
-      const newSelectedElements = {
-        ...selectedElements,
-        // 如果选择了主角类型，更新subjects数组
-        subjects: selectedTheme ? [selectedTheme.id] : selectedElements.subjects,
-        // 将 predicates 转换为数组格式（兼容 StoryGenerator）
-        predicates: selectedElements.predicates ? [selectedElements.predicates] : []
-      };
+      setGenerationStage('scenes');
+      setProgress(50);
 
-      // 首先尝试使用AI生成故事
-      const aiStory = await generateAIStory();
-      if (aiStory) {
-        setGeneratedStory(aiStory);
-      } else {
-        // 如果AI生成失败，回退到传统方式
-        storyGenerator.generateStory(newSelectedElements);
-        const story = storyGenerator.getGeneratedStory();
-        setGeneratedStory(story);
-      }
+      // 第二回合：生成场景
+      const scenesRes = await fetch('/api/generate-story?stage=scenes', {
+        method: 'POST',
+        body: JSON.stringify({ outline: outlineData }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const scenesData = await scenesRes.json();
+
+      setGenerationStage('paragraphs');
+      setProgress(75);
+
+      // 第三回合：生成段落 - 修复数据结构
+      const paragraphsRes = await fetch('/api/generate-story?stage=paragraphs', {
+        method: 'POST',
+        body: JSON.stringify({
+          outline: outlineData,
+          scenes: {
+            chapter: scenesData[0]?.chapter || 1,
+            scenes: scenesData[0]?.scenes || []
+          }
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const paragraphsData = await paragraphsRes.json();
+
+      setGenerationStage('full');
+      setProgress(90);
+
+      // 第四回合：生成完整内容 - 修复数据结构
+      const fullRes = await fetch('/api/generate-story?stage=full', {
+        method: 'POST',
+        body: JSON.stringify({
+          outline: outlineData,
+          scenes: {
+            chapter: scenesData[0]?.chapter || 1,
+            scenes: scenesData[0]?.scenes || []
+          },
+          paragraphs: paragraphsData
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const fullContent = await fullRes.text();
+
+      setGenerationStage('assemble');
+      setProgress(95);
+
+      // 第五回合：组装完整书籍
+      // 首先保存大纲文件到data目录
+      const safeTitle = (outlineData.title || '未命名故事').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
+      const outlineFilePath = `data/${safeTitle}-story-outline.json`;
+
+      const assembleRes = await fetch('/api/generate-story?stage=assemble', {
+        method: 'POST',
+        body: JSON.stringify({ outlineFilePath }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const assembledBook = await assembleRes.text();
+
+      setGenerationStage('idle');
+      setProgress(100);
+      setGeneratedStory(assembledBook);
     } catch (error) {
-      console.error("生成故事时出错:", error);
+      setGenerationStage('idle');
+      setProgress(0);
+      console.error("生成失败:", error);
       alert("生成故事时出错，请查看控制台了解详情。");
     } finally {
       setIsGenerating(false);
@@ -399,6 +454,20 @@ export default function Home() {
                 disabled={isGenerating}
               />
             </div>
+
+            {/* 进度指示器 */}
+            {generationStage !== 'idle' && (
+              <div className="progress-container mb-8">
+                <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+                <div className="progress-label">
+                  {generationStage === 'outline' && "生成大纲中..."}
+                  {generationStage === 'scenes' && "生成场景中..."}
+                  {generationStage === 'paragraphs' && "生成段落中..."}
+                  {generationStage === 'full' && "生成完整内容中..."}
+                  {generationStage === 'assemble' && "组装完整书籍中..."}
+                </div>
+              </div>
+            )}
 
             {generatedStory && (
               <StoryDisplay story={generatedStory} />

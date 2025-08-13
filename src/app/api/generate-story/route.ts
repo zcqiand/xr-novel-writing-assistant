@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AIStoryGenerator, AIStoryRequest } from '@/lib/ai-story-generator';
-// TODO: 验证 Models 导入是否需要使用
-// import { Models } from 'openai/resources';
+import { AIStoryGenerator, AIStoryRequest, StoryOutline, ChapterScenes, SceneParagraphs, FullSceneContent } from '@/lib/ai-story-generator';
+import { generateStoryOutline, generateChapterScenes, generateSceneParagraphs, generateFullSceneContent, assembleFullBook, generateBookMarkdown } from '@/lib/ai-story-generator';
 
 // 环境变量配置
 const config = {
@@ -17,58 +16,183 @@ const config = {
  * 生成故事的API端点
  */
 export async function POST(request: NextRequest) {
+  const { stage } = Object.fromEntries(request.nextUrl.searchParams);
+
   try {
-    // 检查API密钥
-    if (!config.apiKey) {
-      return NextResponse.json(
-        { error: '服务器配置错误：缺少API密钥' },
-        { status: 500 }
-      );
+    switch (stage) {
+      case 'outline':
+        const outline = await generateStoryOutline();
+        return NextResponse.json(outline);
+
+      case 'scenes':
+        const scenesBody = await request.json();
+        const scenes = await generateChapterScenes(scenesBody.outline);
+        return NextResponse.json(scenes);
+
+      case 'paragraphs':
+        const paragraphsBody = await request.json();
+        console.log('=== paragraphs API 调用调试 ===');
+        console.log('时间:', new Date().toISOString());
+        console.log('请求体完整结构:', JSON.stringify(paragraphsBody, null, 2));
+        console.log('outline 存在:', !!paragraphsBody.outline);
+        console.log('outline 类型:', typeof paragraphsBody.outline);
+        console.log('scenes 存在:', !!paragraphsBody.scenes);
+        console.log('scenes 类型:', typeof paragraphsBody.scenes);
+        if (paragraphsBody.scenes) {
+          console.log('scenes.scenes 存在:', !!paragraphsBody.scenes.scenes);
+          console.log('scenes.scenes 类型:', typeof paragraphsBody.scenes.scenes);
+          if (paragraphsBody.scenes.scenes) {
+            console.log('scenes.scenes 长度:', paragraphsBody.scenes.scenes.length);
+            console.log('scenes.scenes[0] 示例:', paragraphsBody.scenes.scenes[0]);
+          }
+        }
+        console.log('================================');
+
+        // 检查必要参数是否存在
+        if (!paragraphsBody.outline) {
+          console.error('❌ paragraphs 验证失败: outline 参数缺失');
+          return NextResponse.json(
+            { error: "缺少必要参数: outline", details: "outline 参数是必需的" },
+            { status: 400 }
+          );
+        }
+        if (!paragraphsBody.scenes) {
+          console.error('❌ paragraphs 验证失败: scenes 参数缺失');
+          return NextResponse.json(
+            { error: "缺少必要参数: scenes", details: "scenes 参数是必需的" },
+            { status: 400 }
+          );
+        }
+        // 检查 scenes 的结构
+        if (!paragraphsBody.scenes.scenes) {
+          console.error('❌ paragraphs 验证失败: scenes.scenes 结构缺失');
+          console.log('scenes 结构:', JSON.stringify(paragraphsBody.scenes, null, 2));
+          return NextResponse.json(
+            { error: "scenes.scenes 不存在", details: "scenes 必须包含 scenes 数组" },
+            { status: 400 }
+          );
+        }
+        if (!Array.isArray(paragraphsBody.scenes.scenes)) {
+          console.error('❌ paragraphs 验证失败: scenes.scenes 不是数组');
+          return NextResponse.json(
+            { error: "scenes.scenes 不是数组", details: `实际类型: ${typeof paragraphsBody.scenes.scenes}` },
+            { status: 400 }
+          );
+        }
+        const paragraphs = await generateSceneParagraphs(paragraphsBody.outline, paragraphsBody.scenes);
+        return NextResponse.json(paragraphs);
+
+      case 'full':
+        const fullBody = await request.json();
+        console.log('=== full API 调用调试 ===');
+        console.log('时间:', new Date().toISOString());
+        console.log('请求体完整结构:', JSON.stringify(fullBody, null, 2));
+        console.log('outline 存在:', !!fullBody.outline);
+        console.log('outline 类型:', typeof fullBody.outline);
+        console.log('scenes 存在:', !!fullBody.scenes);
+        console.log('scenes 类型:', typeof fullBody.scenes);
+        console.log('paragraphs 存在:', !!fullBody.paragraphs);
+        console.log('paragraphs 类型:', typeof fullBody.paragraphs);
+        console.log('paragraphs 长度:', Array.isArray(fullBody.paragraphs) ? fullBody.paragraphs.length : 'N/A');
+
+        if (fullBody.scenes) {
+          console.log('scenes.scenes 存在:', !!fullBody.scenes.scenes);
+          console.log('scenes.scenes 类型:', typeof fullBody.scenes.scenes);
+          if (fullBody.scenes.scenes) {
+            console.log('scenes.scenes 长度:', fullBody.scenes.scenes.length);
+            console.log('scenes.scenes[0] 示例:', fullBody.scenes.scenes[0]);
+          }
+        }
+        if (fullBody.paragraphs && fullBody.paragraphs.length > 0) {
+          console.log('paragraphs[0] 示例:', fullBody.paragraphs[0]);
+        }
+        console.log('========================');
+
+        // 检查必要参数是否存在
+        if (!fullBody.outline) {
+          console.error('❌ full 验证失败: outline 参数缺失');
+          return NextResponse.json(
+            { error: "缺少必要参数: outline", details: "outline 参数是必需的" },
+            { status: 400 }
+          );
+        }
+        if (!fullBody.scenes) {
+          console.error('❌ full 验证失败: scenes 参数缺失');
+          return NextResponse.json(
+            { error: "缺少必要参数: scenes", details: "scenes 参数是必需的" },
+            { status: 400 }
+          );
+        }
+        if (!fullBody.paragraphs) {
+          console.error('❌ full 验证失败: paragraphs 参数缺失');
+          return NextResponse.json(
+            { error: "缺少必要参数: paragraphs", details: "paragraphs 参数是必需的" },
+            { status: 400 }
+          );
+        }
+        // 检查 scenes 的结构
+        if (!fullBody.scenes.scenes) {
+          console.error('❌ full 验证失败: scenes.scenes 结构缺失');
+          console.log('scenes 结构:', JSON.stringify(fullBody.scenes, null, 2));
+          return NextResponse.json(
+            { error: "scenes.scenes 不存在", details: "scenes 必须包含 scenes 数组" },
+            { status: 400 }
+          );
+        }
+        if (!Array.isArray(fullBody.scenes.scenes)) {
+          console.error('❌ full 验证失败: scenes.scenes 不是数组');
+          return NextResponse.json(
+            { error: "scenes.scenes 不是数组", details: `实际类型: ${typeof fullBody.scenes.scenes}` },
+            { status: 400 }
+          );
+        }
+        const fullContentArray = await generateFullSceneContent(
+          fullBody.outline,
+          fullBody.scenes,
+          fullBody.paragraphs
+        );
+        // 将数组转换为字符串
+        const fullContent = JSON.stringify(fullContentArray, null, 2);
+        return new NextResponse(fullContent, {
+          headers: { 'Content-Type': 'text/markdown' }
+        });
+
+      case 'assemble':
+        // 获取大纲文件路径
+        const { outlineFilePath } = await request.json();
+
+        if (!outlineFilePath) {
+          return NextResponse.json(
+            { error: "缺少必要参数: outlineFilePath", details: "outlineFilePath 参数是必需的" },
+            { status: 400 }
+          );
+        }
+
+        try {
+          // 组装完整书籍
+          const fullBook = await assembleFullBook(outlineFilePath);
+
+          // 返回完整书籍内容
+          return new NextResponse(generateBookMarkdown(fullBook), {
+            headers: { 'Content-Type': 'text/markdown' }
+          });
+        } catch (error) {
+          console.error('组装完整书籍失败:', error);
+          return NextResponse.json(
+            { error: `组装完整书籍失败: ${error instanceof Error ? error.message : '未知错误'}` },
+            { status: 500 }
+          );
+        }
+
+      default:
+        return NextResponse.json(
+          { error: "无效的生成阶段" },
+          { status: 400 }
+        );
     }
-
-    // 解析请求体
-    const body = await request.json();
-    const { theme, plot, conflict, outcome, style, length } = body;
-
-    // 验证必需字段
-    if (!theme || !plot || !conflict || !outcome) {
-      return NextResponse.json(
-        { error: '缺少必需的故事元素：主角类型、情节、冲突、结局' },
-        { status: 400 }
-      );
-    }
-
-    // 创建AI故事生成器
-    const aiGenerator = new AIStoryGenerator(config);
-
-    // 构建生成请求
-    const storyRequest: AIStoryRequest = {
-      theme,
-      plot,
-      conflict,
-      outcome,
-      style: style || 'narrative',
-      length: length || 'medium',
-    };
-
-    // 生成故事
-    const result = await aiGenerator.generateStory(storyRequest);
-
-    // 返回成功响应
-    return NextResponse.json({
-      success: true,
-      data: result,
-    });
-
   } catch (error) {
-    console.error('生成故事时出错:', error);
-
-    // 返回错误响应
     return NextResponse.json(
-      {
-        error: '生成故事失败',
-        message: error instanceof Error ? error.message : '未知错误'
-      },
+      { error: `生成失败: ${error instanceof Error ? error.message : '未知错误'}` },
       { status: 500 }
     );
   }

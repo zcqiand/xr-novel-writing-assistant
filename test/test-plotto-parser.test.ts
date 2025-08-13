@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { PlottoParser } from './plotto-parser';
+import { PlottoParser } from '../src/lib/plotto-parser';
 
 // 读取 XML 文件
 const xmlFilePath = './docs/literature/plotto-simple.xml';
