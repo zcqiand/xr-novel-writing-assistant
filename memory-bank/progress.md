@@ -35,3 +35,5 @@ This file tracks the project's progress using a task list format.
 2025-08-14 15:26:32 - 完成冲突处理逻辑和UI组件的全部修改：成功修改了story-generator.ts中的冲突处理逻辑，使其符合用户需求"已选择冲突，则不出现冲突类别的冲突，只出现前置冲突，继续冲突，包含冲突"。同时修改了UnifiedSelector.tsx组件，确保当conflictType为空时不显示冲突项。所有修改都经过测试验证，功能正常工作。
 
 2025-08-14 15:50:00 - 完成UnifiedSelector.tsx中getRelatedConflicts函数的修改：成功将函数逻辑改为只获取最后一个冲突的前置冲突、后续冲突和包含冲突。通过了TypeScript类型检查和ESLint验证，代码质量良好。修改已记录到activeContext.md和decisionLog.md中。
+
+2025-08-14 16:04:36 - 完成前置冲突插入功能实现：成功修改了page.tsx中的handleSelectElement函数，实现了当在待选冲突中选择前置冲突时，将其插入到已选冲突中最后冲突前面的逻辑。通过了TypeScript类型检查，代码质量良好。功能已记录到activeContext.md和decisionLog.md中。

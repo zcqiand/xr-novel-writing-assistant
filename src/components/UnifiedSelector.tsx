@@ -254,6 +254,7 @@ export default function UnifiedSelector({
 
   // 处理冲突选择
   const handleConflictSelect = (conflictId: string) => {
+    // 所有冲突选择逻辑现在都在父组件中处理
     if (onConflictSelect) {
       onConflictSelect(conflictId);
     }
@@ -518,7 +519,7 @@ export default function UnifiedSelector({
                     const conflict = conflicts.find(c => c.id === id);
                     return (
                       <span key={id} className="inline-flex items-center bg-red-100 text-red-800 text-xs px-2 py-1 rounded mr-1 mb-1">
-                        {conflict?.details || id}
+                        {id} - {conflict?.details}
                         {onConflictRemove && (
                           <button
                             onClick={(e) => {

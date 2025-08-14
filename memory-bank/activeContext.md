@@ -51,3 +51,5 @@ This file tracks the project's current status, including recent changes, current
 2025-08-14 15:26:12 - 完成UnifiedSelector组件修改：成功修改src/components/UnifiedSelector.tsx中的冲突显示逻辑，使用三元运算符确保当conflictType为空时不显示冲突项。优化了用户界面，只显示有明确冲突类型的冲突（前置、继续、包含）。
 
 2025-08-14 15:49:00 - 修改UnifiedSelector.tsx中的getRelatedConflicts函数：将函数改为只获取最后一个冲突的前置冲突、后续冲突和包含冲突，而不是处理所有选择的冲突。更新了函数注释和内部逻辑，添加了更详细的日志记录。
+
+2025-08-14 16:04:00 - 实现前置冲突插入功能：成功修改page.tsx中的handleSelectElement函数，当在待选冲突中选择前置冲突时，将其插入到已选冲突中最后冲突的前面。修改包括添加前置冲突检测逻辑和特殊的数组插入处理。

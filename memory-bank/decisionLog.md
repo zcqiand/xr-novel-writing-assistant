@@ -43,3 +43,5 @@ This file records architectural and implementation decisions using a list format
 2025-08-14 15:25:41 - 决策修改UnifiedSelector组件：根据用户反馈，修改了src/components/UnifiedSelector.tsx中的冲突显示逻辑，当conflictType为空时使用三元运算符返回null，避免显示没有冲突类型的冲突项。确保只有有明确冲突类型（前置、继续、包含）的冲突才会显示在UI中。
 
 2025-08-14 15:49:00 - 决策修改getRelatedConflicts函数逻辑：根据用户需求，将UnifiedSelector.tsx中的getRelatedConflicts函数修改为只处理最后一个冲突的相关冲突（前置、后续、包含），而不是处理所有选择的冲突。这样可以确保用户界面只显示最新选择冲突的相关冲突，提供更直观的用户体验。
+
+2025-08-14 16:04:15 - 决策实现前置冲突插入功能：根据用户需求"如果在待选冲突中选了前置冲突，则把前置冲突插入到已选冲突中最后冲突的前面"，修改了page.tsx中的handleSelectElement函数。实现方案包括：1) 检测新选择的冲突是否是最后一个已选冲突的前置冲突；2) 如果是前置冲突，则将其插入到最后一个冲突的前面而不是数组末尾；3) 简化了UnifiedSelector组件中的冲突选择逻辑。这个修改确保了用户在选择前置冲突时能够获得更直观的冲突序列体验。

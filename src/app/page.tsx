@@ -116,6 +116,36 @@ export default function Home() {
       const categoryElements = prev[category] as string[];
       const isSelected = categoryElements.includes(elementId);
 
+      // 如果是冲突类别且是新增选择，需要检查是否是前置冲突
+      if (category === 'conflicts' && !isSelected) {
+        // 查找当前选中的最后一个冲突
+        const lastConflictId = categoryElements[categoryElements.length - 1];
+
+        // 如果有已选冲突，检查新选择的冲突是否是最后一个冲突的前置冲突
+        if (lastConflictId && plottoData) {
+          const lastConflict = plottoData.conflicts.find(c => c.id === lastConflictId);
+          const newConflict = plottoData.conflicts.find(c => c.id === elementId);
+
+          // 检查新冲突是否是最后一个冲突的前置冲突
+          const isLeadUpConflict = lastConflict?.leadUps?.some(group =>
+            group.conflictLinks.some(link => link.ref === elementId)
+          );
+
+          if (isLeadUpConflict) {
+            // 如果是前置冲突，插入到最后一个冲突的前面
+            const lastConflictIndex = categoryElements.length - 1;
+            return {
+              ...prev,
+              [category]: [
+                ...categoryElements.slice(0, lastConflictIndex),
+                elementId,
+                categoryElements[lastConflictIndex]
+              ]
+            };
+          }
+        }
+      }
+
       return {
         ...prev,
         [category]: isSelected
