@@ -45,3 +45,9 @@ This file tracks the project's current status, including recent changes, current
 2025-08-13 23:45:00 - 实现合并段落生成API：创建新的API端点 /api/generate-merged-paragraphs，支持POST和GET请求，生成开头段落和结尾段落合并的JSON格式返回
 
 2025-08-14 11:31:00 - 修复ESLint未使用变量警告：成功修复ai-story-generator.ts和story-generator.ts中的4个未使用变量警告，通过添加下划线前缀标记未使用的参数和函数
+
+2025-08-14 15:10:53 - 完成冲突处理逻辑修改：成功修改story-generator.ts中的冲突处理逻辑，使其符合"已选择冲突，则不出现冲突类别的冲突，只出现前置冲突，继续冲突，包含冲突"的需求。测试验证通过，功能正常工作。
+
+2025-08-14 15:26:12 - 完成UnifiedSelector组件修改：成功修改src/components/UnifiedSelector.tsx中的冲突显示逻辑，使用三元运算符确保当conflictType为空时不显示冲突项。优化了用户界面，只显示有明确冲突类型的冲突（前置、继续、包含）。
+
+2025-08-14 15:49:00 - 修改UnifiedSelector.tsx中的getRelatedConflicts函数：将函数改为只获取最后一个冲突的前置冲突、后续冲突和包含冲突，而不是处理所有选择的冲突。更新了函数注释和内部逻辑，添加了更详细的日志记录。

@@ -37,3 +37,9 @@ This file records architectural and implementation decisions using a list format
 2025-08-13 12:31:00 - 决策修复完整书籍生成问题：识别并解决两个关键问题（1）generateBookMarkdown函数包含不应出现在完整书籍中的场景标题和连续性注释（2）场景生成函数默认参数错误导致只生成第一个章节第一个场景。修复方案包括注释掉场景标题和连续性注释的生成代码，以及修改三个核心函数的默认参数从固定值1改为使用实际数据长度
 
 2025-08-13 23:45:00 - 决策创建合并段落生成API：创建新的API端点 /api/generate-merged-paragraphs，支持POST和GET两种请求方式，返回包含sceneNumber、title、openingParagraph、closingParagraph字段的JSON格式数据，使用现有的测试模式段落生成逻辑
+
+2025-08-14 15:10:30 - 决策修改冲突处理逻辑：根据用户需求"已选择冲突，则不出现冲突类别的冲突，只出现前置冲突，继续冲突，包含冲突"，修改了story-generator.ts中的buildStory方法，移除了主要冲突类别的显示，只显示相关的前置冲突、继续冲突和包含冲突。添加了hasRelatedConflicts标志来跟踪是否有相关冲突，并在没有相关冲突时显示提示信息。
+
+2025-08-14 15:25:41 - 决策修改UnifiedSelector组件：根据用户反馈，修改了src/components/UnifiedSelector.tsx中的冲突显示逻辑，当conflictType为空时使用三元运算符返回null，避免显示没有冲突类型的冲突项。确保只有有明确冲突类型（前置、继续、包含）的冲突才会显示在UI中。
+
+2025-08-14 15:49:00 - 决策修改getRelatedConflicts函数逻辑：根据用户需求，将UnifiedSelector.tsx中的getRelatedConflicts函数修改为只处理最后一个冲突的相关冲突（前置、后续、包含），而不是处理所有选择的冲突。这样可以确保用户界面只显示最新选择冲突的相关冲突，提供更直观的用户体验。

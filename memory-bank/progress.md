@@ -29,3 +29,9 @@ This file tracks the project's progress using a task list format.
 2025-08-13 04:24:00 - 完成章节标题生成问题修复：成功实现AI自动为每个章节生成吸引人标题的功能
 
 2025-08-13 23:45:00 - 完成合并段落生成API实现：创建新的API端点 /api/generate-merged-paragraphs，支持POST和GET请求，返回JSON格式的开头段落和结尾段落，包含完整的测试验证
+
+2025-08-14 15:11:11 - 完成冲突处理逻辑修改任务：成功修改story-generator.ts中的冲突处理逻辑，使其符合用户需求"已选择冲突，则不出现冲突类别的冲突，只出现前置冲突，继续冲突，包含冲突"。测试验证通过，功能正常工作。
+
+2025-08-14 15:26:32 - 完成冲突处理逻辑和UI组件的全部修改：成功修改了story-generator.ts中的冲突处理逻辑，使其符合用户需求"已选择冲突，则不出现冲突类别的冲突，只出现前置冲突，继续冲突，包含冲突"。同时修改了UnifiedSelector.tsx组件，确保当conflictType为空时不显示冲突项。所有修改都经过测试验证，功能正常工作。
+
+2025-08-14 15:50:00 - 完成UnifiedSelector.tsx中getRelatedConflicts函数的修改：成功将函数逻辑改为只获取最后一个冲突的前置冲突、后续冲突和包含冲突。通过了TypeScript类型检查和ESLint验证，代码质量良好。修改已记录到activeContext.md和decisionLog.md中。

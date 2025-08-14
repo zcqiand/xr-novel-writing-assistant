@@ -207,12 +207,15 @@ export class StoryGenerator {
       story += "\n";
     }
 
-    // 如果有冲突，尝试添加前置冲突和后续冲突
+    // 如果有冲突，添加前置冲突、继续冲突和包含冲突（不显示冲突类别本身）
     if (selectedConflicts.length > 0) {
       story += "情节发展：\n";
       selectedConflicts.forEach(conflict => {
+        let hasRelatedConflicts = false;
+
         // 添加前置冲突信息
         if (conflict.leadUps && conflict.leadUps.length > 0) {
+          hasRelatedConflicts = true;
           story += `在冲突 ${conflict.id} 发生之前：\n`;
           conflict.leadUps.forEach((group, groupIndex) => {
             story += `  组 ${groupIndex + 1} (${group.mode}):\n`;
@@ -228,8 +231,9 @@ export class StoryGenerator {
           });
         }
 
-        // 添加后续冲突信息
+        // 添加继续冲突信息
         if (conflict.carryOns && conflict.carryOns.length > 0) {
+          hasRelatedConflicts = true;
           story += `在冲突 ${conflict.id} 发生之后：\n`;
           conflict.carryOns.forEach((group, groupIndex) => {
             story += `  组 ${groupIndex + 1} (${group.mode}):\n`;
@@ -247,6 +251,7 @@ export class StoryGenerator {
 
         // 添加包含冲突信息
         if (conflict.includes && conflict.includes.length > 0) {
+          hasRelatedConflicts = true;
           story += `与冲突 ${conflict.id} 同时发生的事件：\n`;
           conflict.includes.forEach((group, groupIndex) => {
             story += `  组 ${groupIndex + 1} (${group.mode}):\n`;
@@ -260,6 +265,11 @@ export class StoryGenerator {
               }
             });
           });
+        }
+
+        // 如果没有相关冲突，添加说明
+        if (!hasRelatedConflicts) {
+          story += `冲突 ${conflict.id} 没有相关的前置冲突、继续冲突或包含冲突。\n`;
         }
       });
       story += "\n";

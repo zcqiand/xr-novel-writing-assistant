@@ -137,19 +137,23 @@ export default function UnifiedSelector({
     return shuffled.slice(0, count);
   };
 
-  // 获取前置冲突、后续冲突和包含冲突
+  // 获取前置冲突、后续冲突和包含冲突（只处理最后一个冲突）
   const getRelatedConflicts = React.useCallback((selectedConflictIds: string[]) => {
     const leadUpConflicts: Conflict[] = [];
     const carryOnConflicts: Conflict[] = [];
     const includeConflicts: Conflict[] = [];
 
-    selectedConflictIds.forEach(conflictId => {
-      const conflict = conflicts.find(c => c.id === conflictId);
-      if (conflict) {
+    // 只处理最后一个冲突
+    if (selectedConflictIds.length > 0) {
+      const lastConflictId = selectedConflictIds[selectedConflictIds.length - 1];
+      const lastConflict = conflicts.find(c => c.id === lastConflictId);
+
+      if (lastConflict) {
+        console.log(`🔍 [getRelatedConflicts] 处理最后一个冲突: ${lastConflict.id}`);
 
         // 获取前置冲突
-        if (conflict.leadUps && conflict.leadUps.length > 0) {
-          conflict.leadUps.forEach((group, _groupIndex) => {
+        if (lastConflict.leadUps && lastConflict.leadUps.length > 0) {
+          lastConflict.leadUps.forEach((group, _groupIndex) => {
             // TODO: 验证 groupIndex 参数是否需要使用
             console.log('🔍 [UnifiedSelector] leadUps groupIndex 未使用:', _groupIndex);
 
@@ -161,6 +165,7 @@ export default function UnifiedSelector({
 
                 if (!isAlreadySelected && !isAlreadyInLeadUps) {
                   leadUpConflicts.push(linkedConflict);
+                  console.log(`🔍 [getRelatedConflicts] 添加前置冲突: ${linkedConflict.id}`);
                 } else {
                   console.log(`🔍 [getRelatedConflicts] 跳过前置冲突: ${linkedConflict.id} (已选择=${isAlreadySelected}, 已在列表中=${!!isAlreadyInLeadUps})`);
                 }
@@ -172,8 +177,8 @@ export default function UnifiedSelector({
         }
 
         // 获取后续冲突
-        if (conflict.carryOns && conflict.carryOns.length > 0) {
-          conflict.carryOns.forEach((group, _groupIndex) => {
+        if (lastConflict.carryOns && lastConflict.carryOns.length > 0) {
+          lastConflict.carryOns.forEach((group, _groupIndex) => {
             // TODO: 验证 groupIndex 参数是否需要使用
             console.log('🔍 [UnifiedSelector] carryOns groupIndex 未使用:', _groupIndex);
 
@@ -185,6 +190,7 @@ export default function UnifiedSelector({
 
                 if (!isAlreadySelected && !isAlreadyInCarryOns) {
                   carryOnConflicts.push(linkedConflict);
+                  console.log(`🔍 [getRelatedConflicts] 添加后续冲突: ${linkedConflict.id}`);
                 } else {
                   console.log(`🔍 [getRelatedConflicts] 跳过后续冲突: ${linkedConflict.id} (已选择=${isAlreadySelected}, 已在列表中=${!!isAlreadyInCarryOns})`);
                 }
@@ -196,8 +202,8 @@ export default function UnifiedSelector({
         }
 
         // 获取包含冲突
-        if (conflict.includes && conflict.includes.length > 0) {
-          conflict.includes.forEach((group, _groupIndex) => {
+        if (lastConflict.includes && lastConflict.includes.length > 0) {
+          lastConflict.includes.forEach((group, _groupIndex) => {
             // TODO: 验证 groupIndex 参数是否需要使用
             console.log('🔍 [UnifiedSelector] includes groupIndex 未使用:', _groupIndex);
 
@@ -209,6 +215,7 @@ export default function UnifiedSelector({
 
                 if (!isAlreadySelected && !isAlreadyInIncludes) {
                   includeConflicts.push(linkedConflict);
+                  console.log(`🔍 [getRelatedConflicts] 添加包含冲突: ${linkedConflict.id}`);
                 } else {
                   console.log(`🔍 [getRelatedConflicts] 跳过包含冲突: ${linkedConflict.id} (已选择=${isAlreadySelected}, 已在列表中=${!!isAlreadyInIncludes})`);
                 }
@@ -219,9 +226,11 @@ export default function UnifiedSelector({
           });
         }
       } else {
-        console.log(`🔍 [getRelatedConflicts] 未找到冲突: ${conflictId}`);
+        console.log(`🔍 [getRelatedConflicts] 未找到最后一个冲突: ${lastConflictId}`);
       }
-    });
+    } else {
+      console.log('🔍 [getRelatedConflicts] 没有选择的冲突');
+    }
 
     // 限制每个列表最多3个冲突
     const limitedLeadUpConflicts = leadUpConflicts.length > 3
@@ -420,7 +429,7 @@ export default function UnifiedSelector({
             </h3>
             <div className="space-y-2">
               <p className="text-xs text-yellow-700 mb-2">
-                以下冲突可供选择（前置冲突将插入到前面，继续冲突和包含冲突将插入到后面）：
+                以下冲突可供选择：
               </p>
               {recommendedConflicts.map((conflict) => {
                 // 确定冲突类型
@@ -444,25 +453,27 @@ export default function UnifiedSelector({
                 }
 
                 return (
-                  <div
-                    key={conflict.id}
-                    className="flex items-center justify-between p-2 bg-white rounded border border-yellow-200 hover:border-yellow-400 cursor-pointer transition-colors"
-                    onClick={() => handleConflictSelect(conflict.id)}
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${conflictTypeClass} mr-2`}>
-                          {conflictType}冲突
-                        </span>
-                        <span className="text-sm font-medium text-gray-800">
-                          {conflict.id} - {conflict.details}
-                        </span>
+                  (conflictType.length > 0 || selectedConflicts.length == 0) ? (
+                    <div
+                      key={conflict.id}
+                      className="flex items-center justify-between p-2 bg-white rounded border border-yellow-200 hover:border-yellow-400 cursor-pointer transition-colors"
+                      onClick={() => handleConflictSelect(conflict.id)}
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${conflictTypeClass} mr-2`}>
+                            {conflictType}冲突
+                          </span>
+                          <span className="text-sm font-medium text-gray-800">
+                            {conflict.id} - {conflict.details}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-yellow-600 text-lg">
+                        ➕
                       </div>
                     </div>
-                    <div className="text-yellow-600 text-lg">
-                      ➕
-                    </div>
-                  </div>
+                  ) : null
                 );
               })}
             </div>
