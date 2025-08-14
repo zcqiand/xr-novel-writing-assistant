@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('获取Plotto数据时出错:', error);
+    console.error('获取Plotto数据失败:', error);
 
     // 返回错误响应
     return NextResponse.json(
@@ -235,7 +235,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('搜索Plotto数据时出错:', error);
+    console.error('搜索Plotto数据失败:', error);
 
     // 返回错误响应
     return NextResponse.json(

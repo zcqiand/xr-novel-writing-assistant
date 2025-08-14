@@ -281,8 +281,6 @@ export class StoryGenerator {
 
     // 替换角色链接
     characterLinks.forEach((link, _index) => {
-      // TODO: 验证 index 参数是否需要使用
-      console.log('🔍 [story-generator] characterLinks index 未使用:', _index);
       const character = this.plottoData.characters.find(c => c.designation === link.ref);
       if (character) {
         // 使用正则表达式替换角色链接

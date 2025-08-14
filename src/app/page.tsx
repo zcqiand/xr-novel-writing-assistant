@@ -142,8 +142,36 @@ export default function Home() {
     setProgress(25);
 
     try {
+      // 构建故事元素参数
+      const storyElements = {
+        theme: selectedTheme?.description || "未指定主题",
+        plot: selectedElements.predicates ?
+          transformedData.predicates.find(p => p.id === selectedElements.predicates)?.description || "未指定情节" :
+          "未指定情节",
+        conflict: selectedElements.conflicts.length > 0 ?
+          selectedElements.conflicts.map(id => {
+            const conflict = transformedData.conflicts.find(c => c.id === id);
+            return conflict?.details || id;
+          }).join('、') :
+          "未指定冲突",
+        outcome: selectedElements.outcomes.length > 0 ?
+          transformedData.outcomes.find(o => o.id === selectedElements.outcomes[0])?.description || "未指定结局" :
+          "未指定结局"
+      };
+
+      console.log('=== 发送到API的故事元素 ===');
+      console.log('故事主题:', storyElements.theme);
+      console.log('故事情节:', storyElements.plot);
+      console.log('主要冲突:', storyElements.conflict);
+      console.log('故事结局:', storyElements.outcome);
+      console.log('===========================');
+
       // 第一回合：生成大纲
-      const outlineRes = await fetch('/api/generate-story?stage=outline', { method: 'POST' });
+      const outlineRes = await fetch('/api/generate-story?stage=outline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(storyElements)
+      });
       const outlineData = await outlineRes.json();
 
       setGenerationStage('scenes');

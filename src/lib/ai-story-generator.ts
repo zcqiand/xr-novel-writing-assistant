@@ -119,14 +119,8 @@ export class AIStoryGenerator {
 
       const storyContent = completion.choices[0]?.message?.content || '';
 
-      // 记录AI模型返回的内容
-      console.log('=== AI模型返回内容 ===');
-      console.log('时间:', new Date().toISOString());
-      console.log('返回内容:', storyContent);
-      console.log('标题:', this.extractTitle(storyContent));
-      console.log('类型:', request.style || 'narrative');
-      console.log('字数:', this.countWords(storyContent));
-      console.log('=====================');
+      // 记录生成结果
+      console.log('AI故事生成完成，标题:', this.extractTitle(storyContent), '字数:', this.countWords(storyContent));
 
       // 解析响应并返回结构化数据
       return {
@@ -245,11 +239,8 @@ export class AIStoryGenerator {
 
       const responseContent = completion.choices[0]?.message?.content || '';
 
-      // 记录AI模型返回的内容
-      console.log('=== AI大纲生成返回内容 ===');
-      console.log('时间:', new Date().toISOString());
-      console.log('返回内容:', responseContent);
-      console.log('===========================');
+      // 记录生成结果
+      console.log('AI大纲生成完成');
 
       // 由于使用了结构化输出，直接返回解析后的JSON
       try {
@@ -366,12 +357,8 @@ export class AIStoryGenerator {
    */
   async testConnection(): Promise<boolean> {
     try {
-      console.log('=== AI连接测试日志 ===');
-      console.log('时间:', new Date().toISOString());
-      console.log('测试模型:', this.config.model);
-      console.log('测试请求: 请回复\'连接成功\'');
-      console.log('API密钥状态:', this.config.apiKey ? '已配置' : '未配置');
-      console.log('=====================');
+      // 记录连接测试信息
+      console.log('AI连接测试开始，模型:', this.config.model);
 
       // 检查是否为测试模式
       if (this.config.apiKey === 'test-api-key-for-debugging') {
@@ -412,10 +399,8 @@ export class AIStoryGenerator {
 
       const response = completion.choices[0]?.message?.content || '';
 
-      console.log('=== AI连接测试返回内容 ===');
-      console.log('时间:', new Date().toISOString());
-      console.log('返回内容:', response);
-      console.log('=========================');
+      // 记录连接测试结果
+      console.log('AI连接测试完成');
 
       // 由于使用了结构化输出，直接解析JSON
       try {
@@ -665,7 +650,7 @@ async function generateChapterScenes(
  * @param chapterNumber 章节号
  * @returns 生成的场景列表
  */
-async function generateScenesForChapter(chapterSummary: string, chapterNumber: number): Promise<Scene[]> {
+async function generateScenesForChapter(chapterSummary: string, _chapterNumber: number): Promise<Scene[]> {
   try {
     // 构建场景生成提示词
     const prompt = `请为以下章节生成3-5个具体的场景：
@@ -691,14 +676,8 @@ async function generateScenesForChapter(chapterSummary: string, chapterNumber: n
 4. 摘要要简洁明了，50-100字
 5. 确保场景之间的逻辑连贯性`;
 
-    // 记录发送给AI模型的提示
-    console.log('=== AI场景生成调用日志 ===');
-    console.log('时间:', new Date().toISOString());
-    console.log('模型:', process.env.OPENAI_MODEL);
-    console.log('章节号:', chapterNumber);
-    console.log('章节摘要:', chapterSummary);
-    console.log('用户提示:', prompt);
-    console.log('===========================');
+    // 记录关键提示词信息
+    console.log('AI场景生成提示词:', prompt);
 
     // 定义JSON schema
     const schema = {
@@ -760,11 +739,8 @@ async function generateScenesForChapter(chapterSummary: string, chapterNumber: n
 
     const responseContent = completion.choices[0]?.message?.content || '';
 
-    // 记录AI模型返回的内容
-    console.log('=== AI场景生成返回内容 ===');
-    console.log('时间:', new Date().toISOString());
-    console.log('返回内容:', responseContent);
-    console.log('===========================');
+    // 记录生成结果
+    console.log('AI场景生成完成');
 
     // 由于使用了结构化输出，直接返回解析后的JSON
     try {
@@ -832,63 +808,17 @@ async function generateSceneParagraphsBatch(
   sceneCount: number = scenes.scenes.length // 修复：生成所有场景而不是只生成1个
 ): Promise<SceneParagraphs[]> {
   try {
-    console.log('=== 开始生成场景段落 ===');
-    console.log('时间:', new Date().toISOString());
-    console.log(`起始场景号: ${startSceneNumber}`);
-    console.log(`生成场景数: ${sceneCount}`);
-    console.log('书籍标题:', outline.title);
-    console.log('传入的 scenes 参数:', JSON.stringify(scenes, null, 2));
-    console.log('scenes 参数类型:', typeof scenes);
-    console.log('scenes.chapter:', scenes.chapter);
-    console.log('scenes.scenes:', scenes.scenes);
-    console.log('scenes.scenes 类型:', typeof scenes.scenes);
-    console.log('scenes.scenes 长度:', scenes.scenes?.length || 'undefined');
-    console.log('=========================');
-
-    // 检查必要参数
-    console.log('=== 参数验证开始 ===');
-    console.log('scenes 存在:', !!scenes);
-    console.log('scenes 类型:', typeof scenes);
-
-    if (!scenes) {
-      console.error('❌ scenes 参数为 undefined');
-      throw new Error('scenes 参数为 undefined');
-    }
-
-    console.log('scenes.chapter 存在:', !!scenes.chapter);
-    console.log('scenes.chapter 值:', scenes.chapter);
-
-    if (!scenes.scenes) {
-      console.error('❌ scenes.scenes 为 undefined');
-      console.log('scenes 完整结构:', JSON.stringify(scenes, null, 2));
-      throw new Error('scenes.scenes 为 undefined');
-    }
-
-    console.log('scenes.scenes 类型:', typeof scenes.scenes);
-    console.log('scenes.scenes 是数组:', Array.isArray(scenes.scenes));
-
-    if (!Array.isArray(scenes.scenes)) {
-      console.error('❌ scenes.scenes 不是数组');
-      console.log('scenes.scenes 实际值:', scenes.scenes);
-      throw new Error('scenes.scenes 不是数组');
-    }
-
-    console.log('scenes.scenes 长度:', scenes.scenes.length);
-    console.log('参数验证通过');
-    console.log('=================');
+    // 记录关键参数信息
+    console.log('开始生成场景段落，起始场景号:', startSceneNumber, '生成场景数:', sceneCount, '书籍标题:', outline.title);
 
     const results: SceneParagraphs[] = [];
     const continuityData: ContinuityData[] = [];
 
     // 获取指定章节的场景
     const chapter = scenes.chapter;
-    console.log(`章节 ${chapter} 的 scenes 参数:`, JSON.stringify(scenes, null, 2));
     const sceneList = scenes.scenes;
-    console.log(`章节 ${chapter} 的 sceneList:`, JSON.stringify(sceneList, null, 2));
 
     // 生成指定场景的段落
-    console.log(`\n=== 开始生成 ${sceneCount} 个场景的段落 ===`);
-    console.log('场景列表:', sceneList.map(s => ({ number: s.sceneNumber, title: s.title })));
 
     for (let i = 0; i < sceneCount; i++) {
       const sceneNumber = startSceneNumber + i;
@@ -936,10 +866,10 @@ async function generateSceneParagraphsBatch(
       const safeTitle = (outline.title || '未命名故事').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
       const fileName = `data/${safeTitle}-chapter-${chapter}-scene-${sceneNumber}-paragraphs.json`;
       await fs.promises.writeFile(fileName, JSON.stringify(sceneParagraphs, null, 2), 'utf8');
-      console.log(`✅ 场景 ${sceneNumber} 段落已保存到 ${fileName}`);
+      console.log(`场景 ${sceneNumber} 段落已保存到 ${fileName}`);
     }
 
-    console.log('\n=== 场景段落生成完成 ===');
+    console.log('场景段落生成完成');
     return results;
 
   } catch (error) {
@@ -1000,14 +930,8 @@ async function generateSceneParagraphs(
   "closingParagraph": "结尾段落内容"
 }`;
 
-    // 记录发送给AI模型的提示
-    console.log('=== AI场景段落生成调用日志 ===');
-    console.log('时间:', new Date().toISOString());
-    console.log('模型:', process.env.OPENAI_MODEL);
-    console.log('场景标题:', sceneTitle);
-    console.log('场景摘要:', sceneSummary);
-    console.log('用户提示:', prompt);
-    console.log('===============================');
+    // 记录关键提示词信息
+    console.log('AI场景段落生成提示词:', prompt);
 
     // 定义JSON schema
     const schema = {
@@ -1065,11 +989,8 @@ async function generateSceneParagraphs(
 
     const responseContent = completion.choices[0]?.message?.content || '';
 
-    // 记录AI模型返回的内容
-    console.log('=== AI场景段落生成返回内容 ===');
-    console.log('时间:', new Date().toISOString());
-    console.log('返回内容:', responseContent);
-    console.log('===============================');
+    // 记录生成结果
+    console.log('AI场景段落生成完成');
 
     // 由于使用了结构化输出，直接解析JSON
     try {
@@ -1100,7 +1021,7 @@ async function generateSceneParagraphs(
  * @param continuityData 连续性数据
  * @returns 开头段落内容
  */
-async function generateOpeningParagraph(
+async function _generateOpeningParagraph(
   sceneTitle: string,
   sceneSummary: string,
   characters: Character[]
@@ -1143,7 +1064,7 @@ function generateTestOpeningParagraph(sceneTitle: string): string {
  * @param continuityData 连续性数据
  * @returns 结尾段落内容
  */
-async function generateClosingParagraph(
+async function _generateClosingParagraph(
   sceneTitle: string,
   sceneSummary: string,
   characters: Character[]
@@ -1173,14 +1094,8 @@ async function generateClosingParagraph(
 
 请直接返回段落内容，不要包含标题或其他格式。`;
 
-    // 记录发送给AI模型的提示
-    console.log('=== AI结尾段落生成调用日志 ===');
-    console.log('时间:', new Date().toISOString());
-    console.log('模型:', process.env.OPENAI_MODEL);
-    console.log('场景标题:', sceneTitle);
-    console.log('场景摘要:', sceneSummary);
-    console.log('用户提示:', prompt);
-    console.log('===============================');
+    // 记录关键提示词信息
+    console.log('AI结尾段落生成提示词:', prompt);
 
     // 对于结尾段落，我们不需要严格的JSON格式，直接返回文本
     // 调用OpenAI API
@@ -1216,11 +1131,8 @@ async function generateClosingParagraph(
 
     const responseContent = completion.choices[0]?.message?.content || '';
 
-    // 记录AI模型返回的内容
-    console.log('=== AI结尾段落生成返回内容 ===');
-    console.log('时间:', new Date().toISOString());
-    console.log('返回内容:', responseContent);
-    console.log('===============================');
+    // 记录生成结果
+    console.log('AI结尾段落生成完成');
 
     return responseContent.trim();
 
@@ -1355,21 +1267,14 @@ async function generateFullSceneContent(
   sceneCount: number = scenes.scenes.length // 修复：生成所有场景而不是只生成1个
 ): Promise<FullSceneContent[]> {
   try {
-    console.log('=== 开始生成完整场景内容 ===');
-    console.log('时间:', new Date().toISOString());
-    console.log(`起始场景号: ${startSceneNumber}`);
-    console.log(`生成场景数: ${sceneCount}`);
-    console.log('书籍标题:', outline.title);
-    console.log('传入的 scenes 参数:', scenes);
-    console.log('================================');
+    // 记录关键参数信息
+    console.log('开始生成完整场景内容，起始场景号:', startSceneNumber, '生成场景数:', sceneCount, '书籍标题:', outline.title);
 
     const results: FullSceneContent[] = [];
 
     // 获取指定章节的场景
     const chapter = scenes.chapter;
-    console.log(`章节 ${chapter} 的 scenes 参数:`, scenes);
     const sceneList = scenes.scenes;
-    console.log(`章节 ${chapter} 的 sceneList:`, sceneList);
 
     // 生成指定场景的完整内容
     for (let i = 0; i < sceneCount; i++) {
@@ -1385,8 +1290,7 @@ async function generateFullSceneContent(
         continue;
       }
 
-      console.log(`\n=== 生成场景 ${sceneNumber} 完整内容 ===`);
-      console.log(`场景标题: ${scene.title}`);
+      console.log(`生成场景 ${sceneNumber} 完整内容，标题: ${scene.title}`);
 
       // 获取该场景的段落信息
       const sceneParagraphs = paragraphs.find((p: {
@@ -1432,10 +1336,10 @@ async function generateFullSceneContent(
       const safeTitle = (outline.title || '未命名故事').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
       const fileName = `data/${safeTitle}-chapter-${chapter}-scene-${sceneNumber}-full.json`;
       await fs.promises.writeFile(fileName, JSON.stringify(fullSceneContent, null, 2), 'utf8');
-      console.log(`✅ 场景 ${sceneNumber} 完整内容已保存到 ${fileName}`);
+      console.log(`场景 ${sceneNumber} 完整内容已保存到 ${fileName}`);
     }
 
-    console.log('\n=== 完整场景内容生成完成 ===');
+    console.log('完整场景内容生成完成');
     return results;
 
   } catch (error) {
@@ -1488,16 +1392,8 @@ ${closingParagraph}
 
 请直接返回完整的场景内容，不要包含标题或其他格式。`;
 
-    // 记录发送给AI模型的提示
-    console.log('=== AI完整场景内容生成调用日志 ===');
-    console.log('时间:', new Date().toISOString());
-    console.log('模型:', process.env.OPENAI_MODEL);
-    console.log('场景标题:', sceneTitle);
-    console.log('场景摘要:', sceneSummary);
-    console.log('开头段落长度:', openingParagraph.length);
-    console.log('结尾段落长度:', closingParagraph.length);
-    console.log('用户提示长度:', prompt.length);
-    console.log('=====================================');
+    // 记录关键提示词信息
+    console.log('AI完整场景内容生成提示词:', prompt);
 
     // 对于完整场景内容，我们不需要严格的JSON格式，直接返回文本
     // 调用OpenAI API
@@ -1534,13 +1430,8 @@ ${closingParagraph}
 
     const responseContent = completion.choices[0]?.message?.content || '';
 
-    // 记录AI模型返回的内容
-    console.log('=== AI完整场景内容生成返回内容 ===');
-    console.log('时间:', new Date().toISOString());
-    console.log('返回内容长度:', responseContent.length);
-    console.log('开头段落匹配:', responseContent.startsWith(openingParagraph.trim()));
-    console.log('结尾段落匹配:', responseContent.endsWith(closingParagraph.trim()));
-    console.log('=====================================');
+    // 记录生成结果
+    console.log('AI完整场景内容生成完成');
 
     return responseContent.trim();
 
@@ -1592,13 +1483,8 @@ ${fullContent}
   ]
 }`;
 
-    // 记录发送给AI模型的提示
-    console.log('=== AI连续性注释生成调用日志 ===');
-    console.log('时间:', new Date().toISOString());
-    console.log('模型:', process.env.OPENAI_MODEL);
-    console.log('场景标题:', sceneTitle);
-    console.log('用户提示长度:', prompt.length);
-    console.log('=================================');
+    // 记录关键提示词信息
+    console.log('AI连续性注释生成提示词:', prompt);
 
     // 定义JSON schema
     const schema = {
@@ -1653,11 +1539,8 @@ ${fullContent}
 
     const responseContent = completion.choices[0]?.message?.content || '';
 
-    // 记录AI模型返回的内容
-    console.log('=== AI连续性注释生成返回内容 ===');
-    console.log('时间:', new Date().toISOString());
-    console.log('返回内容:', responseContent);
-    console.log('=================================');
+    // 记录生成结果
+    console.log('AI连续性注释生成完成');
 
     // 由于使用了结构化输出，直接返回解析后的JSON
     try {
@@ -1693,12 +1576,8 @@ async function assembleFullBook(
   fullScenesDirectory: string = 'data'
 ): Promise<FullBookContent> {
   try {
-    console.log('=== 开始组装完整书籍 ===');
-    console.log('时间:', new Date().toISOString());
-    console.log(`大纲文件路径: ${outlineFilePath}`);
-    console.log(`场景文件目录: ${scenesDirectory}`);
-    console.log(`完整场景文件目录: ${fullScenesDirectory}`);
-    console.log('================================');
+    // 记录关键参数信息
+    console.log('开始组装完整书籍，大纲文件路径:', outlineFilePath);
 
     // 读取并解析大纲JSON
     const outlineData = JSON.parse(fs.readFileSync(outlineFilePath, 'utf8'));
@@ -1710,7 +1589,6 @@ async function assembleFullBook(
 
     // 遍历所有章节
     for (const chapter of outlineData.chapters) {
-      console.log(`\n=== 处理第${chapter.chapter}章 ===`);
 
       // 查找对应的场景文件，使用动态书籍名称
       const safeTitle = (bookTitle || '未命名故事').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
@@ -1724,7 +1602,6 @@ async function assembleFullBook(
 
         // 遍历章节中的所有场景
         for (const scene of scenes) {
-          console.log(`处理场景: ${scene.title}`);
 
           // 查找对应的完整场景文件，使用动态书籍名称和章节号
           const fullSceneFilePath = path.join(fullScenesDirectory, `${safeTitle}-chapter-${chapter.chapter}-scene-${scene.sceneNumber}-full.json`);
@@ -1745,7 +1622,6 @@ async function assembleFullBook(
         };
 
         chapters.push(chapterContent);
-        console.log(`✅ 第${chapter.chapter}章处理完成`);
 
       } catch {
         console.warn(`无法读取场景文件 ${scenesFilePath}，跳过该章节`);
@@ -1762,9 +1638,9 @@ async function assembleFullBook(
     const safeBookTitle = (bookTitle || '未命名故事').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
     const bookFilePath = path.join(fullScenesDirectory, `${safeBookTitle}-full-book.md`);
     await fs.promises.writeFile(bookFilePath, generateBookMarkdown(fullBookContent), 'utf8');
-    console.log(`✅ 完整书籍已保存到 ${bookFilePath}`);
+    console.log(`完整书籍已保存到 ${bookFilePath}`);
 
-    console.log('\n=== 完整书籍组装完成 ===');
+    console.log('完整书籍组装完成');
     return fullBookContent;
 
   } catch (error) {
@@ -1822,7 +1698,12 @@ export {
  * 生成故事大纲
  * @returns 生成的故事大纲
  */
-export async function generateStoryOutline(): Promise<StoryOutline> {
+export async function generateStoryOutline(
+  theme: string = "未指定主题",
+  plot: string = "未指定情节",
+  conflict: string = "未指定冲突",
+  outcome: string = "未指定结局"
+): Promise<StoryOutline> {
   const generator = new AIStoryGenerator({
     apiKey: process.env.OPENAI_API_KEY || 'test-api-key-for-debugging',
     baseUrl: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
@@ -1830,12 +1711,7 @@ export async function generateStoryOutline(): Promise<StoryOutline> {
     siteUrl: process.env.SITE_URL || 'http://localhost:3000',
     siteName: process.env.SITE_NAME || '小说写作助手',
   });
-  const outline = await generator.generateStoryOutline(
-    "未指定主题",
-    "未指定情节",
-    "未指定冲突",
-    "未指定结局"
-  );
+  const outline = await generator.generateStoryOutline(theme, plot, conflict, outcome);
 
   // 保存大纲到文件
   // 确保data目录存在

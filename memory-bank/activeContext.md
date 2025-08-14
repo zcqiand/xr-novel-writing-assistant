@@ -43,3 +43,5 @@ This file tracks the project's current status, including recent changes, current
 2025-08-13 23:27:30 - 修复场景段落开头和结尾段落为空的问题：成功修复4个段落文件中的openingParagraph和closingParagraph字段，使用测试模式生成有意义的段落内容
 
 2025-08-13 23:45:00 - 实现合并段落生成API：创建新的API端点 /api/generate-merged-paragraphs，支持POST和GET请求，生成开头段落和结尾段落合并的JSON格式返回
+
+2025-08-14 11:31:00 - 修复ESLint未使用变量警告：成功修复ai-story-generator.ts和story-generator.ts中的4个未使用变量警告，通过添加下划线前缀标记未使用的参数和函数
