@@ -37,3 +37,9 @@ This file tracks the project's current status, including recent changes, current
 2025-08-13 03:20:54 - 修复故事大纲文件未保存的问题：更新generateStoryOutline函数，添加保存大纲到data目录的逻辑，使用动态文件名
 
 2025-08-13 04:24:00 - 修复章节标题生成问题：更新AI大纲生成提示词，要求AI为每个章节生成吸引人的标题；更新Chapter接口添加title字段；更新JSON schema包含章节标题字段；修改assembleFullBook和generateBookMarkdown函数使用AI生成的章节标题
+
+2025-08-13 12:31:00 - 修复完整书籍生成问题：成功解决场景标题和连续性注释在完整书籍中显示的问题，同时修复了只生成第一个章节第一个场景的问题
+
+2025-08-13 23:27:30 - 修复场景段落开头和结尾段落为空的问题：成功修复4个段落文件中的openingParagraph和closingParagraph字段，使用测试模式生成有意义的段落内容
+
+2025-08-13 23:45:00 - 实现合并段落生成API：创建新的API端点 /api/generate-merged-paragraphs，支持POST和GET请求，生成开头段落和结尾段落合并的JSON格式返回

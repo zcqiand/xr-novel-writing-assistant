@@ -92,8 +92,11 @@ export default function UnifiedSelector({
   const [carryOnConflicts, setCarryOnConflicts] = useState<Conflict[]>([]);
   const [includeConflicts, setIncludeConflicts] = useState<Conflict[]>([]);
   // TODO: 验证这些状态变量是否需要使用 - 暂时保留以备将来UI扩展
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showLeadUpConflicts, setShowLeadUpConflicts] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showCarryOnConflicts, setShowCarryOnConflicts] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showIncludeConflicts, setShowIncludeConflicts] = useState(false);
 
   // 根据选择的情节获取关联的冲突

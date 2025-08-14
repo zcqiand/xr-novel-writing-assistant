@@ -5,7 +5,11 @@
   "terminal.integrated.profiles.windows": {
     "PowerShell": {
       "source": "PowerShell",
-      "icon": "terminal-powershell"
+      "icon": "terminal-powershell",
+      "args": [
+        "/K",
+        "chcp 65001"
+      ], // 启动 cmd 时设置编码为 UTF-8
     },
     "Command Prompt": {
       "path": [
@@ -20,6 +24,21 @@
     },
     "Git Bash": {
       "source": "Git Bash",
+      "icon": "terminal-bash",
+      "args": [
+        "/K",
+        "chcp 65001"
+      ], // 启动 cmd 时设置编码为 UTF-8
+    }
+  },
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.profiles.linux": {
+    "bash": {
+      "path": "bash",
+      "args": [
+        "-c",
+        "export LANG=zh_CN.UTF-8"
+      ],
       "icon": "terminal-bash"
     }
   },

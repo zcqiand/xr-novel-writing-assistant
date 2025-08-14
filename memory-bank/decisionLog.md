@@ -33,3 +33,7 @@ This file records architectural and implementation decisions using a list format
 2025-08-13 03:20:54 - 决策修复故事大纲文件未保存的问题：更新generateStoryOutline函数，添加保存大纲到data目录的逻辑，使用动态文件名，确保所有生成的文件都保存到data目录
 
 2025-08-13 04:24:00 - 修复章节标题生成问题：决定更新AI大纲生成提示词，要求AI为每个章节生成吸引人的标题，并更新相关数据结构和处理函数以支持章节标题的正确显示和使用
+
+2025-08-13 12:31:00 - 决策修复完整书籍生成问题：识别并解决两个关键问题（1）generateBookMarkdown函数包含不应出现在完整书籍中的场景标题和连续性注释（2）场景生成函数默认参数错误导致只生成第一个章节第一个场景。修复方案包括注释掉场景标题和连续性注释的生成代码，以及修改三个核心函数的默认参数从固定值1改为使用实际数据长度
+
+2025-08-13 23:45:00 - 决策创建合并段落生成API：创建新的API端点 /api/generate-merged-paragraphs，支持POST和GET两种请求方式，返回包含sceneNumber、title、openingParagraph、closingParagraph字段的JSON格式数据，使用现有的测试模式段落生成逻辑

@@ -160,15 +160,12 @@ export default function Home() {
       setGenerationStage('paragraphs');
       setProgress(75);
 
-      // 第三回合：生成段落 - 修复数据结构
+      // 第三回合：生成段落 - 传递所有章节
       const paragraphsRes = await fetch('/api/generate-story?stage=paragraphs', {
         method: 'POST',
         body: JSON.stringify({
           outline: outlineData,
-          scenes: {
-            chapter: scenesData[0]?.chapter || 1,
-            scenes: scenesData[0]?.scenes || []
-          }
+          scenes: scenesData // 传递所有章节，而不是只传递第一个
         }),
         headers: { 'Content-Type': 'application/json' }
       });
@@ -177,20 +174,17 @@ export default function Home() {
       setGenerationStage('full');
       setProgress(90);
 
-      // 第四回合：生成完整内容 - 修复数据结构
+      // 第四回合：生成场景完整内容 - 传递所有章节
       const fullRes = await fetch('/api/generate-story?stage=full', {
         method: 'POST',
         body: JSON.stringify({
           outline: outlineData,
-          scenes: {
-            chapter: scenesData[0]?.chapter || 1,
-            scenes: scenesData[0]?.scenes || []
-          },
+          scenes: scenesData, // 传递所有章节，而不是只传递第一个
           paragraphs: paragraphsData
         }),
         headers: { 'Content-Type': 'application/json' }
       });
-      const fullContent = await fullRes.text();
+      setGeneratedStory(await fullRes.text());
 
       setGenerationStage('assemble');
       setProgress(95);
@@ -220,91 +214,6 @@ export default function Home() {
     }
   };
 
-  /**
-   * 使用AI生成故事
-   */
-  const generateAIStory = async (): Promise<string | null> => {
-    try {
-      // 获取选择的故事元素描述
-      const themeDescription = selectedTheme?.description || '';
-      const plotDescription = selectedElements.predicates
-        ? plottoData?.predicates.find(p => p.number.toString() === selectedElements.predicates)?.description || ''
-        : '';
-      const conflictDescriptions = selectedElements.conflicts.map(conflictId => {
-        const conflict = plottoData?.conflicts.find(c => c.id === conflictId);
-        const details = conflict ? (conflict.permutations.length > 0
-          ? replaceCharacterReferences(conflict.permutations[0].description, conflict.permutations[0].characterLinks)
-          : '') : '';
-        return details;
-      }).join('；');
-      const outcomeDescription = selectedElements.outcomes.length > 0
-        ? plottoData?.outcomes.find(o => o.number.toString() === selectedElements.outcomes[0])?.description || ''
-        : '';
-
-      // 如果没有选择任何元素，返回null
-      if (!themeDescription && !plotDescription && !conflictDescriptions && !outcomeDescription) {
-        return null;
-      }
-
-      // 首先尝试使用真实的AI生成API
-      try {
-        const response = await fetch('/api/generate-story', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            theme: themeDescription || '未指定主角类型',
-            plot: plotDescription || '未指定情节',
-            conflict: conflictDescriptions || '未指定冲突',
-            outcome: outcomeDescription || '未指定结局',
-            style: 'narrative',
-            length: 'medium',
-          }),
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success) {
-            return result.data.story;
-          }
-        }
-      } catch (error) {
-        console.log('AI生成API不可用，使用测试模式:', error instanceof Error ? error.message : '未知错误');
-      }
-
-      // 如果真实API不可用，使用测试端点
-      const testResponse = await fetch('/api/generate-story/test', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          theme: themeDescription || '未指定主题',
-          plot: plotDescription || '未指定情节',
-          conflict: conflictDescriptions || '未指定冲突',
-          outcome: outcomeDescription || '未指定结局',
-          style: 'narrative',
-          length: 'medium',
-        }),
-      });
-
-      if (!testResponse.ok) {
-        throw new Error(`测试API错误! status: ${testResponse.status}`);
-      }
-
-      const testResult = await testResponse.json();
-
-      if (testResult.success) {
-        return testResult.data.story;
-      } else {
-        throw new Error(testResult.error || '测试API生成故事失败');
-      }
-    } catch (error) {
-      console.error('AI生成故事失败:', error);
-      return null;
-    }
-  };
 
 
   // 替换描述中的角色标识符为角色描述

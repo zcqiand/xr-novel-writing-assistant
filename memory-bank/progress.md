@@ -27,3 +27,5 @@ This file tracks the project's progress using a task list format.
 2025-08-13 00:25:28 - 修复JSON解析错误，完成API路由调试和测试
 
 2025-08-13 04:24:00 - 完成章节标题生成问题修复：成功实现AI自动为每个章节生成吸引人标题的功能
+
+2025-08-13 23:45:00 - 完成合并段落生成API实现：创建新的API端点 /api/generate-merged-paragraphs，支持POST和GET请求，返回JSON格式的开头段落和结尾段落，包含完整的测试验证
