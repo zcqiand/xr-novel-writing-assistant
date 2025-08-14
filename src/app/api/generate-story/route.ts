@@ -70,19 +70,19 @@ export async function POST(request: NextRequest) {
         const outlineBody = await request.json();
 
         // 构建故事元素参数，优先使用前端传递的值，否则使用默认值
-        const theme = outlineBody.theme || "未指定主题";
-        const plot = outlineBody.plot || "未指定情节";
+        const protagonist = outlineBody.protagonist || "未指定主角类型";
+        const plot = outlineBody.plot || "未指定情节发展";
         const conflict = outlineBody.conflict || "未指定冲突";
-        const outcome = outlineBody.outcome || "未指定结局";
+        const outcome = outlineBody.outcome || "未指定故事结局";
 
         console.log('=== 大纲生成参数 ===');
-        console.log('故事主题:', theme);
-        console.log('故事情节:', plot);
+        console.log('主角类型:', protagonist);
+        console.log('情节发展:', plot);
         console.log('主要冲突:', conflict);
         console.log('故事结局:', outcome);
         console.log('==================');
 
-        const outline = await generateStoryOutline(theme, plot, conflict, outcome);
+        const outline = await generateStoryOutline(protagonist, plot, conflict, outcome);
         return NextResponse.json(outline);
 
       case 'scenes':

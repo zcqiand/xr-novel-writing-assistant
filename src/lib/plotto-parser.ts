@@ -19,14 +19,14 @@ export interface ConflictLink {
 }
 
 export interface Predicate {
-  number: number;             // 情节编号
-  description: string;        // 情节描述
+  number: number;             // 情节发展编号
+  description: string;        // 情节发展描述
   conflictLinks: ConflictLink[]; // 关联的冲突链接
 }
 
 export interface Outcome {
-  number: number;       // 结局编号
-  description: string;  // 结局描述
+  number: number;       // 故事结局编号
+  description: string;  // 故事结局描述
 }
 
 export interface CharacterLink {
@@ -159,7 +159,7 @@ export class PlottoParser {
   }
 
   /**
-   * 解析情节部分
+   * 解析情节发展部分
    */
   private parsePredicates(xmlDoc: Document): Predicate[] {
     const predicates: Predicate[] = [];
@@ -194,7 +194,7 @@ export class PlottoParser {
   }
 
   /**
-   * 解析结局部分
+   * 解析故事结局部分
    */
   private parseOutcomes(xmlDoc: Document): Outcome[] {
     const outcomes: Outcome[] = [];

@@ -9,7 +9,7 @@ import { StoryGenerator } from "@/lib/story-generator";
 import { PlottoData, CharacterLink } from "@/lib/plotto-parser";
 
 // 主角类型接口定义
-interface Theme {
+interface Protagonist {
   id: string;
   description: string;
 }
@@ -84,7 +84,7 @@ export default function Home() {
   });
   const [generatedStory, setGeneratedStory] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null);
+  const [selectedProtagonist, setSelectedProtagonist] = useState<Protagonist | null>(null);
   const [generationStage, setGenerationStage] = useState<'idle' | 'outline' | 'scenes' | 'paragraphs' | 'full' | 'assemble'>('idle');
   const [progress, setProgress] = useState(0);
 
@@ -132,8 +132,8 @@ export default function Home() {
     }
 
     // 检查是否选择了必要的故事元素
-    if (!selectedTheme && !selectedElements.predicates && !selectedElements.conflicts.length && !selectedElements.outcomes.length) {
-      alert("请至少选择一个故事元素（主角类型、情节、冲突或结局）");
+    if (!selectedProtagonist && !selectedElements.predicates && !selectedElements.conflicts.length && !selectedElements.outcomes.length) {
+      alert("请至少选择一个故事元素（主角类型、情节发展、冲突或故事结局）");
       return;
     }
 
@@ -144,10 +144,10 @@ export default function Home() {
     try {
       // 构建故事元素参数
       const storyElements = {
-        theme: selectedTheme?.description || "未指定主题",
+        protagonist: selectedProtagonist?.description || "未指定主角类型",
         plot: selectedElements.predicates ?
-          transformedData.predicates.find(p => p.id === selectedElements.predicates)?.description || "未指定情节" :
-          "未指定情节",
+          transformedData.predicates.find(p => p.id === selectedElements.predicates)?.description || "未指定情节发展" :
+          "未指定情节发展",
         conflict: selectedElements.conflicts.length > 0 ?
           selectedElements.conflicts.map(id => {
             const conflict = transformedData.conflicts.find(c => c.id === id);
@@ -155,13 +155,13 @@ export default function Home() {
           }).join('、') :
           "未指定冲突",
         outcome: selectedElements.outcomes.length > 0 ?
-          transformedData.outcomes.find(o => o.id === selectedElements.outcomes[0])?.description || "未指定结局" :
-          "未指定结局"
+          transformedData.outcomes.find(o => o.id === selectedElements.outcomes[0])?.description || "未指定故事结局" :
+          "未指定故事结局"
       };
 
       console.log('=== 发送到API的故事元素 ===');
-      console.log('故事主题:', storyElements.theme);
-      console.log('故事情节:', storyElements.plot);
+      console.log('主角类型:', storyElements.protagonist);
+      console.log('情节发展:', storyElements.plot);
       console.log('主要冲突:', storyElements.conflict);
       console.log('故事结局:', storyElements.outcome);
       console.log('===========================');
@@ -338,7 +338,7 @@ export default function Home() {
       })),
       outcomes: plottoData.outcomes.map(outcome => ({
         id: outcome.number.toString(),
-        name: `结局 ${outcome.number}`,
+        name: `故事结局 ${outcome.number}`,
         description: outcome.description
       }))
     };
@@ -363,12 +363,12 @@ export default function Home() {
         ) : (
           <>
             <UnifiedSelector
-              themes={transformedData.subjects.map(subject => ({
+              protagonists={transformedData.subjects.map(subject => ({
                 id: subject.id,
                 description: subject.description
               }))}
-              selectedTheme={selectedTheme}
-              onThemeChange={setSelectedTheme}
+              selectedProtagonist={selectedProtagonist}
+              onProtagonistChange={setSelectedProtagonist}
 
               predicates={transformedData.predicates}
               selectedPredicate={selectedElements.predicates}

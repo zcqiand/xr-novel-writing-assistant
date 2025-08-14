@@ -19,14 +19,14 @@ export interface ConflictLink {
 }
 
 export interface Predicate {
-  number: number;             // 情节编号
-  description: string;        // 情节描述
+  number: number;             // 情节发展编号
+  description: string;        // 情节发展描述
   conflictLinks: ConflictLink[]; // 关联的冲突链接
 }
 
 export interface Outcome {
-  number: number;       // 结局编号
-  description: string;  // 结局描述
+  number: number;       // 故事结局编号
+  description: string;  // 故事结局描述
 }
 
 export interface CharacterLink {
@@ -119,7 +119,7 @@ export class StoryGenerator {
       ? [this.plottoData.subjects[Math.floor(Math.random() * this.plottoData.subjects.length)].number.toString()]
       : [];
 
-    // 随机选择一个情节
+    // 随机选择一个情节发展
     const randomPredicate = this.plottoData.predicates.length > 0
       ? [this.plottoData.predicates[Math.floor(Math.random() * this.plottoData.predicates.length)].number.toString()]
       : [];
@@ -129,7 +129,7 @@ export class StoryGenerator {
       ? [this.plottoData.conflicts[Math.floor(Math.random() * this.plottoData.conflicts.length)].id]
       : [];
 
-    // 随机选择一个结局
+    // 随机选择一个故事结局
     const randomOutcome = this.plottoData.outcomes.length > 0
       ? [this.plottoData.outcomes[Math.floor(Math.random() * this.plottoData.outcomes.length)].number.toString()]
       : [];
@@ -176,9 +176,9 @@ export class StoryGenerator {
       story += "\n";
     }
 
-    // 添加情节信息
+    // 添加情节发展信息
     if (selectedPredicates.length > 0) {
-      story += "情节：\n";
+      story += "情节发展：\n";
       selectedPredicates.forEach(predicate => {
         story += `- ${predicate.description}\n`;
       });
@@ -198,7 +198,7 @@ export class StoryGenerator {
       story += "\n";
     }
 
-    // 添加结局信息
+    // 添加故事结局信息
     if (selectedOutcomes.length > 0) {
       story += "故事结局：\n";
       selectedOutcomes.forEach(outcome => {
@@ -209,7 +209,7 @@ export class StoryGenerator {
 
     // 如果有冲突，尝试添加前置冲突和后续冲突
     if (selectedConflicts.length > 0) {
-      story += "情节：\n";
+      story += "情节发展：\n";
       selectedConflicts.forEach(conflict => {
         // 添加前置冲突信息
         if (conflict.leadUps && conflict.leadUps.length > 0) {

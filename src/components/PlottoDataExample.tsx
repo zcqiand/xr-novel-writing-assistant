@@ -38,8 +38,8 @@ export default function PlottoDataExample() {
     setError(null);
     try {
       const results = await plottoClient.search(query);
-      console.log('搜索结局:', results);
-      // 这里可以处理搜索结局，比如显示在界面上
+      console.log('搜索故事结局:', results);
+      // 这里可以处理搜索故事结局，比如显示在界面上
     } catch (err) {
       setError(err instanceof Error ? err.message : '搜索失败');
     } finally {
@@ -136,10 +136,10 @@ export default function PlottoDataExample() {
             </div>
           )}
 
-          {/* 情节卡片 */}
+          {/* 情节发展卡片 */}
           {predicate && (
             <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-              <h3 className="text-lg font-semibold text-yellow-800 mb-2">情节</h3>
+              <h3 className="text-lg font-semibold text-yellow-800 mb-2">情节发展</h3>
               <div className="space-y-2">
                 <p><span className="font-medium">编号:</span> #{predicate.number}</p>
                 <p><span className="font-medium">描述:</span> {predicate.description}</p>
@@ -148,10 +148,10 @@ export default function PlottoDataExample() {
             </div>
           )}
 
-          {/* 结局卡片 */}
+          {/* 故事结局卡片 */}
           {outcome && (
             <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-              <h3 className="text-lg font-semibold text-purple-800 mb-2">结局</h3>
+              <h3 className="text-lg font-semibold text-purple-800 mb-2">故事结局</h3>
               <div className="space-y-2">
                 <p><span className="font-medium">编号:</span> #{outcome.number}</p>
                 <p><span className="font-medium">描述:</span> {outcome.description}</p>

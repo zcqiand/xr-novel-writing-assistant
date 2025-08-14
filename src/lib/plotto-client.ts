@@ -163,56 +163,56 @@ export class PlottoClient {
   }
 
   /**
-   * 获取情节数据
+   * 获取情节发展数据
    */
   async getPredicates(): Promise<PlottoPredicate[]> {
     const response = await fetch(`${this.baseUrl}?type=predicates`);
     const result = await response.json();
 
     if (!result.success) {
-      throw new Error(result.error || '获取情节数据失败');
+      throw new Error(result.error || '获取情节发展数据失败');
     }
 
     return result.data;
   }
 
   /**
-   * 获取特定情节
+   * 获取特定情节发展
    */
   async getPredicate(id: number): Promise<PlottoPredicate | null> {
     const response = await fetch(`${this.baseUrl}?type=predicates&id=${id}`);
     const result = await response.json();
 
     if (!result.success) {
-      throw new Error(result.error || '获取情节数据失败');
+      throw new Error(result.error || '获取情节发展数据失败');
     }
 
     return result.data;
   }
 
   /**
-   * 获取结局数据
+   * 获取故事结局数据
    */
   async getOutcomes(): Promise<PlottoOutcome[]> {
     const response = await fetch(`${this.baseUrl}?type=outcomes`);
     const result = await response.json();
 
     if (!result.success) {
-      throw new Error(result.error || '获取结局数据失败');
+      throw new Error(result.error || '获取故事结局数据失败');
     }
 
     return result.data;
   }
 
   /**
-   * 获取特定结局
+   * 获取特定故事结局
    */
   async getOutcome(id: number): Promise<PlottoOutcome | null> {
     const response = await fetch(`${this.baseUrl}?type=outcomes&id=${id}`);
     const result = await response.json();
 
     if (!result.success) {
-      throw new Error(result.error || '获取结局数据失败');
+      throw new Error(result.error || '获取故事结局数据失败');
     }
 
     return result.data;
@@ -311,7 +311,7 @@ export class PlottoClient {
   }
 
   /**
-   * 随机获取一个情节
+   * 随机获取一个情节发展
    */
   async getRandomPredicate(): Promise<PlottoPredicate> {
     const predicates = await this.getPredicates();
@@ -320,7 +320,7 @@ export class PlottoClient {
   }
 
   /**
-   * 随机获取一个结局
+   * 随机获取一个故事结局
    */
   async getRandomOutcome(): Promise<PlottoOutcome> {
     const outcomes = await this.getOutcomes();

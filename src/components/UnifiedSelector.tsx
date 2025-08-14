@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-interface Theme {
+interface Protagonist {
   id: string;
   description: string;
 }
@@ -54,9 +54,9 @@ interface Conflict {
 }
 
 interface UnifiedSelectorProps {
-  themes: Theme[];
-  selectedTheme: Theme | null;
-  onThemeChange: (theme: Theme) => void;
+  protagonists: Protagonist[];
+  selectedProtagonist: Protagonist | null;
+  onProtagonistChange: (protagonist: Protagonist) => void;
 
   predicates: Predicate[];
   selectedPredicate: string | null;
@@ -73,9 +73,9 @@ interface UnifiedSelectorProps {
 }
 
 export default function UnifiedSelector({
-  themes,
-  selectedTheme,
-  onThemeChange,
+  protagonists,
+  selectedProtagonist,
+  onProtagonistChange,
   predicates,
   selectedPredicate,
   onPredicateChange,
@@ -99,15 +99,15 @@ export default function UnifiedSelector({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showIncludeConflicts, setShowIncludeConflicts] = useState(false);
 
-  // 根据选择的情节获取关联的冲突
+  // 根据选择的情节发展获取关联的冲突
   useEffect(() => {
 
-    // 只有在没有选择冲突时，才根据情节推荐冲突
+    // 只有在没有选择冲突时，才根据情节发展推荐冲突
     if (selectedPredicate && selectedConflicts.length === 0) {
       const predicate = predicates.find(p => p.id === selectedPredicate);
       if (predicate) {
 
-        // 获取与当前情节关联的冲突
+        // 获取与当前情节发展关联的冲突
         const relatedConflictIds = predicate.conflictLinks?.map(link => link.ref) || [];
         const relatedConflicts = conflicts.filter(conflict =>
           relatedConflictIds.includes(conflict.id)
@@ -265,7 +265,7 @@ export default function UnifiedSelector({
     }
   }, [selectedConflicts, conflicts, getRelatedConflicts]);
 
-  // 当选择的冲突或情节发生变化时，更新待选冲突区域
+  // 当选择的冲突或情节发展发生变化时，更新待选冲突区域
   useEffect(() => {
 
     if (selectedConflicts.length > 0) {
@@ -291,10 +291,10 @@ export default function UnifiedSelector({
 
       setRecommendedConflicts(finalConflicts);
     } else if (selectedPredicate && selectedConflicts.length === 0) {
-      // 如果没有选择冲突但有情节，则恢复基于情节的冲突推荐
+      // 如果没有选择冲突但有情节发展，则恢复基于情节发展的冲突推荐
       const predicate = predicates.find(p => p.id === selectedPredicate);
       if (predicate) {
-        // 获取与当前情节关联的冲突
+        // 获取与当前情节发展关联的冲突
         const relatedConflictIds = predicate.conflictLinks?.map(link => link.ref) || [];
         const relatedConflicts = conflicts.filter(conflict =>
           relatedConflictIds.includes(conflict.id)
@@ -316,7 +316,7 @@ export default function UnifiedSelector({
         setRecommendedConflicts([]);
       }
     } else {
-      // 既没有选择冲突也没有选择情节，清空待选冲突
+      // 既没有选择冲突也没有选择情节发展，清空待选冲突
       setRecommendedConflicts([]);
     }
   }, [selectedConflicts, conflicts, getRelatedConflicts, selectedPredicate, predicates]);
@@ -329,38 +329,38 @@ export default function UnifiedSelector({
       <div className="p-6 space-y-6">
         {/* 主角类型选择 */}
         <div className="space-y-3">
-          <label htmlFor="theme-select" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="protagonist-select" className="block text-sm font-medium text-gray-700">
             🎭 选择主角类型
           </label>
           <select
-            id="theme-select"
-            value={selectedTheme?.id || ''}
+            id="protagonist-select"
+            value={selectedProtagonist?.id || ''}
             onChange={(e) => {
-              const selected = themes.find(theme => theme.id === e.target.value);
+              const selected = protagonists.find(protagonist => protagonist.id === e.target.value);
               if (selected) {
-                onThemeChange(selected);
+                onProtagonistChange(selected);
               }
             }}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md"
             aria-label="选择主角类型"
           >
             <option value="">请选择主角类型</option>
-            {themes.map((theme) => (
-              <option key={theme.id} value={theme.id}>
-                {theme.id} - {theme.description}
+            {protagonists.map((protagonist) => (
+              <option key={protagonist.id} value={protagonist.id}>
+                {protagonist.id} - {protagonist.description}
               </option>
             ))}
           </select>
         </div>
 
-        {/* 情节选择 */}
+        {/* 情节发展选择 */}
         <div className="space-y-3">
           <label htmlFor="predicate-select" className="block text-sm font-medium text-gray-700">
-            📝 选择情节
+            📝 选择情节发展
           </label>
           {selectedConflicts.length > 0 && (
             <div className="text-xs text-orange-600 bg-orange-50 border border-orange-200 rounded p-2">
-              ⚠️ 已选择冲突，无法修改情节。请先清除冲突选择。
+              ⚠️ 已选择冲突，无法修改情节发展。请先清除冲突选择。
             </div>
           )}
           <select
@@ -376,9 +376,9 @@ export default function UnifiedSelector({
               ? 'bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-white border-gray-300 hover:border-green-400'
               }`}
-            aria-label="选择情节"
+            aria-label="选择情节发展"
           >
-            <option value="">请选择情节</option>
+            <option value="">请选择情节发展</option>
             {predicates.map((predicate) => (
               <option key={predicate.id} value={predicate.id}>
                 {predicate.id} - {predicate.description}
@@ -387,10 +387,10 @@ export default function UnifiedSelector({
           </select>
         </div>
 
-        {/* 结局选择 */}
+        {/* 故事结局选择 */}
         <div className="space-y-3">
           <label htmlFor="outcome-select" className="block text-sm font-medium text-gray-700">
-            🎯 选择结局
+            🎯 选择故事结局
           </label>
           <select
             id="outcome-select"
@@ -401,9 +401,9 @@ export default function UnifiedSelector({
               }
             }}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md"
-            aria-label="选择结局"
+            aria-label="选择故事结局"
           >
-            <option value="">请选择结局</option>
+            <option value="">请选择故事结局</option>
             {outcomes.map((outcome) => (
               <option key={outcome.id} value={outcome.id}>
                 {outcome.id} - {outcome.description}
@@ -477,7 +477,7 @@ export default function UnifiedSelector({
                 ℹ️ 冲突提醒
               </h3>
               <p className="text-xs text-gray-600">
-                当前没有待选冲突。请选择情节来获取冲突推荐，或手动添加冲突来开始构建您的故事。
+                当前没有待选冲突。请选择情节发展来获取冲突推荐，或手动添加冲突来开始构建您的故事。
               </p>
             </div>
           </div>
@@ -489,14 +489,14 @@ export default function UnifiedSelector({
           <div className="space-y-1 text-sm text-gray-600">
             <div className="flex items-center">
               <span className="w-20 font-medium">主角类型:</span>
-              <span>{selectedTheme ? selectedTheme.description : '未选择'}</span>
+              <span>{selectedProtagonist ? selectedProtagonist.description : '未选择'}</span>
             </div>
             <div className="flex items-center">
-              <span className="w-20 font-medium">情节:</span>
+              <span className="w-20 font-medium">情节发展:</span>
               <span>{selectedPredicate ? predicates.find(p => p.id === selectedPredicate)?.description : '未选择'}</span>
             </div>
             <div className="flex items-center">
-              <span className="w-20 font-medium">结局:</span>
+              <span className="w-20 font-medium">故事结局:</span>
               <span>{selectedOutcome ? outcomes.find(o => o.id === selectedOutcome)?.description : '未选择'}</span>
             </div>
             <div className="flex items-center">

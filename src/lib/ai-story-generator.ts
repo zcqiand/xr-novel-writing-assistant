@@ -13,7 +13,7 @@ export interface AIStoryGeneratorConfig {
 
 // AI故事生成请求接口
 export interface AIStoryRequest {
-  theme: string;
+  protagonist: string;
   plot: string;
   conflict: string;
   outcome: string;
@@ -85,11 +85,11 @@ export class AIStoryGenerator {
       console.log('时间:', new Date().toISOString());
       console.log('模型:', process.env.OPENAI_MODEL);
       console.log('请求参数:', JSON.stringify(request, null, 2));
-      console.log('系统提示:', `你是一个专业的小说写作助手，擅长根据用户提供的故事元素创作出生动有趣的故事。请根据用户提供的主角类型、情节、冲突和结局，创作一个完整的故事。故事应该：
-1. 情节连贯，逻辑清晰
+      console.log('系统提示:', `你是一个专业的小说写作助手，擅长根据用户提供的故事元素创作出生动有趣的故事。请根据用户提供的主角类型、情节发展、冲突和故事结局，创作一个完整的故事。故事应该：
+1. 情节发展连贯，逻辑清晰
 2. 人物形象鲜明
 3. 冲突设置合理
-4. 结局符合用户要求
+4. 故事结局符合用户要求
 5. 语言生动，富有感染力`);
       console.log('用户提示:', prompt);
       console.log('=====================');
@@ -101,11 +101,11 @@ export class AIStoryGenerator {
         messages: [
           {
             role: "system",
-            content: `你是一个专业的小说写作助手，擅长根据用户提供的故事元素创作出生动有趣的故事。请根据用户提供的主角类型、情节、冲突和结局，创作一个完整的故事。故事应该：
-1. 情节连贯，逻辑清晰
+            content: `你是一个专业的小说写作助手，擅长根据用户提供的故事元素创作出生动有趣的故事。请根据用户提供的主角类型、情节发展、冲突和故事结局，创作一个完整的故事。故事应该：
+1. 情节发展连贯，逻辑清晰
 2. 人物形象鲜明
 3. 冲突设置合理
-4. 结局符合用户要求
+4. 故事结局符合用户要求
 5. 语言生动，富有感染力`
           },
           {
@@ -138,8 +138,8 @@ export class AIStoryGenerator {
 
   /**
    * 生成故事大纲
-   * @param theme 故事主题
-   * @param plot 故事情节
+   * @param protagonist 主角类型
+   * @param plot 情节发展
    * @param conflict 主要冲突
    * @param outcome 故事结局
    * @param style 写作风格
@@ -147,7 +147,7 @@ export class AIStoryGenerator {
    * @returns 生成的故事大纲
    */
   async generateStoryOutline(
-    theme: string,
+    protagonist: string,
     plot: string,
     conflict: string,
     outcome: string,
@@ -156,18 +156,18 @@ export class AIStoryGenerator {
   ): Promise<StoryOutline> {
     try {
       // 构建大纲生成提示词
-      const prompt = this.buildOutlinePrompt(theme, plot, conflict, outcome, style, length);
+      const prompt = this.buildOutlinePrompt(protagonist, plot, conflict, outcome, style, length);
 
       // 记录发送给AI模型的提示
       console.log('=== AI大纲生成调用日志 ===');
       console.log('时间:', new Date().toISOString());
       console.log('模型:', process.env.OPENAI_MODEL);
-      console.log('请求参数:', { theme, plot, conflict, outcome, style, length });
+      console.log('请求参数:', { protagonist: protagonist, plot, conflict, outcome, style, length });
       console.log('系统提示:', `你是一个专业的小说写作助手，擅长为故事创建详细的大纲。请根据用户提供的故事元素，生成包含角色列表和章节摘要的故事大纲。大纲应该：
 1. 角色形象鲜明，符合故事主题
 2. 章节安排合理，情节发展连贯
 3. 冲突设置有层次感
-4. 结局符合用户要求
+4. 故事结局符合用户要求
 5. 大纲结构清晰，易于理解`);
       console.log('用户提示:', prompt);
       console.log('=========================');
@@ -217,7 +217,7 @@ export class AIStoryGenerator {
 1. 角色形象鲜明，符合故事主题
 2. 章节安排合理，情节发展连贯
 3. 冲突设置有层次感
-4. 结局符合用户要求
+4. 故事结局符合用户要求
 5. 大纲结构清晰，易于理解`
           },
           {
@@ -263,7 +263,7 @@ export class AIStoryGenerator {
    * @returns 构建好的提示词
    */
   private buildPrompt(request: AIStoryRequest): string {
-    const { theme, plot, conflict, outcome, style, length } = request;
+    const { protagonist, plot, conflict, outcome, style, length } = request;
 
     let styleDescription = '';
     switch (style) {
@@ -303,8 +303,8 @@ export class AIStoryGenerator {
 
     return `请根据以下故事元素创作一个${lengthDescription}的故事：
 
-主角类型：${theme}
-情节：${plot}
+主角类型：${protagonist}
+情节发展：${plot}
 主要冲突：${conflict}
 故事结局：${outcome}
 写作风格：${styleDescription}
@@ -314,7 +314,7 @@ export class AIStoryGenerator {
 2. 生动的人物形象
 3. 连贯的情节发展
 4. 合理的冲突设置
-5. 符合要求的结局
+5. 符合要求的故事结局
 6. 丰富的细节描写
 
 请确保故事内容积极向上，富有感染力。`;
@@ -418,8 +418,8 @@ export class AIStoryGenerator {
 
   /**
    * 构建大纲生成提示词
-   * @param theme 故事主题
-   * @param plot 故事情节
+   * @param protagonist 主角类型
+   * @param plot 情节发展
    * @param conflict 主要冲突
    * @param outcome 故事结局
    * @param style 写作风格
@@ -427,7 +427,7 @@ export class AIStoryGenerator {
    * @returns 构建好的提示词
    */
   private buildOutlinePrompt(
-    theme: string,
+    protagonist: string,
     plot: string,
     conflict: string,
     outcome: string,
@@ -439,8 +439,8 @@ export class AIStoryGenerator {
 
     return `请根据以下故事元素生成一个详细的故事大纲：
 
-故事主题：${theme}
-故事情节：${plot}
+主角类型：${protagonist}
+情节发展：${plot}
 主要冲突：${conflict}
 故事结局：${outcome}
 写作风格：${styleDescription}
@@ -449,7 +449,7 @@ export class AIStoryGenerator {
 请生成包含以下内容的大纲：
 1. 书籍标题：为这个故事创作一个吸引人的标题
 2. 角色列表：包括主要角色和重要配角，每个角色包含姓名和详细描述
-3. 章节摘要：按照故事发展逻辑，分章节描述情节要点，每个章节需要有吸引人的章节标题
+3. 章节摘要：按照故事发展逻辑，分章节描述情节发展要点，每个章节需要有吸引人的章节标题
 
 请严格按照以下JSON格式返回：
 {
@@ -1225,7 +1225,7 @@ function checkContinuity(continuityData: ContinuityData[]): { isValid: boolean; 
     });
   }
 
-  // 检查情节连贯性
+  // 检查情节发展连贯性
   for (let i = 1; i < continuityData.length; i++) {
     const prevScene = continuityData[i - 1];
     const currScene = continuityData[i];
@@ -1557,7 +1557,7 @@ ${fullContent}
       `场景${sceneTitle}: 连续性注释生成失败`,
       `需要手动检查连续性`,
       `确保角色状态一致`,
-      `检查情节逻辑性`,
+      `检查情节发展逻辑性`,
       `验证时间线连贯性`
     ];
   }
@@ -1699,10 +1699,10 @@ export {
  * @returns 生成的故事大纲
  */
 export async function generateStoryOutline(
-  theme: string = "未指定主题",
-  plot: string = "未指定情节",
+  protagonist: string = "未指定主角类型",
+  plot: string = "未指定情节发展",
   conflict: string = "未指定冲突",
-  outcome: string = "未指定结局"
+  outcome: string = "未指定故事结局"
 ): Promise<StoryOutline> {
   const generator = new AIStoryGenerator({
     apiKey: process.env.OPENAI_API_KEY || 'test-api-key-for-debugging',
@@ -1711,7 +1711,7 @@ export async function generateStoryOutline(
     siteUrl: process.env.SITE_URL || 'http://localhost:3000',
     siteName: process.env.SITE_NAME || '小说写作助手',
   });
-  const outline = await generator.generateStoryOutline(theme, plot, conflict, outcome);
+  const outline = await generator.generateStoryOutline(protagonist, plot, conflict, outcome);
 
   // 保存大纲到文件
   // 确保data目录存在

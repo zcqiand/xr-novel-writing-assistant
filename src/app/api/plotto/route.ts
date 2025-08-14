@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
 
       case 'predicates':
         if (id) {
-          // 获取特定情节
+          // 获取特定情节发展
           const predicate = plottoData.predicates.find(p => p.number === parseInt(id));
           responseData = predicate || null;
         } else {
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
 
       case 'outcomes':
         if (id) {
-          // 获取特定结局
+          // 获取特定故事结局
           const outcome = plottoData.outcomes.find(o => o.number === parseInt(id));
           responseData = outcome || null;
         } else {
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 搜索情节
+    // 搜索情节发展
     if (type === 'all' || type === 'predicates') {
       plottoData.predicates.forEach(predicate => {
         if (predicate.description.toLowerCase().includes(searchQuery)) {
@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 搜索结局
+    // 搜索故事结局
     if (type === 'all' || type === 'outcomes') {
       plottoData.outcomes.forEach(outcome => {
         if (outcome.description.toLowerCase().includes(searchQuery)) {

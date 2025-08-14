@@ -2,7 +2,7 @@
 
 ## 概述
 
-Plotto API 提供了通过服务器调用方式获取Plotto数据的接口。该API支持获取角色、主题、情节、结局和冲突等数据，并提供搜索功能。
+Plotto API 提供了通过服务器调用方式获取Plotto数据的接口。该API支持获取角色、主题、情节发展、故事结局和冲突等数据，并提供搜索功能。
 
 ## 基础信息
 
@@ -246,8 +246,8 @@ interface Predicate {
 ### Outcome
 ```typescript
 interface Outcome {
-  number: number;       // 结局编号
-  description: string;  // 结局描述
+  number: number;       // 故事结局编号
+  description: string;  // 故事结局描述
 }
 ```
 

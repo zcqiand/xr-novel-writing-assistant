@@ -27,7 +27,7 @@
 - **主题类型**：多样化的主角类型选择
 - **情节发展**：系统化的情节结构
 - **冲突库**：大量可组合的情节冲突
-- **结局选项**：多种可能的故事结局
+- **故事结局选项**：多种可能的故事结局
 
 ### 🤖 AI智能生成
 
@@ -183,10 +183,10 @@ GET /api/generate-story/test
 POST /api/generate-story/test
 Content-Type: application/json
 {
-  "theme": "爱情与成长",
-  "plot": "一个年轻人在大城市中寻找自我价值",
+  "protagonist": "一个坠入爱河的人",
+  "plot": "因为某些义务而无法坠入爱河",
   "conflict": "事业与爱情的冲突",
-  "outcome": "最终找到平衡，实现个人成长"
+  "outcome": "在一项不幸的事业中付出了惨痛的代价"
 }
 ```
 
