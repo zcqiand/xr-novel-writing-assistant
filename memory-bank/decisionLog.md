@@ -47,3 +47,7 @@ This file records architectural and implementation decisions using a list format
 2025-08-14 16:04:15 - 决策实现前置冲突插入功能：根据用户需求"如果在待选冲突中选了前置冲突，则把前置冲突插入到已选冲突中最后冲突的前面"，修改了page.tsx中的handleSelectElement函数。实现方案包括：1) 检测新选择的冲突是否是最后一个已选冲突的前置冲突；2) 如果是前置冲突，则将其插入到最后一个冲突的前面而不是数组末尾；3) 简化了UnifiedSelector组件中的冲突选择逻辑。这个修改确保了用户在选择前置冲突时能够获得更直观的冲突序列体验。
 
 2025-08-15 21:48:00 - 决策移除场景标题生成功能：根据用户需求"不要场景标题"，修改了AI故事生成器的场景生成逻辑。具体修改包括：1) 修改SYSTEM_PROMPT_SCENES和USER_PROMPT_SCENES提示词，移除场景标题字段要求；2) 修改USER_PROMPT_PARAGRAPHS提示词，移除场景标题参数；3) 更新Scene接口定义，移除title字段；4) 修改相关函数调用逻辑，使用场景编号作为标题替代。确保AI生成的场景内容不再包含场景标题。
+
+[2025-08-15 15:19:00] - 决策移除写作风格功能：根据用户需求"不要写作风格"，成功移除了AI故事生成器中的所有写作风格相关功能。具体修改包括：1) 移除AIStoryRequest接口中的style字段；2) 移除generateStoryOutlineForOpenAI和buildOutlinePrompt方法的style参数；3) 更新USER_PROMPT_STORY_OUTLINE常量，移除写作风格相关内容；4) 移除getStyleDescription辅助方法；5) 更新相关调用代码。TypeScript类型检查通过，开发服务器正常运行。
+
+[2025-08-15 15:33:35] - 决策添加故事篇幅选择功能：根据用户需求"前端界面增加故事篇幅的选择"，决定在UnifiedSelector组件中添加故事篇幅选择下拉菜单，支持短篇、中篇、长篇三种选择。实现方案包括：1) 修改UnifiedSelector接口和组件，添加selectedLength和onLengthChange属性；2) 在page.tsx中添加selectedLength状态管理；3) 更新AI故事生成器支持故事篇幅参数；4) 修改API路由正确传递和处理故事篇幅参数。确保用户能够根据需要选择不同篇幅的故事，AI生成时会根据选择的篇幅调整章节数量和内容深度。

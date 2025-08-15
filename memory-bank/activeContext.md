@@ -57,3 +57,7 @@ This file tracks the project's current status, including recent changes, current
 [2025-08-15 15:43:30] - 在 ai-story-generator.ts 的段落生成提示词中增加了连续性注释功能，修改了 USER_PROMPT_PARAGRAPHS 常量添加 {continuityNotes} 占位符，并在 generateSceneContentForOpenAI 函数中集成了连续性注释生成逻辑。
 
 [2025-08-15 21:48:00] - 修改场景生成逻辑：移除场景标题生成功能，修改了SYSTEM_PROMPT_SCENES和USER_PROMPT_SCENES提示词，移除了场景标题字段；修改了USER_PROMPT_PARAGRAPHS提示词，移除了场景标题参数；修改了Scene接口和相关函数，不再生成和使用场景标题。
+
+[2025-08-15 15:19:30] - 完成写作风格功能移除：成功移除AI故事生成器中的所有写作风格相关功能，包括接口定义、方法参数、提示词常量和辅助方法。代码修改通过TypeScript类型检查，开发服务器正常运行。
+
+[2025-08-15 15:33:35] - 完成前端界面故事篇幅选择功能：成功在UnifiedSelector组件中添加故事篇幅选择下拉菜单，支持短篇、中篇、长篇三种选择；更新page.tsx添加状态管理和API传递；修改ai-story-generator.ts支持故事篇幅参数；更新API路由正确传递和处理故事篇幅参数。TypeScript编译和ESLint检查通过，功能测试正常。

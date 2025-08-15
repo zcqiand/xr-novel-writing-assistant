@@ -70,6 +70,9 @@ interface UnifiedSelectorProps {
   selectedConflicts: string[];
   onConflictSelect?: (conflictId: string) => void;
   onConflictRemove?: (conflictId: string) => void;
+
+  selectedLength?: 'short' | 'medium' | 'long';
+  onLengthChange?: (length: 'short' | 'medium' | 'long') => void;
 }
 
 export default function UnifiedSelector({
@@ -85,7 +88,9 @@ export default function UnifiedSelector({
   conflicts,
   selectedConflicts,
   onConflictSelect,
-  onConflictRemove
+  onConflictRemove,
+  selectedLength,
+  onLengthChange
 }: UnifiedSelectorProps) {
   const [recommendedConflicts, setRecommendedConflicts] = useState<Conflict[]>([]);
   const [leadUpConflicts, setLeadUpConflicts] = useState<Conflict[]>([]);
@@ -422,6 +427,28 @@ export default function UnifiedSelector({
           </select>
         </div>
 
+        {/* 故事篇幅选择 */}
+        <div className="space-y-3">
+          <label htmlFor="length-select" className="block text-sm font-medium text-gray-700">
+            📚 选择故事篇幅
+          </label>
+          <select
+            id="length-select"
+            value={selectedLength || 'medium'}
+            onChange={(e) => {
+              if (onLengthChange) {
+                onLengthChange(e.target.value as 'short' | 'medium' | 'long');
+              }
+            }}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md"
+            aria-label="选择故事篇幅"
+          >
+            <option value="short">短篇故事（约5-10章）</option>
+            <option value="medium">中篇故事（约15-30章）</option>
+            <option value="long">长篇故事（50章以上）</option>
+          </select>
+        </div>
+
         {/* 冲突推荐区域 */}
         {recommendedConflicts.length > 0 && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-6">
@@ -510,6 +537,15 @@ export default function UnifiedSelector({
             <div className="flex items-center">
               <span className="w-20 font-medium">故事结局:</span>
               <span>{selectedOutcome ? outcomes.find(o => o.id === selectedOutcome)?.description : '未选择'}</span>
+            </div>
+            <div className="flex items-center">
+              <span className="w-20 font-medium">故事篇幅:</span>
+              <span>
+                {selectedLength === 'short' && '短篇故事（约5-10章）'}
+                {selectedLength === 'medium' && '中篇故事（约15-30章）'}
+                {selectedLength === 'long' && '长篇故事（50章以上）'}
+                {!selectedLength && '未选择'}
+              </span>
             </div>
             <div className="flex items-center">
               <span className="w-20 font-medium">冲突:</span>

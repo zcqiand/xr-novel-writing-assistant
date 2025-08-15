@@ -32,15 +32,17 @@ export async function POST(request: NextRequest) {
         const plot = outlineBody.plot || "未指定情节发展";
         const conflict = outlineBody.conflict || "未指定冲突";
         const outcome = outlineBody.outcome || "未指定故事结局";
+        const length = outlineBody.length || 'medium';
 
         console.log('=== 大纲生成参数 ===');
         console.log('主角类型:', protagonist);
         console.log('情节发展:', plot);
         console.log('主要冲突:', conflict);
         console.log('故事结局:', outcome);
+        console.log('故事篇幅:', length);
         console.log('==================');
 
-        const outline = await generateStoryOutline(protagonist, plot, conflict, outcome);
+        const outline = await generateStoryOutline(protagonist, plot, conflict, outcome, length);
         return NextResponse.json(outline);
 
       case 'scenes':

@@ -39,3 +39,7 @@ This file tracks the project's progress using a task list format.
 2025-08-14 16:04:36 - 完成前置冲突插入功能实现：成功修改了page.tsx中的handleSelectElement函数，实现了当在待选冲突中选择前置冲突时，将其插入到已选冲突中最后冲突前面的逻辑。通过了TypeScript类型检查，代码质量良好。功能已记录到activeContext.md和decisionLog.md中。
 
 2025-08-15 21:48:30 - 完成场景标题移除功能：成功修改AI故事生成器，移除场景标题生成功能。修改包括提示词调整、接口更新和函数逻辑修改，确保AI生成的场景内容不再包含场景标题。TypeScript编译通过，开发服务器正常运行。
+
+[2025-08-15 15:20:00] - 完成写作风格功能移除任务：成功移除AI故事生成器中的所有写作风格相关功能，包括接口定义、方法参数、提示词常量和辅助方法。修改通过TypeScript类型检查，开发服务器正常运行，功能测试通过。
+
+[2025-08-15 15:33:35] - 完成前端界面故事篇幅选择功能实现：成功在UnifiedSelector组件中添加故事篇幅选择下拉菜单，支持短篇、中篇、长篇三种选择；更新page.tsx添加状态管理和API传递；修改ai-story-generator.ts支持故事篇幅参数；更新API路由正确传递和处理故事篇幅参数。TypeScript编译和ESLint检查通过，功能测试正常。

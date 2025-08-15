@@ -85,6 +85,7 @@ export default function Home() {
   const [generatedStory, setGeneratedStory] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [selectedProtagonist, setSelectedProtagonist] = useState<Protagonist | null>(null);
+  const [selectedLength, setSelectedLength] = useState<'short' | 'medium' | 'long'>('medium');
   const [generationStage, setGenerationStage] = useState<'idle' | 'outline' | 'scenes' | 'paragraphs' | 'full' | 'assemble'>('idle');
   const [progress, setProgress] = useState(0);
 
@@ -185,7 +186,8 @@ export default function Home() {
           "未指定冲突",
         outcome: selectedElements.outcomes.length > 0 ?
           transformedData.outcomes.find(o => o.id === selectedElements.outcomes[0])?.description || "未指定故事结局" :
-          "未指定故事结局"
+          "未指定故事结局",
+        length: selectedLength
       };
 
       console.log('=== 发送到API的故事元素 ===');
@@ -411,6 +413,9 @@ export default function Home() {
               selectedConflicts={selectedElements.conflicts}
               onConflictSelect={(id: string) => handleSelectElement('conflicts', id)}
               onConflictRemove={(id: string) => handleSelectElement('conflicts', id)}
+
+              selectedLength={selectedLength}
+              onLengthChange={setSelectedLength}
             />
 
 

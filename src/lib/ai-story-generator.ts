@@ -18,7 +18,6 @@ export interface AIStoryRequest {
   plot: string;
   conflict: string;
   outcome: string;
-  style?: 'narrative' | 'dramatic' | 'romantic' | 'mysterious' | 'adventure';
   length?: 'short' | 'medium' | 'long';
 }
 
@@ -60,7 +59,8 @@ async function generateStoryOutline(
   protagonist: string = "未指定主角类型",
   plot: string = "未指定情节发展",
   conflict: string = "未指定冲突",
-  outcome: string = "未指定故事结局"
+  outcome: string = "未指定故事结局",
+  length: 'short' | 'medium' | 'long' = 'medium'
 ): Promise<StoryOutline> {
   const generator = new AIStoryGenerator({
     apiKey: process.env.OPENAI_API_KEY || 'test-api-key-for-debugging',
@@ -69,7 +69,7 @@ async function generateStoryOutline(
     siteUrl: process.env.SITE_URL || 'http://localhost:3000',
     siteName: process.env.SITE_NAME || '小说写作助手',
   });
-  const outline = await generator.generateStoryOutlineForOpenAI(protagonist, plot, conflict, outcome);
+  const outline = await generator.generateStoryOutlineForOpenAI(protagonist, plot, conflict, outcome, length);
 
   // 保存大纲到文件
   // 确保data目录存在
@@ -115,7 +115,6 @@ export class AIStoryGenerator {
    * @param plot 情节发展
    * @param conflict 主要冲突
    * @param outcome 故事结局
-   * @param style 写作风格
    * @param length 故事篇幅
    * @returns 生成的故事大纲
    */
@@ -124,18 +123,17 @@ export class AIStoryGenerator {
     plot: string,
     conflict: string,
     outcome: string,
-    style?: 'narrative' | 'dramatic' | 'romantic' | 'mysterious' | 'adventure',
     length?: 'short' | 'medium' | 'long'
   ): Promise<StoryOutline> {
     try {
       // 构建大纲生成提示词
-      const prompt = this.buildOutlinePrompt(protagonist, plot, conflict, outcome, style, length);
+      const prompt = this.buildOutlinePrompt(protagonist, plot, conflict, outcome, length);
 
       // 记录发送给AI模型的提示
       console.log('=== AI大纲生成调用日志 ===');
       console.log('时间:', new Date().toISOString());
       console.log('模型:', process.env.OPENAI_MODEL);
-      console.log('请求参数:', { protagonist: protagonist, plot, conflict, outcome, style, length });
+      console.log('请求参数:', { protagonist: protagonist, plot, conflict, outcome, length });
       console.log('系统提示:', SYSTEM_PROMPT_STORY_OUTLINE);
       console.log('用户提示:', prompt);
       console.log('=========================');
@@ -290,7 +288,6 @@ export class AIStoryGenerator {
    * @param plot 情节发展
    * @param conflict 主要冲突
    * @param outcome 故事结局
-   * @param style 写作风格
    * @param length 故事篇幅
    * @returns 构建好的提示词
    */
@@ -299,10 +296,8 @@ export class AIStoryGenerator {
     plot: string,
     conflict: string,
     outcome: string,
-    style?: 'narrative' | 'dramatic' | 'romantic' | 'mysterious' | 'adventure',
     length?: 'short' | 'medium' | 'long'
   ): string {
-    const styleDescription = style ? this.getStyleDescription(style) : '叙事风格，注重情节发展和人物心理描写';
     const lengthDescription = length ? this.getLengthDescription(length) : '短篇故事，约5-10章';
 
     return USER_PROMPT_STORY_OUTLINE
@@ -310,24 +305,7 @@ export class AIStoryGenerator {
       .replace(/{plot}/g, plot)
       .replace(/{conflict}/g, conflict)
       .replace(/{outcome}/g, outcome)
-      .replace(/{styleDescription}/g, styleDescription)
       .replace(/{lengthDescription}/g, lengthDescription);
-  }
-
-  /**
-   * 获取风格描述
-   * @param style 风格类型
-   * @returns 风格描述
-   */
-  private getStyleDescription(style: string): string {
-    const styleMap: Record<string, string> = {
-      'narrative': '叙事风格，注重情节发展和人物心理描写',
-      'dramatic': '戏剧风格，强调冲突和情感张力',
-      'romantic': '浪漫风格，注重情感描写和浪漫氛围',
-      'mysterious': '悬疑风格，设置悬念和谜团',
-      'adventure': '冒险风格，强调动作和探索'
-    };
-    return styleMap[style] || '叙事风格，注重情节发展和人物心理描写';
   }
 
   /**
