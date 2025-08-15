@@ -72,7 +72,9 @@ export const USER_PROMPT_SCENES = `请为以下章节生成4-5个具体的场景
 }`;
 
 // 系统提示：段落（边界）
-export const SYSTEM_PROMPT_PARAGRAPHS_BOUNDING = `你是一个专业的小说家，擅长为场景创作完整的段落。请根据场景标题、摘要和角色信息，同时创作一个吸引人的开头段落和一个引人深思的结尾段落。段落应该：
+export const SYSTEM_PROMPT_PARAGRAPHS_BOUNDING = `你是一个专业的小说家，擅长为场景创作完整的段落。请根据场景标题、摘要和角色信息，同时创作一个吸引人的开头段落和一个引人深思的结尾段落。
+
+要求：
 1. 开头段落：字数50-150字
 2. 结尾段落：字数50-150字
 3. 语言生动，富有感染力
@@ -100,7 +102,9 @@ export const USER_PROMPT_PARAGRAPHS_BOUNDING = `请为以下场景同时生成�
 }`;
 
 // 系统提示：段落
-export const SYSTEM_PROMPT_PARAGRAPHS = `你是一个专业的小说家，擅长创作完整的场景内容。请根据场景标题、摘要、开头段落和结尾段落，创作一个连贯完整的场景。场景应该：
+export const SYSTEM_PROMPT_PARAGRAPHS = `你是一个专业的小说家，擅长创作完整的场景内容。请根据场景标题、摘要、开头段落和结尾段落，创作一个连贯完整的场景。
+
+要求：
 1. 以提供的开头段落开始
 2. 以提供的结尾段落结束
 3. 字数控制在500-600字
@@ -115,7 +119,7 @@ export const SYSTEM_PROMPT_PARAGRAPHS = `你是一个专业的小说家，擅长
 12. 让一些角色讲笑话，但避免让他们有傻乎乎的性格，也许只有一两个角色例外。除了背景人物，每个角色都应该有独特的个性和性格特征。`;
 
 // 用户提示：段落
-export const USER_PROMPT_PARAGRAPHS = `请根据以下信息生成一个写一个更长、更详细版本的场景：
+export const USER_PROMPT_PARAGRAPHS = `请根据以下信息生成一个写一个更长、更详细版本的场景（500-600字）：
  
 场景摘要：{sceneSummary}
 章节信息：第{chapter}章
@@ -131,7 +135,9 @@ export const USER_PROMPT_PARAGRAPHS = `请根据以下信息生成一个写一�
 {continuityNotes}`;
 
 // 系统提示：连续性注释
-export const SYSTEM_PROMPT_CONTINUITY_NOTES = `你是一个专业的小说家，擅长为场景生成连续性注释。请根据场景信息，提取重要的细节和事实，确保故事连贯性。注释应该：
+export const SYSTEM_PROMPT_CONTINUITY_NOTES = `你是一个专业的小说家，擅长为场景生成连续性注释。请根据场景信息，提取重要的细节和事实，确保故事连贯性。
+
+要求：
 1. 包含4-5个重要的细节和事实
 2. 确保这些细节对后续场景的连续性很重要
 3. 包括角色状态、关键事件、重要决定等

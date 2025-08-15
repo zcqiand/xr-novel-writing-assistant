@@ -196,7 +196,6 @@ export class AIStoryGenerator {
             schema: schema
           }
         },
-        max_tokens: 2000,
         temperature: 0.7,
       });
 
@@ -503,7 +502,6 @@ async function generateScenesTitleForOpenAI(chapterSummary: string): Promise<Sce
           schema: schema
         }
       },
-      max_tokens: 2000,
       temperature: 0.7,
     });
 
@@ -711,7 +709,6 @@ async function generateSceneParagraphsForOpenAI(
           schema: schema
         }
       },
-      max_tokens: 500,
       temperature: 0.7,
     });
 
@@ -977,7 +974,6 @@ async function generateSceneContentForOpenAI(
           content: prompt
         }
       ],
-      max_tokens: 1500,
       temperature: 0.7,
     });
 
@@ -1062,7 +1058,6 @@ async function generateContinuityNotesForOpenAI(
           schema: schema
         }
       },
-      max_tokens: 300,
       temperature: 0.7,
     });
 
