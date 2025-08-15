@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import * as fs from 'fs';
 import * as path from 'path';
+import { STORY_GENERATION_SYSTEM_PROMPT, STORY_OUTLINE_SYSTEM_PROMPT, SCENE_GENERATION_SYSTEM_PROMPT, SCENE_PARAGRAPHS_SYSTEM_PROMPT, COMPLETE_SCENE_CONTENT_SYSTEM_PROMPT, CONTINUITY_NOTES_SYSTEM_PROMPT } from './constants';
 
 // AI故事生成器配置接口
 export interface AIStoryGeneratorConfig {
@@ -85,12 +86,7 @@ export class AIStoryGenerator {
       console.log('时间:', new Date().toISOString());
       console.log('模型:', process.env.OPENAI_MODEL);
       console.log('请求参数:', JSON.stringify(request, null, 2));
-      console.log('系统提示:', `你是一个专业的小说写作助手，擅长根据用户提供的故事元素创作出生动有趣的故事。请根据用户提供的主角类型、情节发展、冲突和故事结局，创作一个完整的故事。故事应该：
-1. 情节发展连贯，逻辑清晰
-2. 人物形象鲜明
-3. 冲突设置合理
-4. 故事结局符合用户要求
-5. 语言生动，富有感染力`);
+      console.log('系统提示:', STORY_GENERATION_SYSTEM_PROMPT);
       console.log('用户提示:', prompt);
       console.log('=====================');
 
@@ -101,12 +97,7 @@ export class AIStoryGenerator {
         messages: [
           {
             role: "system",
-            content: `你是一个专业的小说写作助手，擅长根据用户提供的故事元素创作出生动有趣的故事。请根据用户提供的主角类型、情节发展、冲突和故事结局，创作一个完整的故事。故事应该：
-1. 情节发展连贯，逻辑清晰
-2. 人物形象鲜明
-3. 冲突设置合理
-4. 故事结局符合用户要求
-5. 语言生动，富有感染力`
+            content: STORY_GENERATION_SYSTEM_PROMPT
           },
           {
             role: "user",
@@ -163,12 +154,7 @@ export class AIStoryGenerator {
       console.log('时间:', new Date().toISOString());
       console.log('模型:', process.env.OPENAI_MODEL);
       console.log('请求参数:', { protagonist: protagonist, plot, conflict, outcome, style, length });
-      console.log('系统提示:', `你是一个专业的小说写作助手，擅长为故事创建详细的大纲。请根据用户提供的故事元素，生成包含角色列表和章节摘要的故事大纲。大纲应该：
-1. 角色形象鲜明，符合故事主题
-2. 章节安排合理，情节发展连贯
-3. 冲突设置有层次感
-4. 故事结局符合用户要求
-5. 大纲结构清晰，易于理解`);
+      console.log('系统提示:', STORY_OUTLINE_SYSTEM_PROMPT);
       console.log('用户提示:', prompt);
       console.log('=========================');
 
@@ -213,12 +199,7 @@ export class AIStoryGenerator {
         messages: [
           {
             role: "system",
-            content: `你是一个专业的小说写作助手，擅长为故事创建详细的大纲。请根据用户提供的故事元素，生成包含角色列表和章节摘要的故事大纲。大纲应该：
-1. 角色形象鲜明，符合故事主题
-2. 章节安排合理，情节发展连贯
-3. 冲突设置有层次感
-4. 故事结局符合用户要求
-5. 大纲结构清晰，易于理解`
+            content: STORY_OUTLINE_SYSTEM_PROMPT
           },
           {
             role: "user",
@@ -714,11 +695,7 @@ async function generateScenesForChapter(chapterSummary: string, _chapterNumber: 
       messages: [
         {
           role: "system",
-          content: `你是一个专业的小说写作助手，擅长根据章节摘要生成具体的场景。请为每个章节创建3-5个连贯的场景，每个场景包含标题和摘要。场景应该：
-1. 连贯地展现章节情节发展
-2. 有明确的标题和50-100字的摘要
-3. 数量控制在3-5个
-4. 确保场景之间的逻辑连贯性`
+          content: SCENE_GENERATION_SYSTEM_PROMPT
         },
         {
           role: "user",
@@ -963,12 +940,7 @@ async function generateSceneParagraphs(
       messages: [
         {
           role: "system",
-          content: `你是一个专业的小说写作助手，擅长为场景创作完整的段落。请根据场景标题、摘要和角色信息，同时创作一个吸引人的开头段落和一个引人深思的结尾段落。段落应该：
-1. 开头段落：设置场景氛围，引入主要角色，字数100-150字
-2. 结尾段落：总结场景要点，留下悬念，字数100-150字
-3. 语言生动，富有感染力
-4. 保持故事的连贯性和吸引力
-5. 严格按照JSON格式返回结果`
+          content: SCENE_PARAGRAPHS_SYSTEM_PROMPT
         },
         {
           role: "user",
@@ -1514,11 +1486,7 @@ ${fullContent}
       messages: [
         {
           role: "system",
-          content: `你是一个专业的小说写作助手，擅长为场景生成连续性注释。请根据场景信息，提取重要的细节和事实，确保故事连贯性。注释应该：
-1. 包含3-5个重要的细节和事实
-2. 确保这些细节对后续场景的连续性很重要
-3. 包括角色状态、关键事件、重要决定等
-4. 语言简洁明了，每个注释20-30字`
+          content: CONTINUITY_NOTES_SYSTEM_PROMPT
         },
         {
           role: "user",
