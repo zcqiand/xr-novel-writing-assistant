@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import * as fs from 'fs';
 import * as path from 'path';
-import { SYSTEM_PROMPT_STORY_OUTLINE, SYSTEM_PROMPT_SCENE_TITLE, SYSTEM_PROMPT_SCENE_PARAGRAPHS, SYSTEM_PROMPT_SCENE_CONTENT, SYSTEM_PROMPT_CONTINUITY_NOTES, USER_PROMPT_STORY_OUTLINE, USER_PROMPT_SCENE_TITLE, USER_PROMPT_SCENE_PARAGRAPHS, USER_PROMPT_SCENE_CONTENT, CUSER_PROMPT_CONTINUITY_NOTES } from './constants';
+import { SYSTEM_PROMPT_STORY_OUTLINE, SYSTEM_PROMPT_SCENES, SYSTEM_PROMPT_PARAGRAPHS_BOUNDING, SYSTEM_PROMPT_PARAGRAPHS, SYSTEM_PROMPT_CONTINUITY_NOTES, USER_PROMPT_STORY_OUTLINE, USER_PROMPT_SCENES, USER_PROMPT_PARAGRAPHS_BOUNDING, USER_PROMPT_PARAGRAPHS, CUSER_PROMPT_CONTINUITY_NOTES } from './constants';
 
 // AI故事生成器配置接口
 export interface AIStoryGeneratorConfig {
@@ -48,6 +48,44 @@ export interface StoryOutline {
   title: string;
   characters: Character[];
   chapters: Chapter[];
+}
+
+
+
+/**
+ * 生成故事大纲
+ * @returns 生成的故事大纲
+ */
+async function generateStoryOutline(
+  protagonist: string = "未指定主角类型",
+  plot: string = "未指定情节发展",
+  conflict: string = "未指定冲突",
+  outcome: string = "未指定故事结局"
+): Promise<StoryOutline> {
+  const generator = new AIStoryGenerator({
+    apiKey: process.env.OPENAI_API_KEY || 'test-api-key-for-debugging',
+    baseUrl: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
+    model: process.env.OPENAI_MODEL || '',
+    siteUrl: process.env.SITE_URL || 'http://localhost:3000',
+    siteName: process.env.SITE_NAME || '小说写作助手',
+  });
+  const outline = await generator.generateStoryOutlineForOpenAI(protagonist, plot, conflict, outcome);
+
+  // 保存大纲到文件
+  // 确保data目录存在
+  const dataDir = path.join(process.cwd(), 'data');
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+
+  // 使用动态文件名保存大纲
+  const safeTitle = (outline.title || '未命名故事').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
+  const outputPath = path.join(dataDir, `${safeTitle}-story-outline.json`);
+  fs.writeFileSync(outputPath, JSON.stringify(outline, null, 2), 'utf8');
+
+  console.log('大纲已保存到:', outputPath);
+
+  return outline;
 }
 
 /**
@@ -266,7 +304,7 @@ export class AIStoryGenerator {
     length?: 'short' | 'medium' | 'long'
   ): string {
     const styleDescription = style ? this.getStyleDescription(style) : '叙事风格，注重情节发展和人物心理描写';
-    const lengthDescription = length ? this.getLengthDescription(length) : '中篇故事，约8-15章';
+    const lengthDescription = length ? this.getLengthDescription(length) : '短篇故事，约5-8章';
 
     return USER_PROMPT_STORY_OUTLINE
       .replace(/{protagonist}/g, protagonist)
@@ -304,12 +342,12 @@ export class AIStoryGenerator {
       'medium': '中篇故事，约8-15章',
       'long': '长篇故事，15章以上'
     };
-    return lengthMap[length] || '中篇故事，约8-15章';
+    return lengthMap[length] || '短篇故事，约5-8章';
   }
 
 }
 
-// 完整场景内容接口
+// 段落（完整场景内容）接口
 export interface FullSceneContent {
   sceneNumber: number;
   title: string;
@@ -344,13 +382,13 @@ export interface ChapterScenes {
 }
 
 /**
- * 生成章节场景
+ * 生成场景
  * @param outline 大纲数据（内存数据）
  * @param startChapter 起始章节号（默认1）
  * @param chapterCount 生成章节数（默认1）
- * @returns 生成的章节场景数据
+ * @returns 生成的场景数据
  */
-async function generateScenesTitle(
+async function generateScenes(
   outline: StoryOutline,
   startChapter: number = 1,
   chapterCount: number = outline.chapters.length // 修复：生成所有章节而不是只生成1个
@@ -408,7 +446,7 @@ async function generateScenesTitle(
 async function generateScenesTitleForOpenAI(chapterSummary: string): Promise<Scene[]> {
   try {
     // 构建场景生成提示词
-    const prompt = USER_PROMPT_SCENE_TITLE
+    const prompt = USER_PROMPT_SCENES
       .replace(/{chapterSummary}/g, chapterSummary);
 
     // 记录关键提示词信息
@@ -449,7 +487,7 @@ async function generateScenesTitleForOpenAI(chapterSummary: string): Promise<Sce
       messages: [
         {
           role: "system",
-          content: SYSTEM_PROMPT_SCENE_TITLE
+          content: SYSTEM_PROMPT_SCENES
         },
         {
           role: "user",
@@ -499,7 +537,7 @@ async function generateScenesTitleForOpenAI(chapterSummary: string): Promise<Sce
   }
 }
 
-// 场景段落生成接口
+// 段落（边界）生成接口
 export interface SceneParagraphs {
   sceneNumber: number;
   title: string;
@@ -517,22 +555,14 @@ export interface ContinuityData {
 }
 
 /**
- * 生成场景段落
+ * 生成段落（边界）
  * @param outline 大纲数据（内存数据）
  * @param scenes 场景数据（内存数据）
  * @param startSceneNumber 起始场景号（默认1）
  * @param sceneCount 生成场景数（默认1）
- * @returns 生成的场景段落数据
+ * @returns 生成的段落（边界）数据
  */
-/**
- * 生成场景段落（批量生成多个场景的段落）
- * @param outline 大纲数据（内存数据）
- * @param scenes 场景数据（内存数据）
- * @param startSceneNumber 起始场景号（默认1）
- * @param sceneCount 生成场景数（默认1）
- * @returns 生成的场景段落数据
- */
-async function generateSceneParagraphs(
+async function generateParagraphsBounding(
   outline: StoryOutline,
   scenes: ChapterScenes,
   startSceneNumber: number = 1,
@@ -540,7 +570,7 @@ async function generateSceneParagraphs(
 ): Promise<SceneParagraphs[]> {
   try {
     // 记录关键参数信息
-    console.log('开始生成场景段落，起始场景号:', startSceneNumber, '生成场景数:', sceneCount, '书籍标题:', outline.title);
+    console.log('开始生成段落（边界），起始场景号:', startSceneNumber, '生成场景数:', sceneCount, '书籍标题:', outline.title);
 
     const results: SceneParagraphs[] = [];
     const continuityData: ContinuityData[] = [];
@@ -549,7 +579,7 @@ async function generateSceneParagraphs(
     const chapter = scenes.chapter;
     const sceneList = scenes.scenes;
 
-    // 生成指定场景的段落
+    // 生成指定场景的段落（边界）
 
     for (let i = 0; i < sceneCount; i++) {
       const sceneNumber = startSceneNumber + i;
@@ -580,7 +610,7 @@ async function generateSceneParagraphs(
         outline.characters
       );
 
-      // 构建场景段落数据
+      // 构建段落（边界）
       const sceneParagraphs: SceneParagraphs = {
         sceneNumber: sceneNumber,
         title: scene.title,
@@ -600,17 +630,17 @@ async function generateSceneParagraphs(
       console.log(`场景 ${sceneNumber} 段落已保存到 ${fileName}`);
     }
 
-    console.log('场景段落生成完成');
+    console.log('段落（边界）生成完成');
     return results;
 
   } catch (error) {
-    console.error('生成场景段落失败:', error);
-    throw new Error(`生成场景段落失败: ${error instanceof Error ? error.message : '未知错误'}`);
+    console.error('生成段落（边界）失败:', error);
+    throw new Error(`生成段落（边界）失败: ${error instanceof Error ? error.message : '未知错误'}`);
   }
 }
 
 /**
- * 生成场景段落（同时生成开头和结尾段落）
+ * 生成段落（边界）
  * @param sceneTitle 场景标题
  * @param sceneSummary 场景摘要
  * @param characters 角色列表
@@ -634,13 +664,13 @@ async function generateSceneParagraphsForOpenAI(
     }
 
     // 构建段落生成提示词
-    const prompt = USER_PROMPT_SCENE_PARAGRAPHS
+    const prompt = USER_PROMPT_PARAGRAPHS_BOUNDING
       .replace(/{sceneTitle}/g, sceneTitle)
       .replace(/{sceneSummary}/g, sceneSummary)
       .replace(/{characters}/g, characters.map(c => c.name).join('、'));
 
     // 记录关键提示词信息
-    console.log('AI场景段落生成提示词:', prompt);
+    console.log('AI段落（边界）生成提示词:', prompt);
 
     // 定义JSON schema
     const schema = {
@@ -672,7 +702,7 @@ async function generateSceneParagraphsForOpenAI(
       messages: [
         {
           role: "system",
-          content: SYSTEM_PROMPT_SCENE_PARAGRAPHS
+          content: SYSTEM_PROMPT_PARAGRAPHS_BOUNDING
         },
         {
           role: "user",
@@ -694,7 +724,7 @@ async function generateSceneParagraphsForOpenAI(
     const responseContent = completion.choices[0]?.message?.content || '';
 
     // 记录生成结果
-    console.log('AI场景段落生成完成');
+    console.log('AI段落（边界）生成完成');
 
     // 由于使用了结构化输出，直接解析JSON
     try {
@@ -705,11 +735,11 @@ async function generateSceneParagraphsForOpenAI(
       };
     } catch (parseError) {
       console.error('JSON解析失败:', parseError);
-      throw new Error(`生成场景段落失败: ${parseError instanceof Error ? parseError.message : '未知错误'}`);
+      throw new Error(`生成段落（边界）失败: ${parseError instanceof Error ? parseError.message : '未知错误'}`);
     }
 
   } catch (error) {
-    console.error('生成场景段落失败:', error);
+    console.error('生成段落（边界）失败:', error);
     return {
       openingParagraph: `场景${sceneTitle}的开头段落生成失败`,
       closingParagraph: `场景${sceneTitle}的结尾段落生成失败`
@@ -805,15 +835,15 @@ function checkContinuity(continuityData: ContinuityData[]): { isValid: boolean; 
 
 
 /**
- * 生成完整场景内容
+ * 生成段落（完整场景内容）
  * @param outline 大纲数据（内存数据）
  * @param scenes 场景数据（内存数据）
  * @param paragraphs 段落数据（内存数据）
  * @param startSceneNumber 起始场景号（默认1）
  * @param sceneCount 生成场景数（默认1）
- * @returns 生成的完整场景内容
+ * @returns 生成的段落（完整场景内容）
  */
-async function generateSceneContent(
+async function generateParagraphs(
   outline: StoryOutline,
   scenes: ChapterScenes,
   paragraphs: SceneParagraphs[],
@@ -822,7 +852,7 @@ async function generateSceneContent(
 ): Promise<FullSceneContent[]> {
   try {
     // 记录关键参数信息
-    console.log('开始生成完整场景内容，起始场景号:', startSceneNumber, '生成场景数:', sceneCount, '书籍标题:', outline.title);
+    console.log('开始生成段落（完整场景内容），起始场景号:', startSceneNumber, '生成场景数:', sceneCount, '书籍标题:', outline.title);
 
     const results: FullSceneContent[] = [];
 
@@ -876,7 +906,7 @@ async function generateSceneContent(
         outline.characters
       );
 
-      // 构建完整场景内容数据
+      // 构建段落（完整场景内容）数据
       const fullSceneContent: FullSceneContent = {
         sceneNumber: sceneNumber,
         title: scene.title,
@@ -886,31 +916,31 @@ async function generateSceneContent(
 
       results.push(fullSceneContent);
 
-      // 保存完整场景内容到文件，使用动态书籍名称和章节号
+      // 保存段落（完整场景内容）到文件，使用动态书籍名称和章节号
       const safeTitle = (outline.title || '未命名故事').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
       const fileName = `data/${safeTitle}-chapter-${chapter}-scene-${sceneNumber}-full.json`;
       await fs.promises.writeFile(fileName, JSON.stringify(fullSceneContent, null, 2), 'utf8');
       console.log(`场景 ${sceneNumber} 完整内容已保存到 ${fileName}`);
     }
 
-    console.log('完整场景内容生成完成');
+    console.log('段落（完整场景内容）生成完成');
     return results;
 
   } catch (error) {
-    console.error('生成完整场景内容失败:', error);
-    throw new Error(`生成完整场景内容失败: ${error instanceof Error ? error.message : '未知错误'}`);
+    console.error('生成段落（完整场景内容）失败:', error);
+    throw new Error(`生成段落（完整场景内容）失败: ${error instanceof Error ? error.message : '未知错误'}`);
   }
 }
 
 /**
- * 生成完整的场景内容
+ * 生成段落（完整场景内容）
  * @param sceneTitle 场景标题
  * @param sceneSummary 场景摘要
  * @param openingParagraph 开头段落
  * @param closingParagraph 结尾段落
  * @param characters 角色列表
  * @param chapter 章节信息
- * @returns 完整的场景内容
+ * @returns 段落（完整场景内容）
  */
 async function generateSceneContentForOpenAI(
   sceneTitle: string,
@@ -921,19 +951,28 @@ async function generateSceneContentForOpenAI(
   chapter: number
 ): Promise<string> {
   try {
-    // 构建完整场景内容生成提示词
-    const prompt = USER_PROMPT_SCENE_CONTENT
+    // 生成连续性注释
+    const continuityNotes = await generateContinuityNotesForOpenAI(
+      sceneTitle,
+      sceneSummary,
+      '', // 临时为空，因为完整内容还未生成
+      characters
+    );
+
+    // 构建段落（完整场景内容）生成提示词
+    const prompt = USER_PROMPT_PARAGRAPHS
       .replace(/{sceneTitle}/g, sceneTitle)
       .replace(/{sceneSummary}/g, sceneSummary)
       .replace(/{chapter}/g, chapter.toString())
       .replace(/{characters}/g, characters.map(c => c.name).join('、'))
       .replace(/{openingParagraph}/g, openingParagraph)
-      .replace(/{closingParagraph}/g, closingParagraph);
+      .replace(/{closingParagraph}/g, closingParagraph)
+      .replace(/{continuityNotes}/g, continuityNotes.join('；'));
 
     // 记录关键提示词信息
-    console.log('AI完整场景内容生成提示词:', prompt);
+    console.log('AI段落（完整场景内容）生成提示词:', prompt);
 
-    // 对于完整场景内容，我们不需要严格的JSON格式，直接返回文本
+    // 对于段落（完整场景内容），我们不需要严格的JSON格式，直接返回文本
     // 调用OpenAI API
     const completion = await new OpenAI({
       baseURL: process.env.OPENAI_BASE_URL,
@@ -947,7 +986,7 @@ async function generateSceneContentForOpenAI(
       messages: [
         {
           role: "system",
-          content: SYSTEM_PROMPT_SCENE_CONTENT
+          content: SYSTEM_PROMPT_PARAGRAPHS
         },
         {
           role: "user",
@@ -961,12 +1000,12 @@ async function generateSceneContentForOpenAI(
     const responseContent = completion.choices[0]?.message?.content || '';
 
     // 记录生成结果
-    console.log('AI完整场景内容生成完成');
+    console.log('AI段落（完整场景内容）生成完成');
 
     return responseContent.trim();
 
   } catch (error) {
-    console.error('生成完整场景内容失败:', error);
+    console.error('生成段落（完整场景内容）失败:', error);
     return `${openingParagraph}\n\n场景内容生成失败，请重试。\n\n${closingParagraph}`;
   }
 }
@@ -975,7 +1014,7 @@ async function generateSceneContentForOpenAI(
  * 生成连续性注释
  * @param sceneTitle 场景标题
  * @param sceneSummary 场景摘要
- * @param fullContent 完整场景内容
+ * @param fullContent 段落（完整场景内容）
  * @param characters 角色列表
  * @returns 连续性注释列表
  */
@@ -1192,46 +1231,10 @@ function generateBookMarkdown(fullBookContent: FullBookContent): string {
 // 导出函数
 export {
   generateStoryOutline,
-  generateScenesTitle,
-  generateSceneParagraphs,
-  generateSceneContent,
+  generateScenes,
+  generateParagraphsBounding,
+  generateParagraphs,
   checkContinuity,
   assembleFullBook,
   generateBookMarkdown
 };
-
-/**
- * 生成故事大纲
- * @returns 生成的故事大纲
- */
-async function generateStoryOutline(
-  protagonist: string = "未指定主角类型",
-  plot: string = "未指定情节发展",
-  conflict: string = "未指定冲突",
-  outcome: string = "未指定故事结局"
-): Promise<StoryOutline> {
-  const generator = new AIStoryGenerator({
-    apiKey: process.env.OPENAI_API_KEY || 'test-api-key-for-debugging',
-    baseUrl: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
-    model: process.env.OPENAI_MODEL || '',
-    siteUrl: process.env.SITE_URL || 'http://localhost:3000',
-    siteName: process.env.SITE_NAME || '小说写作助手',
-  });
-  const outline = await generator.generateStoryOutlineForOpenAI(protagonist, plot, conflict, outcome);
-
-  // 保存大纲到文件
-  // 确保data目录存在
-  const dataDir = path.join(process.cwd(), 'data');
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-
-  // 使用动态文件名保存大纲
-  const safeTitle = (outline.title || '未命名故事').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
-  const outputPath = path.join(dataDir, `${safeTitle}-story-outline.json`);
-  fs.writeFileSync(outputPath, JSON.stringify(outline, null, 2), 'utf8');
-
-  console.log('大纲已保存到:', outputPath);
-
-  return outline;
-}

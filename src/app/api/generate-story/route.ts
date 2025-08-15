@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AIStoryGenerator } from '@/lib/ai-story-generator';
-import { generateStoryOutline, generateScenesTitle, generateSceneParagraphs, generateSceneContent, assembleFullBook, generateBookMarkdown } from '@/lib/ai-story-generator';
+import { generateStoryOutline, generateScenes, generateParagraphsBounding, generateParagraphs, assembleFullBook, generateBookMarkdown } from '@/lib/ai-story-generator';
 
 // 环境变量配置
 const config = {
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 
       case 'scenes':
         const scenesBody = await request.json();
-        const scenes = await generateScenesTitle(scenesBody.outline);
+        const scenes = await generateScenes(scenesBody.outline);
         return NextResponse.json(scenes);
 
       case 'paragraphs':
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
             allParagraphs.push(...testParagraphs);
           } else {
             // 正常模式：调用AI生成段落
-            const chapterParagraphs = await generateSceneParagraphs(paragraphsBody.outline, chapterScenes);
+            const chapterParagraphs = await generateParagraphsBounding(paragraphsBody.outline, chapterScenes);
             allParagraphs.push(...chapterParagraphs);
           }
         }
@@ -196,7 +196,7 @@ export async function POST(request: NextRequest) {
         // fullScenesArray 已经在上面处理过了，这里直接使用
 
         for (const chapterScenes of fullScenesArray) {
-          const chapterFullContent = await generateSceneContent(
+          const chapterFullContent = await generateParagraphs(
             fullBody.outline,
             chapterScenes,
             fullBody.paragraphs
