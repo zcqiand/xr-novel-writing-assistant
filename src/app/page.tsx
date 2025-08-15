@@ -124,7 +124,6 @@ export default function Home() {
         // 如果有已选冲突，检查新选择的冲突是否是最后一个冲突的前置冲突
         if (lastConflictId && plottoData) {
           const lastConflict = plottoData.conflicts.find(c => c.id === lastConflictId);
-          const newConflict = plottoData.conflicts.find(c => c.id === elementId);
 
           // 检查新冲突是否是最后一个冲突的前置冲突
           const isLeadUpConflict = lastConflict?.leadUps?.some(group =>

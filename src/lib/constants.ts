@@ -1,72 +1,13 @@
-// 系统提示常量定义
-export const STORY_GENERATION_SYSTEM_PROMPT = `你是一个专业的小说写作助手，擅长根据用户提供的故事元素创作出生动有趣的故事。请根据用户提供的主角类型、情节发展、冲突和故事结局，创作一个完整的故事。故事应该：
-1. 情节发展连贯，逻辑清晰
-2. 人物形象鲜明
-3. 冲突设置合理
-4. 故事结局符合用户要求
-5. 语言生动，富有感染力`;
-
-// 生成故事详细的大纲的系统提示
-export const STORY_OUTLINE_SYSTEM_PROMPT = `你是一个专业的小说写作助手，擅长为故事创建详细的大纲。请根据用户提供的故事元素，生成包含角色列表和章节摘要的故事大纲。大纲应该：
+// 系统提示:故事大纲
+export const SYSTEM_PROMPT_STORY_OUTLINE = `你是一个专业的小说写作助手，擅长为故事创建详细的大纲。请根据用户提供的故事元素，生成包含角色列表和章节摘要的故事大纲。大纲应该：
 1. 角色形象鲜明，符合故事主题
 2. 章节安排合理，情节发展连贯
 3. 冲突设置有层次感
 4. 故事结局符合用户要求
 5. 大纲结构清晰，易于理解`;
 
-// 生成每个场景的标题和摘要的系统提示
-export const SCENE_GENERATION_SYSTEM_PROMPT = `你是一个专业的小说写作助手，擅长根据章节摘要生成具体的场景。请为每个章节创建3-5个连贯的场景，每个场景包含标题和摘要。场景应该：
-1. 连贯地展现章节情节发展
-2. 有明确的标题和50-100字的摘要
-3. 数量控制在3-5个
-4. 确保场景之间的逻辑连贯性`;
-
-// 生成每个场景的开头段落和结尾段落的系统提示
-export const SCENE_PARAGRAPHS_SYSTEM_PROMPT = `你是一个专业的小说写作助手，擅长为场景创作完整的段落。请根据场景标题、摘要和角色信息，同时创作一个吸引人的开头段落和一个引人深思的结尾段落。段落应该：
-1. 开头段落：设置场景氛围，引入主要角色，字数100-150字
-2. 结尾段落：总结场景要点，留下悬念，字数100-150字
-3. 语言生动，富有感染力
-4. 保持故事的连贯性和吸引力
-5. 严格按照JSON格式返回结果`;
-
-// 生成每个场景的完整内容的系统提示
-export const COMPLETE_SCENE_CONTENT_SYSTEM_PROMPT = `你是一个专业的小说写作助手，擅长创作完整的场景内容。请根据场景标题、摘要、开头段落和结尾段落，创作一个连贯完整的场景。场景应该：
-1. 以提供的开头段落开始
-2. 以提供的结尾段落结束
-3. 中间内容连贯自然，符合场景描述
-4. 包含适当的对话和动作描写
-5. 保持角色性格的一致性
-6. 确保情节发展的逻辑性
-7. 请直接返回完整的场景内容，不要包含标题或其他格式。`;
-
-// 生成连续性注释的系统提示
-export const CONTINUITY_NOTES_SYSTEM_PROMPT = `你是一个专业的小说写作助手，擅长为场景生成连续性注释。请根据场景信息，提取重要的细节和事实，确保故事连贯性。注释应该：
-1. 包含3-5个重要的细节和事实
-2. 确保这些细节对后续场景的连续性很重要
-3. 包括角色状态、关键事件、重要决定等
-4. 语言简洁明了，每个注释20-30字`;
-
-// 用户故事生成提示模板
-export const USER_STORY_PROMPT_TEMPLATE = `请根据以下故事元素创作一个{lengthDescription}的故事：
-
-主角类型：{protagonist}
-情节发展：{plot}
-主要冲突：{conflict}
-故事结局：{outcome}
-写作风格：{styleDescription}
-
-请创作一个完整的故事，包括：
-1. 吸引人的标题
-2. 生动的人物形象
-3. 连贯的情节发展
-4. 合理的冲突设置
-5. 符合要求的故事结局
-6. 丰富的细节描写
-
-请确保故事内容积极向上，富有感染力。`;
-
-// 用户大纲生成提示模板
-export const USER_OUTLINE_PROMPT_TEMPLATE = `请根据以下故事元素生成一个详细的故事大纲：
+// 用户提示:故事大纲
+export const USER_PROMPT_STORY_OUTLINE = `请根据以下故事元素生成一个详细的故事大纲：
 
 主角类型：{protagonist}
 情节发展：{plot}
@@ -95,8 +36,15 @@ export const USER_OUTLINE_PROMPT_TEMPLATE = `请根据以下故事元素生成�
 
 请确保大纲内容丰富，角色形象鲜明，章节安排合理，书籍标题和章节标题都要吸引人且符合故事主题。`;
 
-// 场景生成用户提示模板
-export const SCENE_GENERATION_USER_PROMPT_TEMPLATE = `请为以下章节生成3-5个具体的场景：
+// 系统提示:场景的标题和摘要
+export const SYSTEM_PROMPT_SCENE_TITLE = `你是一个专业的小说写作助手，擅长根据章节摘要生成具体的场景。请为每个章节创建3-5个连贯的场景，每个场景包含标题和摘要。场景应该：
+1. 连贯地展现章节情节发展
+2. 有明确的标题和50-100字的摘要
+3. 数量控制在3-5个
+4. 确保场景之间的逻辑连贯性`;
+
+// 用户提示:场景的标题和摘要
+export const USER_PROMPT_SCENE_TITLE = `请为以下章节生成3-5个具体的场景：
  
 章节摘要：{chapterSummary}
 
@@ -119,8 +67,16 @@ export const SCENE_GENERATION_USER_PROMPT_TEMPLATE = `请为以下章节生成3-
 4. 摘要要简洁明了，50-100字
 5. 确保场景之间的逻辑连贯性`;
 
-// 场景段落生成用户提示模板
-export const SCENE_PARAGRAPHS_USER_PROMPT_TEMPLATE = `请为以下场景同时生成一个吸引人的开头段落和一个引人深思的结尾段落：
+// 系统提示：场景的开头段落和结尾段落
+export const SYSTEM_PROMPT_SCENE_PARAGRAPHS = `你是一个专业的小说写作助手，擅长为场景创作完整的段落。请根据场景标题、摘要和角色信息，同时创作一个吸引人的开头段落和一个引人深思的结尾段落。段落应该：
+1. 开头段落：设置场景氛围，引入主要角色，字数100-150字
+2. 结尾段落：总结场景要点，留下悬念，字数100-150字
+3. 语言生动，富有感染力
+4. 保持故事的连贯性和吸引力
+5. 严格按照JSON格式返回结果`;
+
+// 用户提示：场景的开头段落和结尾段落
+export const USER_PROMPT_SCENE_PARAGRAPHS = `请为以下场景同时生成一个吸引人的开头段落和一个引人深思的结尾段落：
  
 场景标题：{sceneTitle}
 场景摘要：{sceneSummary}
@@ -147,24 +103,18 @@ export const SCENE_PARAGRAPHS_USER_PROMPT_TEMPLATE = `请为以下场景同时�
   "closingParagraph": "结尾段落内容"
 }`;
 
-// 结尾段落生成用户提示模板 (用于 _generateClosingParagraph 函数)
-export const CLOSING_PARAGRAPH_USER_PROMPT_TEMPLATE = `请为以下场景生成一个引人深思的结尾段落（100-150字）：
- 
-场景标题：{sceneTitle}
-场景摘要：{sceneSummary}
-主要角色：{characters}
+// 系统提示：场景的详细内容
+export const SYSTEM_PROMPT_SCENE_CONTENT = `你是一个专业的小说写作助手，擅长创作完整的场景内容。请根据场景标题、摘要、开头段落和结尾段落，创作一个连贯完整的场景。场景应该：
+1. 以提供的开头段落开始
+2. 以提供的结尾段落结束
+3. 中间内容连贯自然，符合场景描述
+4. 包含适当的对话和动作描写
+5. 保持角色性格的一致性
+6. 确保情节发展的逻辑性
+7. 请直接返回完整的场景内容，不要包含标题或其他格式。`;
 
-要求：
-1. 结尾段落应该总结场景要点，留下悬念或过渡到下一个场景
-2. 语言生动，富有感染力
-3. 字数控制在100-150字
-4. 为后续场景发展做好铺垫
-5. 保持故事的连贯性和吸引力
-
-请直接返回段落内容，不要包含标题或其他格式。`;
-
-// 完整场景内容生成用户提示模板
-export const COMPLETE_SCENE_CONTENT_USER_PROMPT_TEMPLATE = `请根据以下信息生成一个完整的场景内容：
+// 用户提示：场景的详细内容
+export const USER_PROMPT_SCENE_CONTENT = `请根据以下信息生成一个完整的场景内容：
  
 场景标题：{sceneTitle}
 场景摘要：{sceneSummary}
@@ -188,8 +138,16 @@ export const COMPLETE_SCENE_CONTENT_USER_PROMPT_TEMPLATE = `请根据以下信�
 
 请直接返回完整的场景内容，不要包含标题或其他格式。`;
 
-// 连续性注释生成用户提示模板
-export const CONTINUITY_NOTES_USER_PROMPT_TEMPLATE = `请为以下场景生成连续性注释，确保故事连贯性：
+// 系统提示：连续性注释
+export const SYSTEM_PROMPT_CONTINUITY_NOTES = `你是一个专业的小说写作助手，擅长为场景生成连续性注释。请根据场景信息，提取重要的细节和事实，确保故事连贯性。注释应该：
+1. 包含3-5个重要的细节和事实
+2. 确保这些细节对后续场景的连续性很重要
+3. 包括角色状态、关键事件、重要决定等
+4. 语言简洁明了，每个注释20-30字`;
+
+
+// 用户提示：连续性注释
+export const CUSER_PROMPT_CONTINUITY_NOTES = `请为以下场景生成连续性注释，确保故事连贯性：
  
 场景标题：{sceneTitle}
 场景摘要：{sceneSummary}

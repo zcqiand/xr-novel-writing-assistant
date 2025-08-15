@@ -290,7 +290,7 @@ export class StoryGenerator {
     let formattedDescription = description;
 
     // 替换角色链接
-    characterLinks.forEach((link, _index) => {
+    characterLinks.forEach((link) => {
       const character = this.plottoData.characters.find(c => c.designation === link.ref);
       if (character) {
         // 使用正则表达式替换角色链接
