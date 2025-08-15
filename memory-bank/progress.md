@@ -37,3 +37,5 @@ This file tracks the project's progress using a task list format.
 2025-08-14 15:50:00 - 完成UnifiedSelector.tsx中getRelatedConflicts函数的修改：成功将函数逻辑改为只获取最后一个冲突的前置冲突、后续冲突和包含冲突。通过了TypeScript类型检查和ESLint验证，代码质量良好。修改已记录到activeContext.md和decisionLog.md中。
 
 2025-08-14 16:04:36 - 完成前置冲突插入功能实现：成功修改了page.tsx中的handleSelectElement函数，实现了当在待选冲突中选择前置冲突时，将其插入到已选冲突中最后冲突前面的逻辑。通过了TypeScript类型检查，代码质量良好。功能已记录到activeContext.md和decisionLog.md中。
+
+2025-08-15 21:48:30 - 完成场景标题移除功能：成功修改AI故事生成器，移除场景标题生成功能。修改包括提示词调整、接口更新和函数逻辑修改，确保AI生成的场景内容不再包含场景标题。TypeScript编译通过，开发服务器正常运行。

@@ -55,3 +55,5 @@ This file tracks the project's current status, including recent changes, current
 2025-08-14 16:04:00 - 实现前置冲突插入功能：成功修改page.tsx中的handleSelectElement函数，当在待选冲突中选择前置冲突时，将其插入到已选冲突中最后冲突的前面。修改包括添加前置冲突检测逻辑和特殊的数组插入处理。
 
 [2025-08-15 15:43:30] - 在 ai-story-generator.ts 的段落生成提示词中增加了连续性注释功能，修改了 USER_PROMPT_PARAGRAPHS 常量添加 {continuityNotes} 占位符，并在 generateSceneContentForOpenAI 函数中集成了连续性注释生成逻辑。
+
+[2025-08-15 21:48:00] - 修改场景生成逻辑：移除场景标题生成功能，修改了SYSTEM_PROMPT_SCENES和USER_PROMPT_SCENES提示词，移除了场景标题字段；修改了USER_PROMPT_PARAGRAPHS提示词，移除了场景标题参数；修改了Scene接口和相关函数，不再生成和使用场景标题。

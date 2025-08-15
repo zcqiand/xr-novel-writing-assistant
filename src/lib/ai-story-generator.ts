@@ -116,7 +116,7 @@ export class AIStoryGenerator {
    * @param conflict 主要冲突
    * @param outcome 故事结局
    * @param style 写作风格
-   * @param length 故事长度
+   * @param length 故事篇幅
    * @returns 生成的故事大纲
    */
   async generateStoryOutlineForOpenAI(
@@ -196,7 +196,7 @@ export class AIStoryGenerator {
             schema: schema
           }
         },
-        max_tokens: 3000,
+        max_tokens: 2000,
         temperature: 0.7,
       });
 
@@ -292,7 +292,7 @@ export class AIStoryGenerator {
    * @param conflict 主要冲突
    * @param outcome 故事结局
    * @param style 写作风格
-   * @param length 故事长度
+   * @param length 故事篇幅
    * @returns 构建好的提示词
    */
   private buildOutlinePrompt(
@@ -304,7 +304,7 @@ export class AIStoryGenerator {
     length?: 'short' | 'medium' | 'long'
   ): string {
     const styleDescription = style ? this.getStyleDescription(style) : '叙事风格，注重情节发展和人物心理描写';
-    const lengthDescription = length ? this.getLengthDescription(length) : '短篇故事，约5-8章';
+    const lengthDescription = length ? this.getLengthDescription(length) : '短篇故事，约5-10章';
 
     return USER_PROMPT_STORY_OUTLINE
       .replace(/{protagonist}/g, protagonist)
@@ -338,11 +338,11 @@ export class AIStoryGenerator {
    */
   private getLengthDescription(length: string): string {
     const lengthMap: Record<string, string> = {
-      'short': '短篇故事，约5-8章',
-      'medium': '中篇故事，约8-15章',
-      'long': '长篇故事，15章以上'
+      'short': '短篇故事，约5-10章',
+      'medium': '中篇故事，约15-30章',
+      'long': '长篇故事，50章以上'
     };
-    return lengthMap[length] || '短篇故事，约5-8章';
+    return lengthMap[length] || '短篇故事，约5-10章';
   }
 
 }
@@ -371,7 +371,6 @@ export interface FullChapterContent {
 // 场景信息接口
 export interface Scene {
   sceneNumber: number;
-  title: string;
   summary: string;
 }
 
@@ -396,6 +395,9 @@ async function generateScenes(
   try {
 
     const results: ChapterScenes[] = [];
+    if (process.env.DEBUG_MODE === 'true') {
+      chapterCount = 1;
+    }
 
     // 生成指定章节的场景
     for (let i = 0; i < chapterCount; i++) {
@@ -462,10 +464,9 @@ async function generateScenesTitleForOpenAI(chapterSummary: string): Promise<Sce
             type: "object",
             properties: {
               sceneNumber: { type: "number" },
-              title: { type: "string" },
               summary: { type: "string" }
             },
-            required: ["sceneNumber", "title", "summary"],
+            required: ["sceneNumber", "summary"],
             additionalProperties: false
           }
         }
@@ -502,7 +503,7 @@ async function generateScenesTitleForOpenAI(chapterSummary: string): Promise<Sce
           schema: schema
         }
       },
-      max_tokens: 3000,
+      max_tokens: 2000,
       temperature: 0.7,
     });
 
@@ -519,11 +520,9 @@ async function generateScenesTitleForOpenAI(chapterSummary: string): Promise<Sce
       // 确保场景编号正确
       return scenes.map((scene: {
         sceneNumber: number;
-        title: string;
         summary: string;
       }, index: number) => ({
         sceneNumber: index + 1,
-        title: scene.title || `场景 ${index + 1}`,
         summary: scene.summary || '场景摘要'
       }));
     } catch (parseError) {
@@ -586,11 +585,7 @@ async function generateParagraphsBounding(
       console.log(`\n--- 查找场景 ${sceneNumber} ---`);
       console.log(`sceneList 长度: ${sceneList.length}`);
 
-      const scene = sceneList.find((s: {
-        sceneNumber: number;
-        title: string;
-        summary: string;
-      }) => s.sceneNumber === sceneNumber);
+      const scene = sceneList.find((s: Scene) => s.sceneNumber === sceneNumber);
       console.log('找到的场景:', scene);
 
       if (!scene) {
@@ -600,12 +595,11 @@ async function generateParagraphsBounding(
       }
 
       console.log(`✅ 生成场景 ${sceneNumber} 段落 ===`);
-      console.log(`场景标题: ${scene.title}`);
       console.log(`场景摘要: ${scene.summary}`);
 
       // 调用新的合并函数同时生成开头和结尾段落
       const paragraphs = await generateSceneParagraphsForOpenAI(
-        scene.title,
+        `场景${sceneNumber}`,
         scene.summary,
         outline.characters
       );
@@ -613,7 +607,7 @@ async function generateParagraphsBounding(
       // 构建段落（边界）
       const sceneParagraphs: SceneParagraphs = {
         sceneNumber: sceneNumber,
-        title: scene.title,
+        title: `场景${sceneNumber}`,
         openingParagraph: paragraphs.openingParagraph,
         closingParagraph: paragraphs.closingParagraph
       };
@@ -717,7 +711,7 @@ async function generateSceneParagraphsForOpenAI(
           schema: schema
         }
       },
-      max_tokens: 600,
+      max_tokens: 500,
       temperature: 0.7,
     });
 
@@ -762,7 +756,7 @@ function recordContinuityData(
 ): void {
   // 提取场景中的重要细节和事实
   const importantDetails = [
-    `场景${sceneNumber}: ${scene.title}`,
+    `场景${sceneNumber}: 场景摘要`,
     `摘要: ${scene.summary}`
   ];
 
@@ -863,26 +857,17 @@ async function generateParagraphs(
     // 生成指定场景的完整内容
     for (let i = 0; i < sceneCount; i++) {
       const sceneNumber = startSceneNumber + i;
-      const scene = sceneList.find((s: {
-        sceneNumber: number;
-        title: string;
-        summary: string;
-      }) => s.sceneNumber === sceneNumber);
+      const scene = sceneList.find((s: Scene) => s.sceneNumber === sceneNumber);
 
       if (!scene) {
         console.warn(`场景 ${sceneNumber} 未找到，跳过`);
         continue;
       }
 
-      console.log(`生成场景 ${sceneNumber} 完整内容，标题: ${scene.title}`);
+      console.log(`生成场景 ${sceneNumber} 完整内容`);
 
       // 获取该场景的段落信息
-      const sceneParagraphs = paragraphs.find((p: {
-        sceneNumber: number;
-        title: string;
-        openingParagraph: string;
-        closingParagraph: string;
-      }) => p.sceneNumber === sceneNumber);
+      const sceneParagraphs = paragraphs.find((p: SceneParagraphs) => p.sceneNumber === sceneNumber);
       if (!sceneParagraphs) {
         console.warn(`场景 ${sceneNumber} 的段落信息未找到，跳过`);
         continue;
@@ -890,7 +875,7 @@ async function generateParagraphs(
 
       // 调用AI模型生成完整的场景内容
       const fullContent = await generateSceneContentForOpenAI(
-        scene.title,
+        `场景${sceneNumber}`,
         scene.summary,
         sceneParagraphs.openingParagraph,
         sceneParagraphs.closingParagraph,
@@ -900,7 +885,7 @@ async function generateParagraphs(
 
       // 记录重要细节和事实以确保连续性
       const continuityNotes = await generateContinuityNotesForOpenAI(
-        scene.title,
+        `场景${sceneNumber}`,
         scene.summary,
         fullContent,
         outline.characters
@@ -909,7 +894,7 @@ async function generateParagraphs(
       // 构建段落（完整场景内容）数据
       const fullSceneContent: FullSceneContent = {
         sceneNumber: sceneNumber,
-        title: scene.title,
+        title: `场景${sceneNumber}`,
         fullContent: fullContent,
         continuityNotes: continuityNotes
       };
@@ -959,9 +944,8 @@ async function generateSceneContentForOpenAI(
       characters
     );
 
-    // 构建段落（完整场景内容）生成提示词
+    // 构建段落（完整场景内容）生成提示词，不使用场景标题
     const prompt = USER_PROMPT_PARAGRAPHS
-      .replace(/{sceneTitle}/g, sceneTitle)
       .replace(/{sceneSummary}/g, sceneSummary)
       .replace(/{chapter}/g, chapter.toString())
       .replace(/{characters}/g, characters.map(c => c.name).join('、'))
@@ -993,7 +977,7 @@ async function generateSceneContentForOpenAI(
           content: prompt
         }
       ],
-      max_tokens: 2000,
+      max_tokens: 1500,
       temperature: 0.7,
     });
 
