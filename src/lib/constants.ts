@@ -45,3 +45,172 @@ export const CONTINUITY_NOTES_SYSTEM_PROMPT = `你是一个专业的小说写作
 2. 确保这些细节对后续场景的连续性很重要
 3. 包括角色状态、关键事件、重要决定等
 4. 语言简洁明了，每个注释20-30字`;
+
+// 用户故事生成提示模板
+export const USER_STORY_PROMPT_TEMPLATE = `请根据以下故事元素创作一个{lengthDescription}的故事：
+
+主角类型：{protagonist}
+情节发展：{plot}
+主要冲突：{conflict}
+故事结局：{outcome}
+写作风格：{styleDescription}
+
+请创作一个完整的故事，包括：
+1. 吸引人的标题
+2. 生动的人物形象
+3. 连贯的情节发展
+4. 合理的冲突设置
+5. 符合要求的故事结局
+6. 丰富的细节描写
+
+请确保故事内容积极向上，富有感染力。`;
+
+// 用户大纲生成提示模板
+export const USER_OUTLINE_PROMPT_TEMPLATE = `请根据以下故事元素生成一个详细的故事大纲：
+
+主角类型：{protagonist}
+情节发展：{plot}
+主要冲突：{conflict}
+故事结局：{outcome}
+写作风格：{styleDescription}
+故事长度：{lengthDescription}
+
+请生成包含以下内容的大纲：
+1. 书籍标题：为这个故事创作一个吸引人的标题
+2. 角色列表：包括主要角色和重要配角，每个角色包含姓名和详细描述
+3. 章节摘要：按照故事发展逻辑，分章节描述情节发展要点，每个章节需要有吸引人的章节标题
+
+请严格按照以下JSON格式返回：
+{
+ "title": "书籍标题",
+ "characters": [
+   {"name": "角色名", "description": "角色详细描述"},
+   ...
+ ],
+ "chapters": [
+   {"chapter": 1, "title": "章节标题", "summary": "第一章详细摘要"},
+   ...
+ ]
+}
+
+请确保大纲内容丰富，角色形象鲜明，章节安排合理，书籍标题和章节标题都要吸引人且符合故事主题。`;
+
+// 场景生成用户提示模板
+export const SCENE_GENERATION_USER_PROMPT_TEMPLATE = `请为以下章节生成3-5个具体的场景：
+ 
+章节摘要：{chapterSummary}
+
+请按照以下JSON格式返回场景列表：
+{
+  "scenes": [
+    {
+      "sceneNumber": 1,
+      "title": "场景标题",
+      "summary": "场景摘要（50-100字）"
+    },
+    ...
+  ]
+}
+
+要求：
+1. 场景应该连贯地展现章节情节发展
+2. 每个场景应该有明确的标题和摘要
+3. 场景数量控制在3-5个
+4. 摘要要简洁明了，50-100字
+5. 确保场景之间的逻辑连贯性`;
+
+// 场景段落生成用户提示模板
+export const SCENE_PARAGRAPHS_USER_PROMPT_TEMPLATE = `请为以下场景同时生成一个吸引人的开头段落和一个引人深思的结尾段落：
+ 
+场景标题：{sceneTitle}
+场景摘要：{sceneSummary}
+主要角色：{characters}
+
+要求：
+开头段落（100-150字）：
+1. 设置场景氛围，引入主要角色
+2. 语言生动，富有感染力
+3. 字数控制在100-150字
+4. 与前一个场景保持连续性（如果有）
+5. 为后续情节发展埋下伏笔
+
+结尾段落（100-150字）：
+1. 总结场景要点，留下悬念或过渡到下一个场景
+2. 语言生动，富有感染力
+3. 字数控制在100-150字
+4. 为后续场景发展做好铺垫
+5. 保持故事的连贯性和吸引力
+
+请严格按照以下JSON格式返回：
+{
+  "openingParagraph": "开头段落内容",
+  "closingParagraph": "结尾段落内容"
+}`;
+
+// 结尾段落生成用户提示模板 (用于 _generateClosingParagraph 函数)
+export const CLOSING_PARAGRAPH_USER_PROMPT_TEMPLATE = `请为以下场景生成一个引人深思的结尾段落（100-150字）：
+ 
+场景标题：{sceneTitle}
+场景摘要：{sceneSummary}
+主要角色：{characters}
+
+要求：
+1. 结尾段落应该总结场景要点，留下悬念或过渡到下一个场景
+2. 语言生动，富有感染力
+3. 字数控制在100-150字
+4. 为后续场景发展做好铺垫
+5. 保持故事的连贯性和吸引力
+
+请直接返回段落内容，不要包含标题或其他格式。`;
+
+// 完整场景内容生成用户提示模板
+export const COMPLETE_SCENE_CONTENT_USER_PROMPT_TEMPLATE = `请根据以下信息生成一个完整的场景内容：
+ 
+场景标题：{sceneTitle}
+场景摘要：{sceneSummary}
+章节信息：第{chapter}章
+主要角色：{characters}
+
+开头段落（必须以此开始）：
+{openingParagraph}
+
+结尾段落（必须以此结束）：
+{closingParagraph}
+
+要求：
+1. 必须以提供的开头段落开始
+2. 必须以提供的结尾段落结束
+3. 中间内容要连贯自然，符合场景摘要的描述
+4. 字数控制在300-500字
+5. 包含适当的对话和动作描写
+6. 保持角色性格的一致性
+7. 确保情节发展的逻辑性
+
+请直接返回完整的场景内容，不要包含标题或其他格式。`;
+
+// 连续性注释生成用户提示模板
+export const CONTINUITY_NOTES_USER_PROMPT_TEMPLATE = `请为以下场景生成连续性注释，确保故事连贯性：
+ 
+场景标题：{sceneTitle}
+场景摘要：{sceneSummary}
+完整场景内容：
+{fullContent}
+
+主要角色：{characters}
+
+要求：
+1. 提取3-5个重要的细节和事实
+2. 确保这些细节对后续场景的连续性很重要
+3. 包括角色状态、关键事件、重要决定等
+4. 语言简洁明了，每个注释20-30字
+
+请按照以下JSON格式返回：
+{
+  "continuityNotes": [
+    "注释1",
+    "注释2",
+    "注释3",
+    "注释4",
+    "注释5"
+  ]
+}`;
