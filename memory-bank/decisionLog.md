@@ -60,3 +60,5 @@ This file records architectural and implementation decisions using a list format
 [2025-08-16 00:00:00] - 修复SQL脚本语法错误：修复了所有四个数据库表SQL脚本中的行级安全策略(RLS)语法错误，将"FOR INSERT WITH CHECK TO anon;"改为正确的"FOR INSERT WITH CHECK USING (true);"语法。确保所有SQL脚本可以在Supabase中正确执行。
 
 [2025-08-16 00:09:00] - 修改表名和字段名：根据用户反馈，将表名和字段名统一修改：story_outlines表改为stories，story_id字段改为story_id，chapter_scenes表改为story_chapter_scenes，scene_paragraphs表改为story_chapter_scene_paragraphs_bounding，full_scene_contents表改为story_chapter_scene_paragraphs。同时更新了所有代码中的表名引用。
+
+[2025-08-16 03:17:00] - 修改故事篇幅默认值：根据用户需求"选择故事篇幅默认是中篇小说，我要默认短篇小说"，将page.tsx中的selectedLength状态默认值从'medium'改为'short'，同时修复了UnifiedSelector.tsx中接口定义的类型不匹配问题，确保selectedLength属性类型为'short' | 'medium' | 'long'。

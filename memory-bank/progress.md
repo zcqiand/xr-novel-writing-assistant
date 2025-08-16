@@ -48,3 +48,5 @@ This file tracks the project's progress using a task list format.
 [2025-08-15 23:17:57] - 完成创建Supabase数据库表SQL脚本的任务：成功创建了`supabase/story_outlines_table.sql`文件，包含完整的story_outlines表创建脚本，包括字段定义、索引、行级安全策略(RLS)和触发器。脚本支持匿名用户访问，包含自动更新时间戳功能，并提供了测试数据示例。
 
 [2025-08-15 23:42:00] - 完成故事大纲保存到Supabase数据库任务：成功将所有本地文件保存操作改为Supabase数据库保存，包括创建数据库表SQL脚本、修改相关保存函数、更新API路由和组装函数。所有代码修改通过TypeScript类型检查，功能测试正常。
+
+[2025-08-16 03:17:00] - 完成故事篇幅默认值修改任务：成功将故事篇幅的默认值从"中篇小说"改为"短篇小说"。修改包括：1) 将page.tsx中的selectedLength状态初始值从'medium'改为'short'；2) 修复UnifiedSelector.tsx中接口定义的类型不匹配问题，确保selectedLength属性类型为'short' | 'medium' | 'long'。TypeScript编译通过，功能正常工作。

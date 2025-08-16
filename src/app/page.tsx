@@ -86,7 +86,7 @@ export default function Home() {
   const [generatedStory, setGeneratedStory] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [selectedProtagonist, setSelectedProtagonist] = useState<Protagonist | null>(null);
-  const [selectedLength, setSelectedLength] = useState<'short' | 'medium' | 'long'>('medium');
+  const [selectedLength, setSelectedLength] = useState<'short' | 'medium' | 'long'>('short');
   const [generationStage, setGenerationStage] = useState<'idle' | 'outline' | 'scenes' | 'paragraphs' | 'full' | 'assemble'>('idle');
   const [progress, setProgress] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
