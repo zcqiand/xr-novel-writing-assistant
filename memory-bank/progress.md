@@ -50,3 +50,7 @@ This file tracks the project's progress using a task list format.
 [2025-08-15 23:42:00] - 完成故事大纲保存到Supabase数据库任务：成功将所有本地文件保存操作改为Supabase数据库保存，包括创建数据库表SQL脚本、修改相关保存函数、更新API路由和组装函数。所有代码修改通过TypeScript类型检查，功能测试正常。
 
 [2025-08-16 03:17:00] - 完成故事篇幅默认值修改任务：成功将故事篇幅的默认值从"中篇小说"改为"短篇小说"。修改包括：1) 将page.tsx中的selectedLength状态初始值从'medium'改为'short'；2) 修复UnifiedSelector.tsx中接口定义的类型不匹配问题，确保selectedLength属性类型为'short' | 'medium' | 'long'。TypeScript编译通过，功能正常工作。
+
+[2025-08-16 04:26:00] - 完成场景生成API错误日志系统添加任务：成功为POST /api/generate-story?stage=scenes端点添加了全面的错误日志记录系统。任务完成内容包括：1) 分析了API路由和AI故事生成器代码，识别出500错误的可能原因；2) 在API路由中添加了详细的请求参数验证、执行日志记录和错误捕获机制；3) 在generateScenes函数中添加了函数级别日志、数据结构验证和章节处理跟踪；4) 在generateScenesTitleForOpenAI函数中添加了环境变量检查、测试模式检测和API调用详细日志；5) 在Supabase数据库操作中添加了详细的错误信息记录，包括错误代码、详情和提示信息；6) 创建了test-error-logging.js测试脚本验证错误日志功能。所有修改都通过了TypeScript类型检查，功能正常工作。系统现在能够详细记录和追踪场景生成过程中的任何错误，便于快速定位和解决问题。
+
+[2025-08-16 06:53:00] - 完成API路由临时ID修复任务：成功将POST /api/generate-story?stage=outline端点返回的临时ID'temp-id'改为从Supabase数据库返回的真实ID。任务完成内容包括：1) 修改了generateStoryOutline函数的返回类型，从Promise<StoryOutline>改为Promise<{ outline: StoryOutline; story_id: string }>；2) 在函数中添加了数据库ID的提取和返回逻辑，确保插入操作成功后获取真实的story_id；3) 更新了API路由中的调用方式，使用解构赋值获取真实的数据库ID；4) 修改了返回的JSON数据结构，使用真实的数据库ID替代临时ID。这个修复确保了后续的场景生成、段落生成等操作都能正确关联到数据库中的故事记录，提高了数据一致性和系统可靠性。所有修改都通过了TypeScript类型检查，功能正常工作。

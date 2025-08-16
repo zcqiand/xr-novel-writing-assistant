@@ -73,7 +73,7 @@ export const USER_PROMPT_STORY_OUTLINE = `请根据以下故事元素生成一�
 请确保大纲内容丰富，角色形象鲜明，章节安排合理，书籍标题和章节标题都要吸引人且符合故事主题。`;
 
 // 系统提示:场景
-export const SYSTEM_PROMPT_SCENES = `你是一个专业的小说家，擅长根据章节摘要生成具体的场景。请为每个章节创建4-5个连贯的场景，每个场景只包含摘要。
+export const SYSTEM_PROMPT_STORY_CHAPTER_SCENES = `你是一个专业的小说家，擅长根据章节摘要生成具体的场景。请为每个章节创建4-5个连贯的场景，每个场景只包含摘要。
 
 要求：
 1. 数量控制在4-5个
@@ -91,7 +91,7 @@ export const SYSTEM_PROMPT_SCENES = `你是一个专业的小说家，擅长根�
 13、严格遵守《创作规范》` + CREATION_GUIDELINES;
 
 // 用户提示:场景
-export const USER_PROMPT_SCENES = `请为以下章节生成4-5个具体的场景：
+export const USER_PROMPT_STORY_CHAPTER_SCENES = `请为以下章节生成4-5个具体的场景：
  
 章节摘要：{chapterSummary}
 
@@ -107,7 +107,7 @@ export const USER_PROMPT_SCENES = `请为以下章节生成4-5个具体的场景
 }`;
 
 // 系统提示：段落（边界）
-export const SYSTEM_PROMPT_PARAGRAPHS_BOUNDING = `你是一个专业的小说家，擅长为场景创作完整的段落。请根据场景标题、摘要和角色信息，同时创作一个吸引人的开头段落和一个引人深思的结尾段落。
+export const SYSTEM_PROMPT_STORY_CHAPTER_PARAGRAPHS_BOUNDING = `你是一个专业的小说家，擅长为场景创作完整的段落。请根据场景标题、摘要和角色信息，同时创作一个吸引人的开头段落和一个引人深思的结尾段落。
 
 要求：
 1. 开头段落：字数50-150字
@@ -125,7 +125,7 @@ export const SYSTEM_PROMPT_PARAGRAPHS_BOUNDING = `你是一个专业的小说家
 13、严格遵守《创作规范》` + CREATION_GUIDELINES;
 
 // 用户提示：段落（边界）
-export const USER_PROMPT_PARAGRAPHS_BOUNDING = `请为以下场景同时生成一个吸引人的开头段落和一个引人深思的结尾段落：
+export const USER_PROMPT_STORY_CHAPTER_PARAGRAPHS_BOUNDING = `请为以下场景同时生成一个吸引人的开头段落和一个引人深思的结尾段落：
  
 场景标题：{sceneTitle}
 场景摘要：{sceneSummary}

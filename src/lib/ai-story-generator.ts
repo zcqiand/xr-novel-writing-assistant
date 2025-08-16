@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import * as fs from 'fs';
 import * as path from 'path';
-import { SYSTEM_PROMPT_STORY_OUTLINE, SYSTEM_PROMPT_SCENES, SYSTEM_PROMPT_PARAGRAPHS_BOUNDING, SYSTEM_PROMPT_PARAGRAPHS, SYSTEM_PROMPT_CONTINUITY_NOTES, USER_PROMPT_STORY_OUTLINE, USER_PROMPT_SCENES, USER_PROMPT_PARAGRAPHS_BOUNDING, USER_PROMPT_PARAGRAPHS, CUSER_PROMPT_CONTINUITY_NOTES } from './constants';
+import { SYSTEM_PROMPT_STORY_OUTLINE, SYSTEM_PROMPT_STORY_CHAPTER_SCENES, SYSTEM_PROMPT_STORY_CHAPTER_PARAGRAPHS_BOUNDING, SYSTEM_PROMPT_PARAGRAPHS, SYSTEM_PROMPT_CONTINUITY_NOTES, USER_PROMPT_STORY_OUTLINE, USER_PROMPT_STORY_CHAPTER_SCENES, USER_PROMPT_STORY_CHAPTER_PARAGRAPHS_BOUNDING, USER_PROMPT_PARAGRAPHS, CUSER_PROMPT_CONTINUITY_NOTES } from './constants';
 import { supabase } from './supabase';
 
 // AI故事生成器配置接口
@@ -62,7 +62,7 @@ async function generateStoryOutline(
   conflict: string = "未指定冲突",
   outcome: string = "未指定故事结局",
   length: 'short' | 'medium' | 'long' = 'medium'
-): Promise<StoryOutline> {
+): Promise<{ outline: StoryOutline; story_id: string }> {
   const generator = new AIStoryGenerator({
     apiKey: process.env.OPENAI_API_KEY || 'test-api-key-for-debugging',
     baseUrl: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
@@ -73,6 +73,7 @@ async function generateStoryOutline(
   const outline = await generator.generateStoryOutlineForOpenAI(protagonist, plot, conflict, outcome, length);
 
   // 保存故事到Supabase数据库
+  let story_id: string;
   try {
     const { data, error } = await supabase
       .from('stories')
@@ -93,13 +94,18 @@ async function generateStoryOutline(
       throw new Error(`保存故事到Supabase失败: ${error.message}`);
     }
 
+    if (!data || !data.id) {
+      throw new Error('数据库返回的数据中没有ID');
+    }
+
+    story_id = data.id;
     console.log('故事已保存到Supabase:', data);
   } catch (error) {
     console.error('保存故事到Supabase时发生错误:', error);
     throw new Error(`保存故事到Supabase失败: ${error instanceof Error ? error.message : '未知错误'}`);
   }
 
-  return outline;
+  return { outline, story_id };
 }
 
 /**
@@ -386,10 +392,23 @@ async function generateScenes(
   chapterCount: number = outline.chapters.length // 修复：生成所有章节而不是只生成1个
 ): Promise<ChapterScenes[]> {
   try {
+    console.log('=== generateScenes 函数开始 ===');
+    console.log('时间:', new Date().toISOString());
+    console.log('故事ID:', story_id);
+    console.log('书籍标题:', outline.title);
+    console.log('起始章节:', startChapter);
+    console.log('生成章节数:', chapterCount);
+    console.log('总章节数:', outline.chapters.length);
 
     const results: ChapterScenes[] = [];
     if (process.env.DEBUG_MODE === 'true') {
+      console.log('DEBUG_MODE=true，限制生成1个章节');
       chapterCount = 1;
+    }
+
+    // 验证outline数据结构
+    if (!outline.chapters || !Array.isArray(outline.chapters)) {
+      throw new Error('outline.chapters 必须是数组');
     }
 
     // 生成指定章节的场景
@@ -406,45 +425,75 @@ async function generateScenes(
         continue;
       }
 
-      // 调用AI模型生成该章节所有场景
-      const scenes = await generateScenesTitleForOpenAI(chapter.summary);
+      console.log(`\n--- 处理章节 ${chapterNumber} ---`);
+      console.log('章节标题:', chapter.title);
+      console.log('章节摘要:', chapter.summary);
 
-      // 构建章节场景数据
-      const chapterScenes: ChapterScenes = {
-        chapter: chapterNumber,
-        scenes: scenes
-      };
-
-      results.push(chapterScenes);
-
-      // 保存场景数据到Supabase数据库
       try {
-        const { data, error } = await supabase
-          .from('story_chapter_scenes')
-          .insert({
-            story_id: story_id,
-            chapter_number: chapterNumber,
-            scenes_data: chapterScenes
-          })
-          .select()
-          .single();
+        // 调用AI模型生成该章节所有场景
+        console.log('开始调用AI生成场景...');
+        const scenes = await generateScenesTitleForOpenAI(chapter.summary);
+        console.log('AI场景生成完成，生成场景数:', scenes.length);
 
-        if (error) {
-          console.error(`保存章节 ${chapterNumber} 场景到Supabase失败:`, error);
-          throw new Error(`保存章节 ${chapterNumber} 场景到Supabase失败: ${error.message}`);
+        // 构建章节场景数据
+        const chapterScenes: ChapterScenes = {
+          chapter: chapterNumber,
+          scenes: scenes
+        };
+
+        results.push(chapterScenes);
+
+        // 保存场景数据到Supabase数据库
+        console.log('开始保存场景到Supabase数据库...');
+        console.log('表名: story_chapter_scenes');
+        console.log('插入数据:', {
+          story_id: story_id,
+          chapter_number: chapterNumber,
+          scenes_data: chapterScenes
+        });
+
+        try {
+          const { data, error } = await supabase
+            .from('story_chapter_scenes')
+            .insert({
+              story_id: story_id,
+              chapter_number: chapterNumber,
+              scenes_data: chapterScenes
+            })
+            .select()
+            .single();
+
+          if (error) {
+            console.error(`❌ 保存章节 ${chapterNumber} 场景到Supabase失败:`, error);
+            console.error('错误代码:', error.code);
+            console.error('错误详情:', error.details);
+            console.error('错误 hint:', error.hint);
+            throw new Error(`保存章节 ${chapterNumber} 场景到Supabase失败: ${error.message}`);
+          }
+
+          console.log(`✅ 章节 ${chapterNumber} 场景已保存到Supabase:`, data);
+        } catch (dbError) {
+          console.error(`❌ 保存章节 ${chapterNumber} 场景到Supabase时发生数据库错误:`, dbError);
+          console.error('错误类型:', dbError instanceof Error ? dbError.constructor.name : '未知类型');
+          console.error('错误消息:', dbError instanceof Error ? dbError.message : '未知错误');
+          throw new Error(`保存章节 ${chapterNumber} 场景到Supabase失败: ${dbError instanceof Error ? dbError.message : '未知错误'}`);
         }
-
-        console.log(`章节 ${chapterNumber} 场景已保存到Supabase:`, data);
-      } catch (error) {
-        console.error(`保存章节 ${chapterNumber} 场景到Supabase时发生错误:`, error);
-        throw new Error(`保存章节 ${chapterNumber} 场景到Supabase失败: ${error instanceof Error ? error.message : '未知错误'}`);
+      } catch (chapterError) {
+        console.error(`❌ 处理章节 ${chapterNumber} 时发生错误:`, chapterError);
+        throw new Error(`处理章节 ${chapterNumber} 失败: ${chapterError instanceof Error ? chapterError.message : '未知错误'}`);
       }
     }
 
+    console.log('=== generateScenes 函数成功完成 ===');
+    console.log('总共生成章节:', results.length);
     return results;
 
   } catch (error) {
-    console.error('生成章节场景失败:', error);
+    console.error('❌ generateScenes 函数失败:', error);
+    console.error('错误类型:', error instanceof Error ? error.constructor.name : '未知类型');
+    console.error('错误消息:', error instanceof Error ? error.message : '未知错误');
+    console.error('错误堆栈:', error instanceof Error ? error.stack : '无堆栈信息');
+
     throw new Error(`生成章节场景失败: ${error instanceof Error ? error.message : '未知错误'}`);
   }
 }
@@ -457,8 +506,35 @@ async function generateScenes(
  */
 async function generateScenesTitleForOpenAI(chapterSummary: string): Promise<Scene[]> {
   try {
+    console.log('=== generateScenesTitleForOpenAI 函数开始 ===');
+    console.log('时间:', new Date().toISOString());
+    console.log('章节摘要长度:', chapterSummary.length);
+    console.log('章节摘要:', chapterSummary.substring(0, 100) + '...');
+
+    // 检查环境变量
+    const apiKey = process.env.OPENAI_API_KEY;
+    const baseUrl = process.env.OPENAI_BASE_URL;
+    const model = process.env.OPENAI_MODEL;
+
+    console.log('API配置检查:');
+    console.log('- API Key存在:', !!apiKey);
+    console.log('- Base URL:', baseUrl || '未设置');
+    console.log('- Model:', model || '未设置');
+
+    // 检查是否为测试模式
+    const isTestMode = apiKey === 'test-api-key-for-debugging';
+    console.log('测试模式:', isTestMode);
+
+    if (isTestMode) {
+      console.log('🔧 检测到测试模式，返回模拟场景数据');
+      return [
+        { sceneNumber: 1, summary: '测试场景1' },
+        { sceneNumber: 2, summary: '测试场景2' }
+      ];
+    }
+
     // 构建场景生成提示词
-    const prompt = USER_PROMPT_SCENES
+    const prompt = USER_PROMPT_STORY_CHAPTER_SCENES
       .replace(/{chapterSummary}/g, chapterSummary);
 
     // 记录关键提示词信息
@@ -485,20 +561,22 @@ async function generateScenesTitleForOpenAI(chapterSummary: string): Promise<Sce
       additionalProperties: false
     };
 
+    console.log('开始调用OpenAI API...');
+
     // 调用OpenAI API
     const completion = await new OpenAI({
-      baseURL: process.env.OPENAI_BASE_URL,
-      apiKey: process.env.OPENAI_API_KEY,
+      baseURL: baseUrl,
+      apiKey: apiKey,
       defaultHeaders: {
         "HTTP-Referer": process.env.SITE_URL,
         "X-Title": process.env.SITE_NAME,
       },
     }).chat.completions.create({
-      model: process.env.OPENAI_MODEL || '',
+      model: model || '',
       messages: [
         {
           role: "system",
-          content: SYSTEM_PROMPT_SCENES
+          content: SYSTEM_PROMPT_STORY_CHAPTER_SCENES
         },
         {
           role: "user",
@@ -517,6 +595,7 @@ async function generateScenesTitleForOpenAI(chapterSummary: string): Promise<Sce
     });
 
     const responseContent = completion.choices[0]?.message?.content || '';
+    console.log('OpenAI API响应内容:', responseContent);
 
     // 记录生成结果
     console.log('AI场景生成完成');
@@ -525,22 +604,31 @@ async function generateScenesTitleForOpenAI(chapterSummary: string): Promise<Sce
     try {
       const response = JSON.parse(responseContent);
       const scenes = response.scenes || [];
+      console.log('解析后的场景数量:', scenes.length);
 
       // 确保场景编号正确
-      return scenes.map((scene: {
+      const processedScenes = scenes.map((scene: {
         sceneNumber: number;
         summary: string;
       }, index: number) => ({
         sceneNumber: index + 1,
         summary: scene.summary || '场景摘要'
       }));
+
+      console.log('处理后的场景:', processedScenes);
+      return processedScenes;
     } catch (parseError) {
-      console.error('JSON解析失败:', parseError);
+      console.error('❌ JSON解析失败:', parseError);
+      console.error('响应内容:', responseContent);
       throw new Error(`生成场景失败: ${parseError instanceof Error ? parseError.message : '未知错误'}`);
     }
 
   } catch (error) {
-    console.error('生成场景失败:', error);
+    console.error('❌ generateScenesTitleForOpenAI 函数失败:', error);
+    console.error('错误类型:', error instanceof Error ? error.constructor.name : '未知类型');
+    console.error('错误消息:', error instanceof Error ? error.message : '未知错误');
+    console.error('错误堆栈:', error instanceof Error ? error.stack : '无堆栈信息');
+
     throw new Error(`生成场景失败: ${error instanceof Error ? error.message : '未知错误'}`);
   }
 }
@@ -689,7 +777,7 @@ async function generateSceneParagraphsForOpenAI(
     }
 
     // 构建段落生成提示词
-    const prompt = USER_PROMPT_PARAGRAPHS_BOUNDING
+    const prompt = USER_PROMPT_STORY_CHAPTER_PARAGRAPHS_BOUNDING
       .replace(/{sceneTitle}/g, sceneTitle)
       .replace(/{sceneSummary}/g, sceneSummary)
       .replace(/{characters}/g, characters.map(c => c.name).join('、'));
@@ -727,7 +815,7 @@ async function generateSceneParagraphsForOpenAI(
       messages: [
         {
           role: "system",
-          content: SYSTEM_PROMPT_PARAGRAPHS_BOUNDING
+          content: SYSTEM_PROMPT_STORY_CHAPTER_PARAGRAPHS_BOUNDING
         },
         {
           role: "user",

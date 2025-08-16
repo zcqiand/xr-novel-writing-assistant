@@ -62,3 +62,7 @@ This file records architectural and implementation decisions using a list format
 [2025-08-16 00:09:00] - 修改表名和字段名：根据用户反馈，将表名和字段名统一修改：story_outlines表改为stories，story_id字段改为story_id，chapter_scenes表改为story_chapter_scenes，scene_paragraphs表改为story_chapter_scene_paragraphs_bounding，full_scene_contents表改为story_chapter_scene_paragraphs。同时更新了所有代码中的表名引用。
 
 [2025-08-16 03:17:00] - 修改故事篇幅默认值：根据用户需求"选择故事篇幅默认是中篇小说，我要默认短篇小说"，将page.tsx中的selectedLength状态默认值从'medium'改为'short'，同时修复了UnifiedSelector.tsx中接口定义的类型不匹配问题，确保selectedLength属性类型为'short' | 'medium' | 'long'。
+
+[2025-08-16 04:26:00] - 决策为场景生成API添加详细错误日志系统：根据用户报告的POST /api/generate-story?stage=scenes 500错误，决定实施全面的错误日志记录系统。实现方案包括：1) 在API路由层添加请求参数验证、详细执行日志和结构化错误捕获；2) 在AI故事生成器核心函数中添加函数级别日志、数据结构验证和执行流程跟踪；3) 在OpenAI API调用层添加环境变量检查、测试模式检测和响应处理日志；4) 在Supabase数据库操作层添加详细的错误信息记录，包括错误代码、详情、提示信息和堆栈跟踪。目标是提高系统可调试性，快速定位和解决500错误的根本原因。创建了test-error-logging.js测试脚本用于验证错误日志功能的有效性。
+
+[2025-08-16 06:52:00] - 决策修复API路由中的临时ID问题：根据用户反馈，决定将POST /api/generate-story?stage=outline端点返回的临时ID'temp-id'改为从Supabase数据库返回的真实ID。实现方案包括：1) 修改generateStoryOutline函数的返回类型，从单一StoryOutline对象改为包含outline和story_id的对象；2) 在数据库插入操作成功后提取并返回真实的story_id；3) 更新API路由中的调用逻辑，使用解构赋值获取真实的数据库ID；4) 确保后续所有生成阶段（场景、段落、完整内容）都能正确关联到数据库中的故事记录。这个修复解决了数据一致性问题，确保每个故事操作都能正确关联到对应的数据库记录。

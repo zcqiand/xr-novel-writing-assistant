@@ -42,19 +42,80 @@ export async function POST(request: NextRequest) {
         console.log('故事篇幅:', length);
         console.log('==================');
 
-        const outlineData = await generateStoryOutline(protagonist, plot, conflict, outcome, length);
+        const { outline: outlineData, story_id } = await generateStoryOutline(protagonist, plot, conflict, outcome, length);
 
         // 返回大纲数据和ID
         return NextResponse.json({
           outline: outlineData,
-          story_id: 'temp-id' // 临时ID，实际应该从数据库返回
+          story_id: story_id // 使用从数据库返回的真实ID
         });
 
       case 'scenes':
-        const scenesBody = await request.json();
-        const { outline, story_id } = scenesBody;
-        const scenes = await generateScenes(outline, story_id);
-        return NextResponse.json(scenes);
+        let scenesBody: any;
+        try {
+          console.log('=== 场景生成API开始 ===');
+          console.log('时间:', new Date().toISOString());
+          console.log('请求URL:', request.url);
+
+          scenesBody = await request.json();
+          console.log('请求体:', JSON.stringify(scenesBody, null, 2));
+
+          // 验证必要参数
+          if (!scenesBody.outline) {
+            console.error('❌ scenes 验证失败: outline 参数缺失');
+            return NextResponse.json(
+              { error: "缺少必要参数: outline", details: "outline 参数是必需的" },
+              { status: 400 }
+            );
+          }
+
+          if (!scenesBody.story_id) {
+            console.error('❌ scenes 验证失败: story_id 参数缺失');
+            return NextResponse.json(
+              { error: "缺少必要参数: story_id", details: "story_id 参数是必需的" },
+              { status: 400 }
+            );
+          }
+
+          const { outline, story_id } = scenesBody;
+          console.log('开始生成场景，故事ID:', story_id);
+          console.log('大纲标题:', outline?.title || '未指定');
+          console.log('大纲章节数:', outline?.chapters?.length || 0);
+
+          const scenes = await generateScenes(outline, story_id);
+          console.log('场景生成完成，生成章节数:', scenes.length);
+
+          console.log('=== 场景生成API成功完成 ===');
+          return NextResponse.json(scenes);
+
+        } catch (error) {
+          console.error('❌ 场景生成API失败:', error);
+          console.error('错误类型:', error instanceof Error ? error.constructor.name : '未知类型');
+          console.error('错误消息:', error instanceof Error ? error.message : '未知错误');
+          console.error('错误堆栈:', error instanceof Error ? error.stack : '无堆栈信息');
+
+          // 记录更详细的错误信息
+          const errorDetails = {
+            timestamp: new Date().toISOString(),
+            endpoint: '/api/generate-story',
+            stage: 'scenes',
+            error: error instanceof Error ? error.message : '未知错误',
+            errorType: error instanceof Error ? error.constructor.name : '未知类型',
+            requestUrl: request.url,
+            requestBody: scenesBody
+          };
+
+          console.error('详细错误信息:', JSON.stringify(errorDetails, null, 2));
+
+          return NextResponse.json(
+            {
+              error: "生成场景失败",
+              details: error instanceof Error ? error.message : '未知错误',
+              timestamp: errorDetails.timestamp
+            },
+            { status: 500 }
+          );
+        }
 
       case 'paragraphs':
         const paragraphsBody = await request.json();
