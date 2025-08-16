@@ -328,6 +328,57 @@ export default function StoryContent({
   };
 
   /**
+   * 计算文本字数
+   */
+  const calculateWordCount = (text: string): number => {
+    if (!text) return 0;
+    // 移除空白字符后计算字符数
+    return text.replace(/\s/g, '').length;
+  };
+
+  /**
+   * 计算书籍总字数
+   */
+  const calculateTotalWordCount = (): number => {
+    if (!storyData?.scene_paragraphs) return 0;
+
+    let totalWords = 0;
+    storyData.scene_paragraphs.forEach(scene => {
+      totalWords += calculateWordCount(scene.full_content);
+    });
+
+    return totalWords;
+  };
+
+  /**
+   * 计算每章字数
+   */
+  const calculateChapterWordCounts = (): { [key: number]: number } => {
+    if (!storyData?.scene_paragraphs) return {};
+
+    const chapterWordCounts: { [key: number]: number } = {};
+
+    storyData.scene_paragraphs.forEach(scene => {
+      if (!chapterWordCounts[scene.chapter_number]) {
+        chapterWordCounts[scene.chapter_number] = 0;
+      }
+      chapterWordCounts[scene.chapter_number] += calculateWordCount(scene.full_content);
+    });
+
+    return chapterWordCounts;
+  };
+
+  /**
+   * 获取章节标题
+   */
+  const getChapterTitle = (chapterNumber: number): string => {
+    if (!storyData?.outline_data?.chapters) return `第${chapterNumber}章`;
+
+    const chapter = storyData.outline_data.chapters.find(ch => ch.chapter === chapterNumber);
+    return chapter ? `第${chapterNumber}章 - ${chapter.title}` : `第${chapterNumber}章`;
+  };
+
+  /**
    * 渲染章节内容
    */
   const renderChapterContent = () => {
@@ -348,28 +399,50 @@ export default function StoryContent({
       chaptersByNumber[scene.chapter_number].push(scene);
     });
 
+    // 计算各章字数
+    const chapterWordCounts = calculateChapterWordCounts();
+    const totalWordCount = calculateTotalWordCount();
+
     return (
       <div className="space-y-8">
-        {Object.entries(chaptersByNumber).map(([chapterNumber, scenes]) => (
-          <div key={chapterNumber} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-gray-800">
-                第{chapterNumber}章
-              </h3>
-            </div>
-            <div className="p-6 space-y-6">
-              {scenes.map((scene) => (
-                <div key={scene.id} className="border-l-4 border-green-400 pl-4">
-                  <div className="prose prose-sm max-w-none">
-                    <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
-                      {scene.full_content}
+        {/* 显示书籍总字数 */}
+        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-4 border border-yellow-200">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-yellow-800">书籍总字数</span>
+            <span className="text-lg font-bold text-yellow-900">{totalWordCount.toLocaleString()} 字</span>
+          </div>
+        </div>
+
+        {Object.entries(chaptersByNumber).map(([chapterNumber, scenes]) => {
+          const chapterWordCount = chapterWordCounts[parseInt(chapterNumber)] || 0;
+          const chapterTitle = getChapterTitle(parseInt(chapterNumber));
+
+          return (
+            <div key={chapterNumber} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-gray-800">
+                    {chapterTitle}
+                  </h3>
+                  <span className="text-sm font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                    {chapterWordCount.toLocaleString()} 字
+                  </span>
+                </div>
+              </div>
+              <div className="p-6 space-y-6">
+                {scenes.map((scene) => (
+                  <div key={scene.id} className="border-l-4 border-green-400 pl-4">
+                    <div className="prose prose-sm max-w-none">
+                      <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                        {scene.full_content}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   };
