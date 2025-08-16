@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AIStoryGenerator } from '@/lib/ai-story-generator';
 import { generateStoryOutline, generateScenes, generateParagraphsBounding, generateParagraphs, assembleFullBook, generateBookMarkdown } from '@/lib/ai-story-generator';
 
 // 环境变量配置
@@ -16,15 +15,16 @@ const isTestMode = config.apiKey === 'test-api-key-for-debugging';
 
 /**
  * POST /api/generate-story
- * 生成故事的API端点
+ * 统一的故事生成API端点
+ * 通过action参数控制不同的生成阶段
  */
 export async function POST(request: NextRequest) {
-  const { stage } = Object.fromEntries(request.nextUrl.searchParams);
+  const { action } = Object.fromEntries(request.nextUrl.searchParams);
 
   try {
-    switch (stage) {
-      case 'outline':
-        // 尝试从请求体中获取前端传递的故事元素
+    switch (action) {
+      case 'generate-outline':
+        // 生成故事大纲
         const outlineBody = await request.json();
 
         // 构建故事元素参数，优先使用前端传递的值，否则使用默认值
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
         const plot = outlineBody.plot || "未指定情节发展";
         const conflict = outlineBody.conflict || "未指定冲突";
         const outcome = outlineBody.outcome || "未指定故事结局";
-        const length = outlineBody.length || 'medium';
+        const length = outlineBody.length || 'short';
 
         console.log('=== 大纲生成参数 ===');
         console.log('主角类型:', protagonist);
@@ -46,97 +46,77 @@ export async function POST(request: NextRequest) {
 
         // 返回大纲数据和ID
         return NextResponse.json({
-          outline: outlineData,
-          story_id: story_id // 使用从数据库返回的真实ID
+          success: true,
+          data: {
+            outline: outlineData,
+            story_id: story_id // 使用从数据库返回的真实ID
+          },
+          message: '故事大纲生成成功'
         });
 
-      case 'scenes':
-        let scenesBody: any;
-        try {
-          console.log('=== 场景生成API开始 ===');
-          console.log('时间:', new Date().toISOString());
-          console.log('请求URL:', request.url);
+      case 'generate-scenes':
+        // 生成场景
+        const scenesBody = await request.json();
 
-          scenesBody = await request.json();
-          console.log('请求体:', JSON.stringify(scenesBody, null, 2));
-
-          // 验证必要参数
-          if (!scenesBody.outline) {
-            console.error('❌ scenes 验证失败: outline 参数缺失');
-            return NextResponse.json(
-              { error: "缺少必要参数: outline", details: "outline 参数是必需的" },
-              { status: 400 }
-            );
-          }
-
-          if (!scenesBody.story_id) {
-            console.error('❌ scenes 验证失败: story_id 参数缺失');
-            return NextResponse.json(
-              { error: "缺少必要参数: story_id", details: "story_id 参数是必需的" },
-              { status: 400 }
-            );
-          }
-
-          const { outline, story_id } = scenesBody;
-          console.log('开始生成场景，故事ID:', story_id);
-          console.log('大纲标题:', outline?.title || '未指定');
-          console.log('大纲章节数:', outline?.chapters?.length || 0);
-
-          const scenes = await generateScenes(outline, story_id);
-          console.log('场景生成完成，生成章节数:', scenes.length);
-
-          console.log('=== 场景生成API成功完成 ===');
-          return NextResponse.json(scenes);
-
-        } catch (error) {
-          console.error('❌ 场景生成API失败:', error);
-          console.error('错误类型:', error instanceof Error ? error.constructor.name : '未知类型');
-          console.error('错误消息:', error instanceof Error ? error.message : '未知错误');
-          console.error('错误堆栈:', error instanceof Error ? error.stack : '无堆栈信息');
-
-          // 记录更详细的错误信息
-          const errorDetails = {
-            timestamp: new Date().toISOString(),
-            endpoint: '/api/generate-story',
-            stage: 'scenes',
-            error: error instanceof Error ? error.message : '未知错误',
-            errorType: error instanceof Error ? error.constructor.name : '未知类型',
-            requestUrl: request.url,
-            requestBody: scenesBody
-          };
-
-          console.error('详细错误信息:', JSON.stringify(errorDetails, null, 2));
-
+        // 验证必要参数
+        if (!scenesBody.outline) {
+          console.error('❌ scenes 验证失败: outline 参数缺失');
           return NextResponse.json(
-            {
-              error: "生成场景失败",
-              details: error instanceof Error ? error.message : '未知错误',
-              timestamp: errorDetails.timestamp
-            },
-            { status: 500 }
+            { success: false, error: "缺少必要参数: outline", details: "outline 参数是必需的" },
+            { status: 400 }
           );
         }
 
-      case 'paragraphs':
+        if (!scenesBody.story_id) {
+          console.error('❌ scenes 验证失败: story_id 参数缺失');
+          return NextResponse.json(
+            { success: false, error: "缺少必要参数: story_id", details: "story_id 参数是必需的" },
+            { status: 400 }
+          );
+        }
+
+        const { outline, story_id: scenesStoryId } = scenesBody;
+        console.log('开始生成场景，故事ID:', scenesStoryId);
+        console.log('大纲标题:', outline?.title || '未指定');
+        console.log('大纲章节数:', outline?.chapters?.length || 0);
+
+        const scenes = await generateScenes(outline, scenesStoryId);
+        console.log('场景生成完成，生成章节数:', scenes.length);
+
+        return NextResponse.json({
+          success: true,
+          data: scenes,
+          message: '场景生成成功'
+        });
+
+      case 'generate-paragraphs-bounding':
+        // 生成段落（边界）
         const paragraphsBody = await request.json();
 
-        // 检查必要参数是否存在
+        // 检查必要参数
         if (!paragraphsBody.outline) {
           console.error('❌ paragraphs 验证失败: outline 参数缺失');
           return NextResponse.json(
-            { error: "缺少必要参数: outline", details: "outline 参数是必需的" },
+            { success: false, error: "缺少必要参数: outline", details: "outline 参数是必需的" },
             { status: 400 }
           );
         }
         if (!paragraphsBody.scenes) {
           console.error('❌ paragraphs 验证失败: scenes 参数缺失');
           return NextResponse.json(
-            { error: "缺少必要参数: scenes", details: "scenes 参数是必需的" },
+            { success: false, error: "缺少必要参数: scenes", details: "scenes 参数是必需的" },
+            { status: 400 }
+          );
+        }
+        if (!paragraphsBody.story_id) {
+          console.error('❌ paragraphs 验证失败: story_id 参数缺失');
+          return NextResponse.json(
+            { success: false, error: "缺少必要参数: story_id", details: "story_id 参数是必需的" },
             { status: 400 }
           );
         }
 
-        // 检查 scenes 的结构 - 根据前端传递的数据结构调整
+        // 处理scenes数据结构
         let scenesArray: Array<{
           chapter: number;
           scenes: Array<{
@@ -146,10 +126,8 @@ export async function POST(request: NextRequest) {
           }>;
         }> = [];
         if (Array.isArray(paragraphsBody.scenes)) {
-          // 如果是数组（前端传递的 scenesData），直接使用
           scenesArray = paragraphsBody.scenes;
         } else if (paragraphsBody.scenes && typeof paragraphsBody.scenes === 'object') {
-          // 如果是单个章节对象，检查是否有 scenes 属性
           if (paragraphsBody.scenes.scenes && Array.isArray(paragraphsBody.scenes.scenes)) {
             scenesArray = [paragraphsBody.scenes];
           } else {
@@ -158,7 +136,7 @@ export async function POST(request: NextRequest) {
         } else {
           console.error('❌ scenes 数据结构异常:', paragraphsBody.scenes);
           return NextResponse.json(
-            { error: "scenes 数据结构异常", details: `期望数组或对象，实际类型: ${typeof paragraphsBody.scenes}` },
+            { success: false, error: "scenes 数据结构异常", details: `期望数组或对象，实际类型: ${typeof paragraphsBody.scenes}` },
             { status: 400 }
           );
         }
@@ -171,8 +149,6 @@ export async function POST(request: NextRequest) {
           closingParagraph: string;
         }> = [];
 
-        // scenesArray 已经在上面处理过了，这里直接使用
-
         for (const chapterScenes of scenesArray) {
           if (isTestMode) {
             // 测试模式：生成模拟段落数据
@@ -182,8 +158,8 @@ export async function POST(request: NextRequest) {
               summary: string;
             }) => {
               const title = scene.title || '未知场景';
-              const opening = `开头段落示例：${title} 开始的精彩故事。`; // 模拟开头段落
-              const closing = `结尾段落示例：${title} 结束的精彩故事。`; // 模拟结尾段落
+              const opening = `开头段落示例：${title} 开始的精彩故事。`;
+              const closing = `结尾段落示例：${title} 结束的精彩故事。`;
               return {
                 sceneNumber: scene.sceneNumber,
                 title: scene.title,
@@ -199,35 +175,47 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        return NextResponse.json(allParagraphs);
+        return NextResponse.json({
+          success: true,
+          data: allParagraphs,
+          message: '段落（边界）生成成功'
+        });
 
-      case 'full':
+      case 'generate-paragraphs':
+        // 生成段落（完整场景内容）
         const fullBody = await request.json();
 
-        // 检查必要参数是否存在
+        // 检查必要参数
         if (!fullBody.outline) {
           console.error('❌ full 验证失败: outline 参数缺失');
           return NextResponse.json(
-            { error: "缺少必要参数: outline", details: "outline 参数是必需的" },
+            { success: false, error: "缺少必要参数: outline", details: "outline 参数是必需的" },
             { status: 400 }
           );
         }
         if (!fullBody.scenes) {
           console.error('❌ full 验证失败: scenes 参数缺失');
           return NextResponse.json(
-            { error: "缺少必要参数: scenes", details: "scenes 参数是必需的" },
+            { success: false, error: "缺少必要参数: scenes", details: "scenes 参数是必需的" },
             { status: 400 }
           );
         }
         if (!fullBody.paragraphs) {
           console.error('❌ full 验证失败: paragraphs 参数缺失');
           return NextResponse.json(
-            { error: "缺少必要参数: paragraphs", details: "paragraphs 参数是必需的" },
+            { success: false, error: "缺少必要参数: paragraphs", details: "paragraphs 参数是必需的" },
+            { status: 400 }
+          );
+        }
+        if (!fullBody.story_id) {
+          console.error('❌ full 验证失败: story_id 参数缺失');
+          return NextResponse.json(
+            { success: false, error: "缺少必要参数: story_id", details: "story_id 参数是必需的" },
             { status: 400 }
           );
         }
 
-        // 检查 scenes 的结构 - 根据前端传递的数据结构调整
+        // 处理scenes数据结构
         let fullScenesArray: Array<{
           chapter: number;
           scenes: Array<{
@@ -237,10 +225,8 @@ export async function POST(request: NextRequest) {
           }>;
         }> = [];
         if (Array.isArray(fullBody.scenes)) {
-          // 如果是数组（前端传递的 scenesData），直接使用
           fullScenesArray = fullBody.scenes;
         } else if (fullBody.scenes && typeof fullBody.scenes === 'object') {
-          // 如果是单个章节对象，检查是否有 scenes 属性
           if (fullBody.scenes.scenes && Array.isArray(fullBody.scenes.scenes)) {
             fullScenesArray = [fullBody.scenes];
           } else {
@@ -249,7 +235,7 @@ export async function POST(request: NextRequest) {
         } else {
           console.error('❌ fullBody.scenes 数据结构异常:', fullBody.scenes);
           return NextResponse.json(
-            { error: "scenes 数据结构异常", details: `期望数组或对象，实际类型: ${typeof fullBody.scenes}` },
+            { success: false, error: "scenes 数据结构异常", details: `期望数组或对象，实际类型: ${typeof fullBody.scenes}` },
             { status: 400 }
           );
         }
@@ -262,8 +248,6 @@ export async function POST(request: NextRequest) {
           continuityNotes: string[];
         }> = [];
 
-        // fullScenesArray 已经在上面处理过了，这里直接使用
-
         for (const chapterScenes of fullScenesArray) {
           const chapterFullContent = await generateParagraphs(
             fullBody.outline,
@@ -274,26 +258,26 @@ export async function POST(request: NextRequest) {
           allFullContent.push(...chapterFullContent);
         }
 
-        // 将数组转换为字符串
-        const fullContent = JSON.stringify(allFullContent, null, 2);
-        return new NextResponse(fullContent, {
-          headers: { 'Content-Type': 'text/markdown' }
+        return NextResponse.json({
+          success: true,
+          data: allFullContent,
+          message: '段落（完整场景内容）生成成功'
         });
 
-      case 'assemble':
-        // 获取大纲文件路径
-        const { outlineFilePath } = await request.json();
+      case 'assemble-book':
+        // 组装完整书籍
+        const assembleBody = await request.json();
 
-        if (!outlineFilePath) {
+        if (!assembleBody.story_id) {
           return NextResponse.json(
-            { error: "缺少必要参数: outlineFilePath", details: "outlineFilePath 参数是必需的" },
+            { success: false, error: "缺少必要参数: story_id", details: "story_id 参数是必需的" },
             { status: 400 }
           );
         }
 
         try {
           // 组装完整书籍
-          const fullBook = await assembleFullBook(outlineFilePath);
+          const fullBook = await assembleFullBook(assembleBody.story_id);
 
           // 返回完整书籍内容
           return new NextResponse(generateBookMarkdown(fullBook), {
@@ -302,20 +286,25 @@ export async function POST(request: NextRequest) {
         } catch (error) {
           console.error('组装完整书籍失败:', error);
           return NextResponse.json(
-            { error: `组装完整书籍失败: ${error instanceof Error ? error.message : '未知错误'}` },
+            { success: false, error: `组装完整书籍失败: ${error instanceof Error ? error.message : '未知错误'}` },
             { status: 500 }
           );
         }
 
       default:
         return NextResponse.json(
-          { error: "无效的生成阶段" },
+          { success: false, error: "无效的操作类型" },
           { status: 400 }
         );
     }
   } catch (error) {
+    console.error('❌ API调用失败:', error);
     return NextResponse.json(
-      { error: `生成失败: ${error instanceof Error ? error.message : '未知错误'}` },
+      {
+        success: false,
+        error: `生成失败: ${error instanceof Error ? error.message : '未知错误'}`,
+        timestamp: new Date().toISOString()
+      },
       { status: 500 }
     );
   }
@@ -329,11 +318,12 @@ export async function GET() {
   try {
     if (!config.apiKey) {
       return NextResponse.json(
-        { error: '服务器配置错误：缺少API密钥' },
+        { success: false, error: '服务器配置错误：缺少API密钥' },
         { status: 500 }
       );
     }
 
+    const { AIStoryGenerator } = await import('@/lib/ai-story-generator');
     const aiGenerator = new AIStoryGenerator(config);
     const isConnected = await aiGenerator.testConnection();
 

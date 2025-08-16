@@ -443,7 +443,7 @@ export default function UnifiedSelector({
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md"
             aria-label="选择故事篇幅"
           >
-            <option value="short">短篇故事（约5-10章）</option>
+            <option value="short">短篇故事（约5-8章）</option>
             <option value="medium">中篇故事（约15-30章）</option>
             <option value="long">长篇故事（50章以上）</option>
           </select>
@@ -541,7 +541,7 @@ export default function UnifiedSelector({
             <div className="flex items-center">
               <span className="w-20 font-medium">故事篇幅:</span>
               <span>
-                {selectedLength === 'short' && '短篇故事（约5-10章）'}
+                {selectedLength === 'short' && '短篇故事（约5-8章）'}
                 {selectedLength === 'medium' && '中篇故事（约15-30章）'}
                 {selectedLength === 'long' && '长篇故事（50章以上）'}
                 {!selectedLength && '未选择'}

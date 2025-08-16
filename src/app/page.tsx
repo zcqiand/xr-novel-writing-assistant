@@ -171,7 +171,7 @@ export default function Home() {
 
     setIsGenerating(true);
     setGenerationStage('outline');
-    setProgress(25);
+    setProgress(20);
 
     try {
       // 构建故事元素参数
@@ -200,64 +200,84 @@ export default function Home() {
       console.log('===========================');
 
       // 第一回合：生成大纲
-      const outlineRes = await fetch('/api/generate-story?stage=outline', {
+      const outlineRes = await fetch('/api/generate-story?action=generate-outline', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(storyElements)
       });
-      const outlineData = await outlineRes.json();
+      const outlineResult = await outlineRes.json();
 
+      if (!outlineResult.success) {
+        throw new Error(outlineResult.error || '生成大纲失败');
+      }
+
+      const outlineData = outlineResult.data;
       setGenerationStage('scenes');
-      setProgress(50);
+      setProgress(40);
 
       // 第二回合：生成场景
-      const scenesRes = await fetch('/api/generate-story?stage=scenes', {
+      const scenesRes = await fetch('/api/generate-story?action=generate-scenes', {
         method: 'POST',
-        body: JSON.stringify({ outline: outlineData }),
+        body: JSON.stringify({
+          outline: outlineData.outline,
+          story_id: outlineData.story_id
+        }),
         headers: { 'Content-Type': 'application/json' }
       });
-      const scenesData = await scenesRes.json();
+      const scenesResult = await scenesRes.json();
 
+      if (!scenesResult.success) {
+        throw new Error(scenesResult.error || '生成场景失败');
+      }
+
+      const scenesData = scenesResult.data;
       setGenerationStage('paragraphs');
-      setProgress(75);
+      setProgress(60);
 
-      // 第三回合：生成段落 - 传递所有章节
-      const paragraphsRes = await fetch('/api/generate-story?stage=paragraphs', {
+      // 第三回合：生成段落（边界）
+      const paragraphsRes = await fetch('/api/generate-story?action=generate-paragraphs-bounding', {
         method: 'POST',
         body: JSON.stringify({
-          outline: outlineData,
-          scenes: scenesData // 传递所有章节，而不是只传递第一个
+          outline: outlineData.outline,
+          scenes: scenesData,
+          story_id: outlineData.story_id
         }),
         headers: { 'Content-Type': 'application/json' }
       });
-      const paragraphsData = await paragraphsRes.json();
+      const paragraphsResult = await paragraphsRes.json();
 
+      if (!paragraphsResult.success) {
+        throw new Error(paragraphsResult.error || '生成段落失败');
+      }
+
+      const paragraphsData = paragraphsResult.data;
       setGenerationStage('full');
-      setProgress(90);
+      setProgress(80);
 
-      // 第四回合：生成场景完整内容 - 传递所有章节
-      const fullRes = await fetch('/api/generate-story?stage=full', {
+      // 第四回合：生成段落（完整场景内容）
+      const fullRes = await fetch('/api/generate-story?action=generate-paragraphs', {
         method: 'POST',
         body: JSON.stringify({
-          outline: outlineData,
-          scenes: scenesData, // 传递所有章节，而不是只传递第一个
-          paragraphs: paragraphsData
+          outline: outlineData.outline,
+          scenes: scenesData,
+          paragraphs: paragraphsData,
+          story_id: outlineData.story_id
         }),
         headers: { 'Content-Type': 'application/json' }
       });
-      setGeneratedStory(await fullRes.text());
+      const fullResult = await fullRes.json();
+
+      if (!fullResult.success) {
+        throw new Error(fullResult.error || '生成完整内容失败');
+      }
 
       setGenerationStage('assemble');
-      setProgress(95);
+      setProgress(90);
 
       // 第五回合：组装完整书籍
-      // 首先保存大纲文件到data目录
-      const safeTitle = (outlineData.title || '未命名故事').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
-      const outlineFilePath = `data/${safeTitle}-story-outline.json`;
-
-      const assembleRes = await fetch('/api/generate-story?stage=assemble', {
+      const assembleRes = await fetch('/api/generate-story?action=assemble-book', {
         method: 'POST',
-        body: JSON.stringify({ outlineFilePath }),
+        body: JSON.stringify({ story_id: outlineData.story_id }),
         headers: { 'Content-Type': 'application/json' }
       });
       const assembledBook = await assembleRes.text();
@@ -285,7 +305,7 @@ export default function Home() {
     setIsRefreshing(true);
     try {
       // 获取最新故事的大纲数据
-      const outlineRes = await fetch('/api/generate-story?stage=outline', {
+      const outlineRes = await fetch('/api/generate-story?action=generate-outline', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -305,13 +325,19 @@ export default function Home() {
           length: selectedLength
         })
       });
-      const outlineData = await outlineRes.json();
+      const outlineResult = await outlineRes.json();
+
+      if (!outlineResult.success) {
+        throw new Error(outlineResult.error || '生成大纲失败');
+      }
+
+      const outlineData = outlineResult.data;
       console.log('重新生成大纲数据:', outlineData);
 
       // 重新组装完整书籍
-      const assembleRes = await fetch('/api/generate-story?stage=assemble', {
+      const assembleRes = await fetch('/api/generate-story?action=assemble-book', {
         method: 'POST',
-        body: JSON.stringify({ outlineFilePath: 'data/latest-story-outline.json' }),
+        body: JSON.stringify({ story_id: outlineData.story_id }),
         headers: { 'Content-Type': 'application/json' }
       });
       const refreshedBook = await assembleRes.text();
@@ -491,7 +517,7 @@ export default function Home() {
                 <div className="progress-label">
                   {generationStage === 'outline' && "生成大纲中..."}
                   {generationStage === 'scenes' && "生成场景中..."}
-                  {generationStage === 'paragraphs' && "生成段落中..."}
+                  {generationStage === 'paragraphs' && "生成段落边界中..."}
                   {generationStage === 'full' && "生成完整内容中..."}
                   {generationStage === 'assemble' && "组装完整书籍中..."}
                 </div>

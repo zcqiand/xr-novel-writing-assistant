@@ -318,7 +318,7 @@ export class AIStoryGenerator {
     outcome: string,
     length?: 'short' | 'medium' | 'long'
   ): string {
-    const lengthDescription = length ? this.getLengthDescription(length) : '短篇故事，约5-10章';
+    const lengthDescription = length ? this.getLengthDescription(length) : '短篇故事，约5-8章';
 
     return USER_PROMPT_STORY_OUTLINE
       .replace(/{protagonist}/g, protagonist)
@@ -335,11 +335,11 @@ export class AIStoryGenerator {
    */
   private getLengthDescription(length: string): string {
     const lengthMap: Record<string, string> = {
-      'short': '短篇故事，约5-10章',
+      'short': '短篇故事，约5-8章',
       'medium': '中篇故事，约15-30章',
       'long': '长篇故事，50章以上'
     };
-    return lengthMap[length] || '短篇故事，约5-10章';
+    return lengthMap[length] || '短篇故事，约5-8章';
   }
 
 }
@@ -1284,13 +1284,37 @@ async function assembleFullBook(
       outlineData = outlineRecords[0];
     }
 
+    // 添加调试日志 - 检查outlineData的结构
+    console.log('=== 调试信息: outlineData结构 ===');
+    console.log('outlineData:', JSON.stringify(outlineData, null, 2));
+    console.log('outlineData类型:', typeof outlineData);
+    console.log('outlineData.chapters存在:', !!outlineData.chapters);
+    console.log('outlineData.chapters类型:', typeof outlineData.chapters);
+    console.log('outlineData.chapters值:', outlineData.chapters);
+    console.log('outlineData.outline_data存在:', !!outlineData.outline_data);
+    console.log('outlineData.outline_data类型:', typeof outlineData.outline_data);
+    console.log('outlineData.outline_data.chapters存在:', !!outlineData.outline_data?.chapters);
+    console.log('outlineData.outline_data.chapters类型:', typeof outlineData.outline_data?.chapters);
+    console.log('outlineData.outline_data.chapters值:', outlineData.outline_data?.chapters);
+    console.log('=====================================');
+
     // 使用故事中的书籍标题
     const bookTitle = outlineData.title || `${outlineData.outline_data.characters[0]?.name || '主角'}的故事`;
 
     const chapters: FullChapterContent[] = [];
 
+    // 修复：尝试从outline_data.chapters获取章节，如果直接访问chapters失败则使用outline_data.chapters
+    const chaptersToIterate = outlineData.chapters || outlineData.outline_data?.chapters;
+
+    if (!chaptersToIterate || !Array.isArray(chaptersToIterate)) {
+      console.error('❌ chapters字段不是数组或不存在');
+      console.error('outlineData.chapters:', outlineData.chapters);
+      console.error('outlineData.outline_data.chapters:', outlineData.outline_data?.chapters);
+      throw new Error('章节数据格式错误：chapters字段不是数组或不存在');
+    }
+
     // 遍历所有章节
-    for (const chapter of outlineData.chapters) {
+    for (const chapter of chaptersToIterate) {
       // 从Supabase读取场景数据
       const { data: chapterScenesData, error: scenesError } = await supabase
         .from('story_chapter_scenes')
@@ -1308,10 +1332,37 @@ async function assembleFullBook(
         continue;
       }
 
+      // 添加调试日志 - 检查场景数据结构
+      console.log(`=== 调试信息: 章节 ${chapter.chapter} 场景数据结构 ===`);
+      console.log(`chapterScenesData长度:`, chapterScenesData.length);
+      console.log(`chapterScenesData[0]:`, JSON.stringify(chapterScenesData[0], null, 2));
+      console.log(`scenes_data字段存在:`, !!chapterScenesData[0]?.scenes_data);
+      console.log(`scenes_data字段类型:`, typeof chapterScenesData[0]?.scenes_data);
+      console.log(`scenes_data字段值:`, chapterScenesData[0]?.scenes_data);
+      console.log(`=============================================`);
+
       const chapterScenes: FullSceneContent[] = [];
 
+      // 修复：检查scenes_data字段结构并正确访问场景数据
+      const scenesData = chapterScenesData[0]?.scenes_data;
+      if (!scenesData) {
+        console.warn(`章节 ${chapter.chapter} 的scenes_data字段不存在，跳过场景处理`);
+        continue;
+      }
+
+      // scenes_data的实际结构是 { scenes: [...], chapter: number }
+      // 需要访问 scenes_data.scenes 数组
+      const scenesArray = scenesData.scenes;
+      if (!scenesArray || !Array.isArray(scenesArray)) {
+        console.warn(`章节 ${chapter.chapter} 的scenes_data.scenes字段不是数组或不存在，跳过场景处理`);
+        console.warn(`scenesArray值:`, scenesArray);
+        continue;
+      }
+
+      console.log(`✅ 章节 ${chapter.chapter} 找到 ${scenesArray.length} 个场景`);
+
       // 遍历章节中的所有场景
-      for (const sceneData of chapterScenesData[0].scenes_data) {
+      for (const sceneData of scenesArray) {
         // 从Supabase读取完整场景内容
         const { data: fullSceneData, error: fullSceneError } = await supabase
           .from('story_chapter_scene_paragraphs')
