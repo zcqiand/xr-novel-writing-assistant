@@ -16,7 +16,7 @@ export interface StoryListItem {
 /**
  * API响应接口
  */
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = StoryListItem[]> {
   success: boolean;
   data?: T;
   error?: string;

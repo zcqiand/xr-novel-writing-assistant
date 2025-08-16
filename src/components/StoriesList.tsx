@@ -80,7 +80,7 @@ export default function StoriesList({
         hour: '2-digit',
         minute: '2-digit'
       });
-    } catch (error) {
+    } catch {
       return dateString;
     }
   };
@@ -174,7 +174,7 @@ export default function StoriesList({
             />
           </svg>
           <h3 className="text-lg font-medium text-gray-900 mb-2">暂无书籍</h3>
-          <p className="text-gray-500 text-sm">还没有生成任何书籍，点击"生成故事"开始创作吧！</p>
+          <p className="text-gray-500 text-sm">还没有生成任何书籍，点击&ldquo;生成故事&rdquo;开始创作吧！</p>
         </div>
       </div>
     );

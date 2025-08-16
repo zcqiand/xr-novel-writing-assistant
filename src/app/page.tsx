@@ -10,7 +10,7 @@ import GenerateButton from "@/components/GenerateButton";
 import StoryDisplay from "@/components/StoryDisplay";
 import UnifiedSelector from "@/components/UnifiedSelector";
 import GeneratedStoriesButton from "@/components/GeneratedStoriesButton";
-import StoriesList from "@/components/StoriesList";
+import StoriesList, { StoryListItem } from "@/components/StoriesList";
 import StoryContent from "@/components/StoryContent";
 import { PlottoParser } from "@/lib/plotto-parser";
 import { StoryGenerator } from "@/lib/story-generator";
@@ -100,7 +100,7 @@ export default function Home() {
   // 新增：已生成故事相关状态
   const [showStoriesList, setShowStoriesList] = useState<boolean>(false);
   const [selectedStoryId, setSelectedStoryId] = useState<string | null>(null);
-  const [stories, setStories] = useState<any[]>([]);
+  const [stories, setStories] = useState<StoryListItem[]>([]);
   const [isLoadingStories, setIsLoadingStories] = useState<boolean>(false);
   const [storiesError, setStoriesError] = useState<string | null>(null);
 
@@ -358,26 +358,6 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 重置所有状态到初始状态
-  const resetAllStates = () => {
-    setShowStoriesList(false);
-    setSelectedStoryId(null);
-    setStories([]);
-    setStoriesError(null);
-    setGeneratedStory("");
-    setSelectedElements({
-      characters: [],
-      subjects: [],
-      predicates: null,
-      conflicts: [],
-      outcomes: [],
-    });
-    setSelectedProtagonist(null);
-    setGenerationStage('idle');
-    setProgress(0);
-    // 滚动到顶部
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
 
 

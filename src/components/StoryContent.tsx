@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -143,7 +143,7 @@ export default function StoryContent({
   /**
    * 获取完整书籍数据
    */
-  const fetchFullStoryData = async () => {
+  const fetchFullStoryData = useCallback(async () => {
     if (!storyId) return;
 
     // 调试日志：检查 Supabase 客户端状态
@@ -217,7 +217,7 @@ export default function StoryContent({
     } finally {
       setIsDataLoading(false);
     }
-  };
+  }, [storyId]);
 
   /**
    * 组件挂载时获取数据
@@ -226,7 +226,7 @@ export default function StoryContent({
     if (storyId) {
       fetchFullStoryData();
     }
-  }, [storyId]);
+  }, [storyId, fetchFullStoryData]);
 
   /**
    * 格式化书籍类型为中文显示
@@ -253,7 +253,7 @@ export default function StoryContent({
         hour: '2-digit',
         minute: '2-digit'
       });
-    } catch (error) {
+    } catch {
       return dateString;
     }
   };
