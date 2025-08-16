@@ -22,6 +22,13 @@ export const supabaseConfig: SupabaseConfig = {
   supabaseKey: process.env.SUPABASE_ANON_KEY || '',
 };
 
+// 调试日志：检查环境变量加载状态
+console.log('[DEBUG] Supabase 环境变量检查:');
+console.log('- SUPABASE_URL:', process.env.SUPABASE_URL);
+console.log('- SUPABASE_ANON_KEY:', process.env.SUPABASE_ANON_KEY ? '已设置' : '未设置');
+console.log('- supabaseUrl 值:', supabaseConfig.supabaseUrl);
+console.log('- supabaseKey 值:', supabaseConfig.supabaseKey ? '已设置' : '未设置');
+
 // 创建默认Supabase客户端
 export const supabase = createSupabaseClient(supabaseConfig);
 

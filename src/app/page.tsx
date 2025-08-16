@@ -1,10 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
+
+// 调试日志：检查环境变量在客户端的加载情况
+console.log('[DEBUG] 页面组件环境变量检查:');
+console.log('- SUPABASE_URL:', process.env.SUPABASE_URL);
+console.log('- SUPABASE_ANON_KEY:', process.env.SUPABASE_ANON_KEY ? '已设置' : '未设置');
 import GenerateButton from "@/components/GenerateButton";
 import StoryDisplay from "@/components/StoryDisplay";
 import UnifiedSelector from "@/components/UnifiedSelector";
-import RefreshButton from "@/components/RefreshButton";
+import GeneratedStoriesButton from "@/components/GeneratedStoriesButton";
+import StoriesList from "@/components/StoriesList";
+import StoryContent from "@/components/StoryContent";
 import { PlottoParser } from "@/lib/plotto-parser";
 import { StoryGenerator } from "@/lib/story-generator";
 import { PlottoData, CharacterLink } from "@/lib/plotto-parser";
@@ -89,7 +96,13 @@ export default function Home() {
   const [selectedLength, setSelectedLength] = useState<'short' | 'medium' | 'long'>('short');
   const [generationStage, setGenerationStage] = useState<'idle' | 'outline' | 'scenes' | 'paragraphs' | 'full' | 'assemble'>('idle');
   const [progress, setProgress] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
+  // 新增：已生成故事相关状态
+  const [showStoriesList, setShowStoriesList] = useState<boolean>(false);
+  const [selectedStoryId, setSelectedStoryId] = useState<string | null>(null);
+  const [stories, setStories] = useState<any[]>([]);
+  const [isLoadingStories, setIsLoadingStories] = useState<boolean>(false);
+  const [storiesError, setStoriesError] = useState<string | null>(null);
 
   // 初始化数据
   useEffect(() => {
@@ -295,61 +308,75 @@ export default function Home() {
     }
   };
 
-  // 刷新书籍内容
-  const handleRefreshBook = async () => {
-    if (!generatedStory) {
-      alert("请先生成故事内容");
-      return;
-    }
+  // 处理显示故事列表
+  const handleShowStoriesList = async () => {
+    setIsLoadingStories(true);
+    setStoriesError(null);
 
-    setIsRefreshing(true);
     try {
-      // 获取最新故事的大纲数据
-      const outlineRes = await fetch('/api/generate-story?action=generate-outline', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          protagonist: selectedProtagonist?.description || "未指定主角类型",
-          plot: selectedElements.predicates ?
-            transformedData.predicates.find(p => p.id === selectedElements.predicates)?.description || "未指定情节发展" :
-            "未指定情节发展",
-          conflict: selectedElements.conflicts.length > 0 ?
-            selectedElements.conflicts.map(id => {
-              const conflict = transformedData.conflicts.find(c => c.id === id);
-              return conflict?.details || id;
-            }).join('、') :
-            "未指定冲突",
-          outcome: selectedElements.outcomes.length > 0 ?
-            transformedData.outcomes.find(o => o.id === selectedElements.outcomes[0])?.description || "未指定故事结局" :
-            "未指定故事结局",
-          length: selectedLength
-        })
-      });
-      const outlineResult = await outlineRes.json();
+      const response = await fetch('/api/stories/list');
+      const result = await response.json();
 
-      if (!outlineResult.success) {
-        throw new Error(outlineResult.error || '生成大纲失败');
+      if (result.success) {
+        setStories(result.data || []);
+        setShowStoriesList(true);
+        setSelectedStoryId(null); // 重置选中的故事
+      } else {
+        setStoriesError(result.error || '获取故事列表失败');
+        console.error('获取故事列表失败:', result.error);
       }
-
-      const outlineData = outlineResult.data;
-      console.log('重新生成大纲数据:', outlineData);
-
-      // 重新组装完整书籍
-      const assembleRes = await fetch('/api/generate-story?action=assemble-book', {
-        method: 'POST',
-        body: JSON.stringify({ story_id: outlineData.story_id }),
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const refreshedBook = await assembleRes.text();
-
-      setGeneratedStory(refreshedBook);
-      console.log("书籍内容刷新成功");
     } catch (error) {
-      console.error("刷新书籍失败:", error);
-      alert("刷新书籍时出错，请查看控制台了解详情。");
+      console.error('获取故事列表失败:', error);
+      setStoriesError('网络错误，请稍后重试');
     } finally {
-      setIsRefreshing(false);
+      setIsLoadingStories(false);
     }
+  };
+
+  // 处理返回到故事生成器
+  const handleBackToGenerator = () => {
+    setShowStoriesList(false);
+    setSelectedStoryId(null);
+    setStories([]);
+    setStoriesError(null);
+    // 重置滚动位置到顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // 处理阅读故事
+  const handleReadStory = (storyId: string) => {
+    setSelectedStoryId(storyId);
+    setShowStoriesList(false);
+    // 滚动到顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // 处理关闭故事内容
+  const handleCloseStoryContent = () => {
+    setSelectedStoryId(null);
+    // 滚动到顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // 重置所有状态到初始状态
+  const resetAllStates = () => {
+    setShowStoriesList(false);
+    setSelectedStoryId(null);
+    setStories([]);
+    setStoriesError(null);
+    setGeneratedStory("");
+    setSelectedElements({
+      characters: [],
+      subjects: [],
+      predicates: null,
+      conflicts: [],
+      outcomes: [],
+    });
+    setSelectedProtagonist(null);
+    setGenerationStage('idle');
+    setProgress(0);
+    // 滚动到顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
 
@@ -503,10 +530,10 @@ export default function Home() {
                 onClick={handleGenerateStory}
                 disabled={isGenerating}
               />
-              <RefreshButton
-                onClick={handleRefreshBook}
-                disabled={isRefreshing}
-                isLoading={isRefreshing}
+              <GeneratedStoriesButton
+                onClick={handleShowStoriesList}
+                disabled={isLoadingStories}
+                isLoading={isLoadingStories}
               />
             </div>
 
@@ -526,6 +553,38 @@ export default function Home() {
 
             {generatedStory && (
               <StoryDisplay story={generatedStory} />
+            )}
+
+            {/* 已生成故事列表 */}
+            {showStoriesList && (
+              <div className="mt-8 animate-fadeIn">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">已生成的故事</h2>
+                  <button
+                    onClick={handleBackToGenerator}
+                    className="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 transform hover:scale-105"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    返回
+                  </button>
+                </div>
+                <StoriesList
+                  stories={stories}
+                  onReadStory={handleReadStory}
+                  isLoading={isLoadingStories}
+                  error={storiesError}
+                />
+              </div>
+            )}
+
+            {/* 故事内容显示 */}
+            {selectedStoryId && (
+              <StoryContent
+                storyId={selectedStoryId}
+                onClose={handleCloseStoryContent}
+              />
             )}
           </>
         )}
