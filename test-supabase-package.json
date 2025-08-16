@@ -1,0 +1,16 @@
+{
+  "name": "supabase-rls-test",
+  "version": "1.0.0",
+  "description": "Supabase RLS 策略测试工具",
+  "main": "test-supabase-rls.js",
+  "scripts": {
+    "test": "node test-supabase-rls.js",
+    "test:debug": "DEBUG=* node test-supabase-rls.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

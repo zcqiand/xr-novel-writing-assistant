@@ -24,7 +24,6 @@ CREATE INDEX IF NOT EXISTS idx_story_chapter_scene_paragraphs_bounding_chapter_s
 -- 启用行级安全策略 (RLS)
 ALTER TABLE public.story_chapter_scene_paragraphs_bounding ENABLE ROW LEVEL SECURITY;
 
-
 -- 创建插入策略（允许经过身份验证用户插入）
 CREATE POLICY "Allow authenticated insert" ON public.story_chapter_scene_paragraphs_bounding
   FOR INSERT TO authenticated WITH CHECK (true);

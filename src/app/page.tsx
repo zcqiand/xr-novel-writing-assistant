@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import GenerateButton from "@/components/GenerateButton";
 import StoryDisplay from "@/components/StoryDisplay";
 import UnifiedSelector from "@/components/UnifiedSelector";
+import RefreshButton from "@/components/RefreshButton";
 import { PlottoParser } from "@/lib/plotto-parser";
 import { StoryGenerator } from "@/lib/story-generator";
 import { PlottoData, CharacterLink } from "@/lib/plotto-parser";
@@ -88,6 +89,7 @@ export default function Home() {
   const [selectedLength, setSelectedLength] = useState<'short' | 'medium' | 'long'>('medium');
   const [generationStage, setGenerationStage] = useState<'idle' | 'outline' | 'scenes' | 'paragraphs' | 'full' | 'assemble'>('idle');
   const [progress, setProgress] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
   // 初始化数据
   useEffect(() => {
@@ -273,6 +275,57 @@ export default function Home() {
     }
   };
 
+  // 刷新书籍内容
+  const handleRefreshBook = async () => {
+    if (!generatedStory) {
+      alert("请先生成故事内容");
+      return;
+    }
+
+    setIsRefreshing(true);
+    try {
+      // 获取最新故事的大纲数据
+      const outlineRes = await fetch('/api/generate-story?stage=outline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          protagonist: selectedProtagonist?.description || "未指定主角类型",
+          plot: selectedElements.predicates ?
+            transformedData.predicates.find(p => p.id === selectedElements.predicates)?.description || "未指定情节发展" :
+            "未指定情节发展",
+          conflict: selectedElements.conflicts.length > 0 ?
+            selectedElements.conflicts.map(id => {
+              const conflict = transformedData.conflicts.find(c => c.id === id);
+              return conflict?.details || id;
+            }).join('、') :
+            "未指定冲突",
+          outcome: selectedElements.outcomes.length > 0 ?
+            transformedData.outcomes.find(o => o.id === selectedElements.outcomes[0])?.description || "未指定故事结局" :
+            "未指定故事结局",
+          length: selectedLength
+        })
+      });
+      const outlineData = await outlineRes.json();
+      console.log('重新生成大纲数据:', outlineData);
+
+      // 重新组装完整书籍
+      const assembleRes = await fetch('/api/generate-story?stage=assemble', {
+        method: 'POST',
+        body: JSON.stringify({ outlineFilePath: 'data/latest-story-outline.json' }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const refreshedBook = await assembleRes.text();
+
+      setGeneratedStory(refreshedBook);
+      console.log("书籍内容刷新成功");
+    } catch (error) {
+      console.error("刷新书籍失败:", error);
+      alert("刷新书籍时出错，请查看控制台了解详情。");
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
 
 
   // 替换描述中的角色标识符为角色描述
@@ -419,10 +472,15 @@ export default function Home() {
             />
 
 
-            <div className="flex justify-center mb-12">
+            <div className="flex justify-center gap-4 mb-12">
               <GenerateButton
                 onClick={handleGenerateStory}
                 disabled={isGenerating}
+              />
+              <RefreshButton
+                onClick={handleRefreshBook}
+                disabled={isRefreshing}
+                isLoading={isRefreshing}
               />
             </div>
 
