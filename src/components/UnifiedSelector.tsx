@@ -434,7 +434,7 @@ export default function UnifiedSelector({
           </label>
           <select
             id="length-select"
-            value={selectedLength || 'medium'}
+            value={selectedLength || 'short'}
             onChange={(e) => {
               if (onLengthChange) {
                 onLengthChange(e.target.value as 'short' | 'medium' | 'long');

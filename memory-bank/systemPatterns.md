@@ -23,3 +23,5 @@ It is optional, but recommended to be updated as the project evolves.
 *   Jest单元测试
 *   端到端测试使用Playwright
 *   AI生成测试用例
+
+[2025-08-15 23:42:00] - 新增数据库存储模式：使用Supabase作为主要数据存储，替代本地JSON文件存储，提高数据持久化和可扩展性

@@ -20,3 +20,5 @@ This file provides a high-level overview of the project and the expected product
 *   前端：Next.js + React
 *   AI生成：自定义故事生成算法
 *   存储：本地JSON文件
+
+[2025-08-15 23:42:00] - 架构变更：将数据存储从本地JSON文件改为Supabase数据库，提高数据持久化和可访问性

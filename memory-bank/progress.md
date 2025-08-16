@@ -43,3 +43,8 @@ This file tracks the project's progress using a task list format.
 [2025-08-15 15:20:00] - 完成写作风格功能移除任务：成功移除AI故事生成器中的所有写作风格相关功能，包括接口定义、方法参数、提示词常量和辅助方法。修改通过TypeScript类型检查，开发服务器正常运行，功能测试通过。
 
 [2025-08-15 15:33:35] - 完成前端界面故事篇幅选择功能实现：成功在UnifiedSelector组件中添加故事篇幅选择下拉菜单，支持短篇、中篇、长篇三种选择；更新page.tsx添加状态管理和API传递；修改ai-story-generator.ts支持故事篇幅参数；更新API路由正确传递和处理故事篇幅参数。TypeScript编译和ESLint检查通过，功能测试正常。
+[2025-08-15 22:36:00] - 完成将故事大纲保存到本地改为保存到Supabase数据库的任务：成功安装@supabase/supabase-js依赖，创建supabase.ts配置文件，修改generateStoryOutline函数的保存逻辑，添加环境变量配置。TypeScript编译通过，开发服务器正常运行，功能测试完成。
+[2025-08-15 22:49:31] - 完成修复assembleFullBook函数的任务：成功将函数从本地文件读取改为从Supabase数据库读取大纲数据，修复了所有TypeScript错误，包括重复变量声明和类型检查问题。TypeScript编译通过，功能测试完成。
+[2025-08-15 23:17:57] - 完成创建Supabase数据库表SQL脚本的任务：成功创建了`supabase/story_outlines_table.sql`文件，包含完整的story_outlines表创建脚本，包括字段定义、索引、行级安全策略(RLS)和触发器。脚本支持匿名用户访问，包含自动更新时间戳功能，并提供了测试数据示例。
+
+[2025-08-15 23:42:00] - 完成故事大纲保存到Supabase数据库任务：成功将所有本地文件保存操作改为Supabase数据库保存，包括创建数据库表SQL脚本、修改相关保存函数、更新API路由和组装函数。所有代码修改通过TypeScript类型检查，功能测试正常。

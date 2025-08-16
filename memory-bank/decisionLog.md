@@ -51,3 +51,12 @@ This file records architectural and implementation decisions using a list format
 [2025-08-15 15:19:00] - 决策移除写作风格功能：根据用户需求"不要写作风格"，成功移除了AI故事生成器中的所有写作风格相关功能。具体修改包括：1) 移除AIStoryRequest接口中的style字段；2) 移除generateStoryOutlineForOpenAI和buildOutlinePrompt方法的style参数；3) 更新USER_PROMPT_STORY_OUTLINE常量，移除写作风格相关内容；4) 移除getStyleDescription辅助方法；5) 更新相关调用代码。TypeScript类型检查通过，开发服务器正常运行。
 
 [2025-08-15 15:33:35] - 决策添加故事篇幅选择功能：根据用户需求"前端界面增加故事篇幅的选择"，决定在UnifiedSelector组件中添加故事篇幅选择下拉菜单，支持短篇、中篇、长篇三种选择。实现方案包括：1) 修改UnifiedSelector接口和组件，添加selectedLength和onLengthChange属性；2) 在page.tsx中添加selectedLength状态管理；3) 更新AI故事生成器支持故事篇幅参数；4) 修改API路由正确传递和处理故事篇幅参数。确保用户能够根据需要选择不同篇幅的故事，AI生成时会根据选择的篇幅调整章节数量和内容深度。
+[2025-08-15 22:36:00] - 决策将故事大纲保存从本地文件改为Supabase数据库：根据用户需求，决定修改AI故事生成器的数据存储方式，从本地JSON文件保存改为Supabase数据库存储。实现方案包括：1) 安装@supabase/supabase-js依赖；2) 创建supabase.ts配置文件和数据库接口定义；3) 修改generateStoryOutline函数的保存逻辑，使用Supabase客户端插入数据；4) 添加必要的环境变量配置。这样可以提高数据持久化能力，支持多用户访问和数据管理。
+[2025-08-15 22:48:47] - 决策修复assembleFullBook函数数据读取逻辑：根据用户反馈"组装完整书籍失败"的错误，决定修改assembleFullBook函数从本地文件读取改为从Supabase数据库读取大纲数据。实现方案包括：1) 将函数参数从outlineFilePath改为outlineId；2) 使用Supabase客户端的select和order方法从数据库读取大纲数据；3) 支持按ID查找或使用最新大纲；4) 修复了TypeScript类型检查和重复变量声明问题。这样可以确保组装完整书籍功能能够正常工作，与新的数据库存储架构保持一致。
+[2025-08-15 23:17:19] - 决策创建Supabase数据库表SQL脚本：根据用户需求，决定创建完整的story_outlines表SQL脚本，以便在Supabase数据库中创建必要的表结构。实现方案包括：1) 创建包含所有必要字段的表结构；2) 添加索引以提高查询性能；3) 配置行级安全策略(RLS)支持匿名用户访问；4) 创建触发器自动更新时间戳；5) 提供测试数据示例。脚本文件保存在`supabase/story_outlines_table.sql`中，可以直接在Supabase SQL编辑器中执行。
+
+[2025-08-15 23:41:00] - 决策将故事大纲保存从本地文件改为Supabase数据库：根据用户需求"把生成故事大纲保存到本地的操作改成保存到supabase数据库"，成功修改了AI故事生成器的所有保存逻辑。具体修改包括：1) 创建了story_outlines、chapter_scenes、scene_paragraphs、full_scene_contents四个数据库表的SQL脚本；2) 修改generateStoryOutline函数保存大纲到Supabase；3) 修改generateScenes函数保存场景到Supabase；4) 修改generateParagraphsBounding函数保存段落边界到Supabase；5) 修改generateParagraphs函数保存完整场景内容到Supabase；6) 更新API路由传递story_id参数；7) 修改assembleFullBook函数从Supabase读取数据。确保所有生成的数据都保存到数据库而不是本地文件。
+
+[2025-08-16 00:00:00] - 修复SQL脚本语法错误：修复了所有四个数据库表SQL脚本中的行级安全策略(RLS)语法错误，将"FOR INSERT WITH CHECK TO anon;"改为正确的"FOR INSERT WITH CHECK USING (true);"语法。确保所有SQL脚本可以在Supabase中正确执行。
+
+[2025-08-16 00:09:00] - 修改表名和字段名：根据用户反馈，将表名和字段名统一修改：story_outlines表改为stories，story_id字段改为story_id，chapter_scenes表改为story_chapter_scenes，scene_paragraphs表改为story_chapter_scene_paragraphs_bounding，full_scene_contents表改为story_chapter_scene_paragraphs。同时更新了所有代码中的表名引用。

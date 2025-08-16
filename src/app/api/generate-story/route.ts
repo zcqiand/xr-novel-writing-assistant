@@ -42,12 +42,18 @@ export async function POST(request: NextRequest) {
         console.log('故事篇幅:', length);
         console.log('==================');
 
-        const outline = await generateStoryOutline(protagonist, plot, conflict, outcome, length);
-        return NextResponse.json(outline);
+        const outlineData = await generateStoryOutline(protagonist, plot, conflict, outcome, length);
+
+        // 返回大纲数据和ID
+        return NextResponse.json({
+          outline: outlineData,
+          story_id: 'temp-id' // 临时ID，实际应该从数据库返回
+        });
 
       case 'scenes':
         const scenesBody = await request.json();
-        const scenes = await generateScenes(scenesBody.outline);
+        const { outline, story_id } = scenesBody;
+        const scenes = await generateScenes(outline, story_id);
         return NextResponse.json(scenes);
 
       case 'paragraphs':
@@ -127,7 +133,7 @@ export async function POST(request: NextRequest) {
             allParagraphs.push(...testParagraphs);
           } else {
             // 正常模式：调用AI生成段落
-            const chapterParagraphs = await generateParagraphsBounding(paragraphsBody.outline, chapterScenes);
+            const chapterParagraphs = await generateParagraphsBounding(paragraphsBody.outline, chapterScenes, paragraphsBody.story_id);
             allParagraphs.push(...chapterParagraphs);
           }
         }
@@ -201,7 +207,8 @@ export async function POST(request: NextRequest) {
           const chapterFullContent = await generateParagraphs(
             fullBody.outline,
             chapterScenes,
-            fullBody.paragraphs
+            fullBody.paragraphs,
+            fullBody.story_id
           );
           allFullContent.push(...chapterFullContent);
         }

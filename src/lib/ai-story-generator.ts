@@ -2,6 +2,7 @@ import OpenAI from 'openai';
 import * as fs from 'fs';
 import * as path from 'path';
 import { SYSTEM_PROMPT_STORY_OUTLINE, SYSTEM_PROMPT_SCENES, SYSTEM_PROMPT_PARAGRAPHS_BOUNDING, SYSTEM_PROMPT_PARAGRAPHS, SYSTEM_PROMPT_CONTINUITY_NOTES, USER_PROMPT_STORY_OUTLINE, USER_PROMPT_SCENES, USER_PROMPT_PARAGRAPHS_BOUNDING, USER_PROMPT_PARAGRAPHS, CUSER_PROMPT_CONTINUITY_NOTES } from './constants';
+import { supabase, StoryOutlineRecord } from './supabase';
 
 // AI故事生成器配置接口
 export interface AIStoryGeneratorConfig {
@@ -71,19 +72,32 @@ async function generateStoryOutline(
   });
   const outline = await generator.generateStoryOutlineForOpenAI(protagonist, plot, conflict, outcome, length);
 
-  // 保存大纲到文件
-  // 确保data目录存在
-  const dataDir = path.join(process.cwd(), 'data');
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+  // 保存大纲到Supabase数据库
+  try {
+    const { data, error } = await supabase
+      .from('stories')
+      .insert({
+        title: outline.title,
+        protagonist,
+        plot,
+        conflict,
+        outcome,
+        length,
+        outline_data: outline
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('保存大纲到Supabase失败:', error);
+      throw new Error(`保存大纲到Supabase失败: ${error.message}`);
+    }
+
+    console.log('大纲已保存到Supabase:', data);
+  } catch (error) {
+    console.error('保存大纲到Supabase时发生错误:', error);
+    throw new Error(`保存大纲到Supabase失败: ${error instanceof Error ? error.message : '未知错误'}`);
   }
-
-  // 使用动态文件名保存大纲
-  const safeTitle = (outline.title || '未命名故事').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
-  const outputPath = path.join(dataDir, `${safeTitle}-story-outline.json`);
-  fs.writeFileSync(outputPath, JSON.stringify(outline, null, 2), 'utf8');
-
-  console.log('大纲已保存到:', outputPath);
 
   return outline;
 }
@@ -360,12 +374,14 @@ export interface ChapterScenes {
 /**
  * 生成场景
  * @param outline 大纲数据（内存数据）
+ * @param story_id 大纲ID（用于关联数据库记录）
  * @param startChapter 起始章节号（默认1）
  * @param chapterCount 生成章节数（默认1）
  * @returns 生成的场景数据
  */
 async function generateScenes(
   outline: StoryOutline,
+  story_id: string,
   startChapter: number = 1,
   chapterCount: number = outline.chapters.length // 修复：生成所有章节而不是只生成1个
 ): Promise<ChapterScenes[]> {
@@ -401,11 +417,28 @@ async function generateScenes(
 
       results.push(chapterScenes);
 
-      // 保存场景数据到文件，使用动态文件名
-      const safeTitle = (outline.title || '未命名故事').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
-      const fileName = `data/${safeTitle}-chapter-${chapterNumber}-scenes.json`;
-      await fs.promises.writeFile(fileName, JSON.stringify(chapterScenes, null, 2), 'utf8');
-      console.log(`章节 ${chapterNumber} 场景已保存到 ${fileName}`);
+      // 保存场景数据到Supabase数据库
+      try {
+        const { data, error } = await supabase
+          .from('story_chapter_scenes')
+          .insert({
+            story_id: story_id,
+            chapter_number: chapterNumber,
+            scenes_data: chapterScenes
+          })
+          .select()
+          .single();
+
+        if (error) {
+          console.error(`保存章节 ${chapterNumber} 场景到Supabase失败:`, error);
+          throw new Error(`保存章节 ${chapterNumber} 场景到Supabase失败: ${error.message}`);
+        }
+
+        console.log(`章节 ${chapterNumber} 场景已保存到Supabase:`, data);
+      } catch (error) {
+        console.error(`保存章节 ${chapterNumber} 场景到Supabase时发生错误:`, error);
+        throw new Error(`保存章节 ${chapterNumber} 场景到Supabase失败: ${error instanceof Error ? error.message : '未知错误'}`);
+      }
     }
 
     return results;
@@ -533,6 +566,7 @@ export interface ContinuityData {
  * 生成段落（边界）
  * @param outline 大纲数据（内存数据）
  * @param scenes 场景数据（内存数据）
+ * @param story_id 大纲ID（用于关联数据库记录）
  * @param startSceneNumber 起始场景号（默认1）
  * @param sceneCount 生成场景数（默认1）
  * @returns 生成的段落（边界）数据
@@ -540,6 +574,7 @@ export interface ContinuityData {
 async function generateParagraphsBounding(
   outline: StoryOutline,
   scenes: ChapterScenes,
+  story_id: string,
   startSceneNumber: number = 1,
   sceneCount: number = scenes.scenes.length // 修复：生成所有场景而不是只生成1个
 ): Promise<SceneParagraphs[]> {
@@ -593,11 +628,31 @@ async function generateParagraphsBounding(
       // 记录连续性数据
       recordContinuityData(sceneNumber, scene, outline.characters, continuityData);
 
-      // 保存段落数据到文件，使用动态书籍名称和章节号
-      const safeTitle = (outline.title || '未命名故事').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
-      const fileName = `data/${safeTitle}-chapter-${chapter}-scene-${sceneNumber}-paragraphs.json`;
-      await fs.promises.writeFile(fileName, JSON.stringify(sceneParagraphs, null, 2), 'utf8');
-      console.log(`场景 ${sceneNumber} 段落已保存到 ${fileName}`);
+      // 保存段落数据到Supabase数据库
+      try {
+        const { data, error } = await supabase
+          .from('story_chapter_scene_paragraphs_bounding')
+          .insert({
+            story_id: story_id,
+            chapter_number: chapter,
+            scene_number: sceneNumber,
+            title: sceneParagraphs.title,
+            opening_paragraph: sceneParagraphs.openingParagraph,
+            closing_paragraph: sceneParagraphs.closingParagraph
+          })
+          .select()
+          .single();
+
+        if (error) {
+          console.error(`保存场景 ${sceneNumber} 段落到Supabase失败:`, error);
+          throw new Error(`保存场景 ${sceneNumber} 段落到Supabase失败: ${error.message}`);
+        }
+
+        console.log(`场景 ${sceneNumber} 段落已保存到Supabase:`, data);
+      } catch (error) {
+        console.error(`保存场景 ${sceneNumber} 段落到Supabase时发生错误:`, error);
+        throw new Error(`保存场景 ${sceneNumber} 段落到Supabase失败: ${error instanceof Error ? error.message : '未知错误'}`);
+      }
     }
 
     console.log('段落（边界）生成完成');
@@ -808,6 +863,7 @@ function checkContinuity(continuityData: ContinuityData[]): { isValid: boolean; 
  * @param outline 大纲数据（内存数据）
  * @param scenes 场景数据（内存数据）
  * @param paragraphs 段落数据（内存数据）
+ * @param story_id 大纲ID（用于关联数据库记录）
  * @param startSceneNumber 起始场景号（默认1）
  * @param sceneCount 生成场景数（默认1）
  * @returns 生成的段落（完整场景内容）
@@ -816,6 +872,7 @@ async function generateParagraphs(
   outline: StoryOutline,
   scenes: ChapterScenes,
   paragraphs: SceneParagraphs[],
+  story_id: string,
   startSceneNumber: number = 1,
   sceneCount: number = scenes.scenes.length // 修复：生成所有场景而不是只生成1个
 ): Promise<FullSceneContent[]> {
@@ -876,11 +933,31 @@ async function generateParagraphs(
 
       results.push(fullSceneContent);
 
-      // 保存段落（完整场景内容）到文件，使用动态书籍名称和章节号
-      const safeTitle = (outline.title || '未命名故事').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
-      const fileName = `data/${safeTitle}-chapter-${chapter}-scene-${sceneNumber}-full.json`;
-      await fs.promises.writeFile(fileName, JSON.stringify(fullSceneContent, null, 2), 'utf8');
-      console.log(`场景 ${sceneNumber} 完整内容已保存到 ${fileName}`);
+      // 保存段落（完整场景内容）到Supabase数据库
+      try {
+        const { data, error } = await supabase
+          .from('story_chapter_scene_paragraphs')
+          .insert({
+            story_id: story_id,
+            chapter_number: chapter,
+            scene_number: sceneNumber,
+            title: fullSceneContent.title,
+            full_content: fullSceneContent.fullContent,
+            continuity_notes: fullSceneContent.continuityNotes
+          })
+          .select()
+          .single();
+
+        if (error) {
+          console.error(`保存场景 ${sceneNumber} 完整内容到Supabase失败:`, error);
+          throw new Error(`保存场景 ${sceneNumber} 完整内容到Supabase失败: ${error.message}`);
+        }
+
+        console.log(`场景 ${sceneNumber} 完整内容已保存到Supabase:`, data);
+      } catch (error) {
+        console.error(`保存场景 ${sceneNumber} 完整内容到Supabase时发生错误:`, error);
+        throw new Error(`保存场景 ${sceneNumber} 完整内容到Supabase失败: ${error instanceof Error ? error.message : '未知错误'}`);
+      }
     }
 
     console.log('段落（完整场景内容）生成完成');
@@ -1067,67 +1144,109 @@ async function generateContinuityNotesForOpenAI(
 
 /**
  * 组装完整书籍
- * @param outlineFilePath 大纲文件路径
+ * @param outlineId 大纲ID（可选，如果不提供则使用最新的大纲）
  * @param scenesDirectory 场景文件目录
  * @param fullScenesDirectory 完整场景文件目录
  * @returns 完整书籍内容
  */
 async function assembleFullBook(
-  outlineFilePath: string,
+  outlineId?: string,
   scenesDirectory: string = 'data',
   fullScenesDirectory: string = 'data'
 ): Promise<FullBookContent> {
   try {
     // 记录关键参数信息
-    console.log('开始组装完整书籍，大纲文件路径:', outlineFilePath);
+    console.log('开始组装完整书籍，大纲ID:', outlineId);
 
-    // 读取并解析大纲JSON
-    const outlineData = JSON.parse(fs.readFileSync(outlineFilePath, 'utf8'));
+    // 从Supabase数据库读取大纲数据
+    let { data: outlineRecords, error } = await supabase
+      .from('stories')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('从Supabase读取大纲失败:', error);
+      throw new Error(`从Supabase读取大纲失败: ${error.message}`);
+    }
+
+    let outlineData: any;
+
+    // 如果指定了outlineId，则查找特定的大纲
+    if (outlineId) {
+      if (!outlineRecords) {
+        throw new Error('未找到任何大纲数据');
+      }
+      outlineData = outlineRecords.find((item: any) => item.id === outlineId);
+      if (!outlineData) {
+        throw new Error(`未找到ID为 ${outlineId} 的大纲`);
+      }
+    } else if (!outlineRecords || outlineRecords.length === 0) {
+      throw new Error('未找到任何大纲数据');
+    } else {
+      // 使用最新的大纲
+      outlineData = outlineRecords[0];
+    }
 
     // 使用大纲中的书籍标题
-    const bookTitle = outlineData.title || `${outlineData.characters[0]?.name || '主角'}的故事`;
+    const bookTitle = outlineData.title || `${outlineData.outline_data.characters[0]?.name || '主角'}的故事`;
 
     const chapters: FullChapterContent[] = [];
 
     // 遍历所有章节
     for (const chapter of outlineData.chapters) {
+      // 从Supabase读取场景数据
+      const { data: chapterScenesData, error: scenesError } = await supabase
+        .from('story_chapter_scenes')
+        .select('*')
+        .eq('story_id', outlineData.id)
+        .eq('chapter_number', chapter.chapter);
 
-      // 查找对应的场景文件，使用动态书籍名称
-      const safeTitle = (bookTitle || '未命名故事').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
-      const scenesFilePath = path.join(scenesDirectory, `${safeTitle}-chapter-${chapter.chapter}-scenes.json`);
+      if (scenesError) {
+        console.error(`读取章节 ${chapter.chapter} 场景数据失败:`, scenesError);
+        continue;
+      }
 
-      try {
-        const scenesData = JSON.parse(fs.readFileSync(scenesFilePath, 'utf8'));
-        const scenes = scenesData.scenes;
+      if (!chapterScenesData || chapterScenesData.length === 0) {
+        console.warn(`未找到章节 ${chapter.chapter} 的场景数据，跳过`);
+        continue;
+      }
 
-        const chapterScenes: FullSceneContent[] = [];
+      const chapterScenes: FullSceneContent[] = [];
 
-        // 遍历章节中的所有场景
-        for (const scene of scenes) {
+      // 遍历章节中的所有场景
+      for (const sceneData of chapterScenesData[0].scenes_data) {
+        // 从Supabase读取完整场景内容
+        const { data: fullSceneData, error: fullSceneError } = await supabase
+          .from('story_chapter_scene_paragraphs')
+          .select('*')
+          .eq('story_id', outlineData.id)
+          .eq('chapter_number', chapter.chapter)
+          .eq('scene_number', sceneData.sceneNumber)
+          .single();
 
-          // 查找对应的完整场景文件，使用动态书籍名称和章节号
-          const fullSceneFilePath = path.join(fullScenesDirectory, `${safeTitle}-chapter-${chapter.chapter}-scene-${scene.sceneNumber}-full.json`);
-
-          try {
-            const fullSceneData = JSON.parse(fs.readFileSync(fullSceneFilePath, 'utf8'));
-            chapterScenes.push(fullSceneData);
-          } catch {
-            console.warn(`无法读取完整场景文件 ${fullSceneFilePath}，跳过`);
-          }
+        if (fullSceneError) {
+          console.error(`读取场景 ${sceneData.sceneNumber} 完整内容失败:`, fullSceneError);
+          continue;
         }
 
-        // 构建章节内容，使用AI生成的章节标题
-        const chapterContent: FullChapterContent = {
-          chapterNumber: chapter.chapter,
-          title: chapter.title || `第${chapter.chapter}章`,
-          scenes: chapterScenes
-        };
-
-        chapters.push(chapterContent);
-
-      } catch {
-        console.warn(`无法读取场景文件 ${scenesFilePath}，跳过该章节`);
+        if (fullSceneData) {
+          chapterScenes.push({
+            sceneNumber: fullSceneData.scene_number,
+            title: fullSceneData.title,
+            fullContent: fullSceneData.full_content,
+            continuityNotes: fullSceneData.continuity_notes || []
+          });
+        }
       }
+
+      // 构建章节内容，使用AI生成的章节标题
+      const chapterContent: FullChapterContent = {
+        chapterNumber: chapter.chapter,
+        title: chapter.title || `第${chapter.chapter}章`,
+        scenes: chapterScenes
+      };
+
+      chapters.push(chapterContent);
     }
 
     // 构建完整书籍内容
