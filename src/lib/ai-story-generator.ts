@@ -193,31 +193,42 @@ export class AIStoryGenerator {
         additionalProperties: false
       };
 
-      // 调用OpenAI API
-      const completion = await this.openai.chat.completions.create({
-        model: this.config.model,
-        messages: [
-          {
-            role: "system",
-            content: SYSTEM_PROMPT_STORY_OUTLINE
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: "story_outline",
-            strict: true,
-            schema: schema
-          }
-        },
-        temperature: 0.7,
-      });
+      console.log(`⏰ [${new Date().toISOString()}] 开始调用OpenAI API生成大纲`);
+      const apiStartTime = Date.now();
 
-      const responseContent = completion.choices[0]?.message?.content || '';
+      // 调用OpenAI API，添加超时控制
+      const completion = await Promise.race([
+        this.openai.chat.completions.create({
+          model: this.config.model,
+          messages: [
+            {
+              role: "system",
+              content: SYSTEM_PROMPT_STORY_OUTLINE
+            },
+            {
+              role: "user",
+              content: prompt
+            }
+          ],
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "story_outline",
+              strict: true,
+              schema: schema
+            }
+          },
+          temperature: 0.7,
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('OpenAI API调用超时（120秒）')), 120000)
+        )
+      ]);
+
+      const apiDuration = Date.now() - apiStartTime;
+      console.log(`✅ [${new Date().toISOString()}] OpenAI API调用完成，耗时: ${apiDuration}ms`);
+
+      const responseContent = (completion as any).choices[0]?.message?.content || '';
 
       // 记录生成结果
       console.log('AI大纲生成完成');
@@ -563,38 +574,47 @@ async function generateScenesTitleForOpenAI(chapterSummary: string): Promise<Sce
 
     console.log('开始调用OpenAI API...');
 
-    // 调用OpenAI API
-    const completion = await new OpenAI({
-      baseURL: baseUrl,
-      apiKey: apiKey,
-      defaultHeaders: {
-        "HTTP-Referer": process.env.SITE_URL,
-        "X-Title": process.env.SITE_NAME,
-      },
-    }).chat.completions.create({
-      model: model || '',
-      messages: [
-        {
-          role: "system",
-          content: SYSTEM_PROMPT_STORY_CHAPTER_SCENES
+    // 调用OpenAI API，添加超时控制
+    const apiStartTime = Date.now();
+    const completion = await Promise.race([
+      new OpenAI({
+        baseURL: baseUrl,
+        apiKey: apiKey,
+        defaultHeaders: {
+          "HTTP-Referer": process.env.SITE_URL,
+          "X-Title": process.env.SITE_NAME,
         },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      response_format: {
-        type: "json_schema",
-        json_schema: {
-          name: "chapter_scenes",
-          strict: true,
-          schema: schema
-        }
-      },
-      temperature: 0.7,
-    });
+      }).chat.completions.create({
+        model: model || '',
+        messages: [
+          {
+            role: "system",
+            content: SYSTEM_PROMPT_STORY_CHAPTER_SCENES
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "chapter_scenes",
+            strict: true,
+            schema: schema
+          }
+        },
+        temperature: 0.7,
+      }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('OpenAI API调用超时（120秒）')), 120000)
+      )
+    ]);
 
-    const responseContent = completion.choices[0]?.message?.content || '';
+    const apiDuration = Date.now() - apiStartTime;
+    console.log(`✅ [${new Date().toISOString()}] OpenAI API调用完成，耗时: ${apiDuration}ms`);
+
+    const responseContent = (completion as any).choices[0]?.message?.content || '';
     console.log('OpenAI API响应内容:', responseContent);
 
     // 记录生成结果
@@ -1097,30 +1117,39 @@ async function generateSceneContentForOpenAI(
     console.log('AI段落（完整场景内容）生成提示词:', prompt);
 
     // 对于段落（完整场景内容），我们不需要严格的JSON格式，直接返回文本
-    // 调用OpenAI API
-    const completion = await new OpenAI({
-      baseURL: process.env.OPENAI_BASE_URL,
-      apiKey: process.env.OPENAI_API_KEY,
-      defaultHeaders: {
-        "HTTP-Referer": process.env.SITE_URL,
-        "X-Title": process.env.SITE_NAME,
-      },
-    }).chat.completions.create({
-      model: process.env.OPENAI_MODEL || '',
-      messages: [
-        {
-          role: "system",
-          content: SYSTEM_PROMPT_PARAGRAPHS
+    // 调用OpenAI API，添加超时控制
+    const apiStartTime = Date.now();
+    const completion = await Promise.race([
+      new OpenAI({
+        baseURL: process.env.OPENAI_BASE_URL,
+        apiKey: process.env.OPENAI_API_KEY,
+        defaultHeaders: {
+          "HTTP-Referer": process.env.SITE_URL,
+          "X-Title": process.env.SITE_NAME,
         },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      temperature: 0.7,
-    });
+      }).chat.completions.create({
+        model: process.env.OPENAI_MODEL || '',
+        messages: [
+          {
+            role: "system",
+            content: SYSTEM_PROMPT_PARAGRAPHS
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+      }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('OpenAI API调用超时（120秒）')), 120000)
+      )
+    ]);
 
-    const responseContent = completion.choices[0]?.message?.content || '';
+    const apiDuration = Date.now() - apiStartTime;
+    console.log(`✅ [${new Date().toISOString()}] OpenAI API调用完成，耗时: ${apiDuration}ms`);
+
+    const responseContent = (completion as any).choices[0]?.message?.content || '';
 
     // 记录生成结果
     console.log('AI段落（完整场景内容）生成完成');

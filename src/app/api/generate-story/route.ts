@@ -21,6 +21,10 @@ const isTestMode = config.apiKey === 'test-api-key-for-debugging';
 export async function POST(request: NextRequest) {
   const { action } = Object.fromEntries(request.nextUrl.searchParams);
 
+  // 添加请求开始时间记录
+  const requestStartTime = Date.now();
+  console.log(`🚀 [${new Date().toISOString()}] API请求开始 - action: ${action}`);
+
   try {
     switch (action) {
       case 'generate-outline':
@@ -42,7 +46,10 @@ export async function POST(request: NextRequest) {
         console.log('故事篇幅:', length);
         console.log('==================');
 
+        console.log(`⏰ [${new Date().toISOString()}] 开始调用generateStoryOutline`);
         const { outline: outlineData, story_id } = await generateStoryOutline(protagonist, plot, conflict, outcome, length);
+        const outlineDuration = Date.now() - requestStartTime;
+        console.log(`✅ [${new Date().toISOString()}] generateStoryOutline完成，耗时: ${outlineDuration}ms`);
 
         // 返回大纲数据和ID
         return NextResponse.json({
@@ -80,8 +87,10 @@ export async function POST(request: NextRequest) {
         console.log('大纲标题:', outline?.title || '未指定');
         console.log('大纲章节数:', outline?.chapters?.length || 0);
 
+        console.log(`⏰ [${new Date().toISOString()}] 开始调用generateScenes`);
         const scenes = await generateScenes(outline, scenesStoryId);
-        console.log('场景生成完成，生成章节数:', scenes.length);
+        const scenesDuration = Date.now() - requestStartTime;
+        console.log(`✅ [${new Date().toISOString()}] generateScenes完成，耗时: ${scenesDuration}ms，生成章节数: ${scenes.length}`);
 
         return NextResponse.json({
           success: true,
@@ -170,8 +179,10 @@ export async function POST(request: NextRequest) {
             allParagraphs.push(...testParagraphs);
           } else {
             // 正常模式：调用AI生成段落
+            console.log(`⏰ [${new Date().toISOString()}] 开始调用generateParagraphsBounding - 章节${chapterScenes.chapter}`);
             const chapterParagraphs = await generateParagraphsBounding(paragraphsBody.outline, chapterScenes, paragraphsBody.story_id);
             allParagraphs.push(...chapterParagraphs);
+            console.log(`✅ [${new Date().toISOString()}] generateParagraphsBounding完成 - 章节${chapterScenes.chapter}，生成${chapterParagraphs.length}个段落`);
           }
         }
 
@@ -249,6 +260,7 @@ export async function POST(request: NextRequest) {
         }> = [];
 
         for (const chapterScenes of fullScenesArray) {
+          console.log(`⏰ [${new Date().toISOString()}] 开始调用generateParagraphs - 章节${chapterScenes.chapter}`);
           const chapterFullContent = await generateParagraphs(
             fullBody.outline,
             chapterScenes,
@@ -256,6 +268,7 @@ export async function POST(request: NextRequest) {
             fullBody.story_id
           );
           allFullContent.push(...chapterFullContent);
+          console.log(`✅ [${new Date().toISOString()}] generateParagraphs完成 - 章节${chapterScenes.chapter}，生成${chapterFullContent.length}个场景`);
         }
 
         return NextResponse.json({
@@ -276,8 +289,11 @@ export async function POST(request: NextRequest) {
         }
 
         try {
+          console.log(`⏰ [${new Date().toISOString()}] 开始调用assembleFullBook`);
           // 组装完整书籍
           const fullBook = await assembleFullBook(assembleBody.story_id);
+          const assembleDuration = Date.now() - requestStartTime;
+          console.log(`✅ [${new Date().toISOString()}] assembleFullBook完成，耗时: ${assembleDuration}ms`);
 
           // 返回完整书籍内容
           return new NextResponse(generateBookMarkdown(fullBook), {
@@ -298,12 +314,14 @@ export async function POST(request: NextRequest) {
         );
     }
   } catch (error) {
-    console.error('❌ API调用失败:', error);
+    const totalDuration = Date.now() - requestStartTime;
+    console.error(`❌ [${new Date().toISOString()}] API调用失败，总耗时: ${totalDuration}ms -`, error);
     return NextResponse.json(
       {
         success: false,
         error: `生成失败: ${error instanceof Error ? error.message : '未知错误'}`,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        duration: totalDuration
       },
       { status: 500 }
     );
