@@ -11,6 +11,11 @@ export interface StoryListItem {
   protagonist: string;
   created_at: string;
   updated_at: string;
+  status?: 'outline' | 'scenes' | 'paragraphs_bounding' | 'paragraphs' | 'completed' | 'error';
+  total_chapters?: number;
+  completed_chapters?: number;
+  next_chapter_total_scenes?: number;
+  next_chapter_completed_scenes?: number;
 }
 
 /**
@@ -45,7 +50,7 @@ export async function GET() {
     // 从数据库中获取所有生成的书籍列表
     const { data, error } = await supabase
       .from('stories')
-      .select('id, title, length, protagonist, created_at, updated_at')
+      .select('id, title, length, protagonist, created_at, updated_at, status, total_chapters, completed_chapters, next_chapter_total_scenes, next_chapter_completed_scenes')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -65,10 +70,26 @@ export async function GET() {
       type: story.length as 'short' | 'medium' | 'long',
       protagonist: story.protagonist,
       created_at: story.created_at,
-      updated_at: story.updated_at
+      updated_at: story.updated_at,
+      status: story.status,
+      total_chapters: story.total_chapters,
+      completed_chapters: story.completed_chapters,
+      next_chapter_total_scenes: story.next_chapter_total_scenes,
+      next_chapter_completed_scenes: story.next_chapter_completed_scenes
     }));
 
     console.log(`✅ 成功获取 ${formattedData.length} 本书籍`);
+    console.log('=== 书籍数据详情 ===');
+    formattedData.forEach((story, index) => {
+      console.log(`故事 ${index + 1}:`, {
+        id: story.id,
+        title: story.title,
+        status: story.status,
+        total_chapters: story.total_chapters,
+        completed_chapters: story.completed_chapters,
+        shouldShowContinueButton: story.status !== 'completed' && story.status !== 'error'
+      });
+    });
     console.log('=== 获取书籍列表完成 ===');
 
     return NextResponse.json<ApiResponse<StoryListItem[]>>({

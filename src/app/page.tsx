@@ -173,6 +173,7 @@ export default function Home() {
   // 轮询生成状态的函数
   const pollGenerationStatus = useCallback(async (id: string) => {
     try {
+      console.log(`🔍 [DEBUG] 开始轮询状态 - ID: ${id}`);
       const response = await fetch('/api/generate-story?action=check-status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -180,9 +181,17 @@ export default function Home() {
       });
 
       const result = await response.json();
+      console.log(`🔍 [DEBUG] 轮询响应:`, result);
 
       if (result.success) {
         const { status, progress: statusProgress, error, completed } = result.data;
+        
+        console.log(`🔍 [DEBUG] 状态更新:`, {
+          status,
+          statusProgress,
+          error,
+          completed
+        });
 
         // 更新进度和状态
         setProgress(statusProgress);
@@ -190,9 +199,13 @@ export default function Home() {
 
         if (completed) {
           // 生成完成，获取结果
+          console.log(`🔍 [DEBUG] 生成完成，获取结果`);
           await getGenerationResult(id);
+          // 获取结果后立即停止轮询，避免重复调用
+          return;
         } else if (status === 'error') {
           // 生成出错
+          console.log(`🔍 [DEBUG] 生成出错: ${error}`);
           setIsGenerating(false);
           setGenerationStage('idle');
           setProgress(0);
@@ -207,6 +220,7 @@ export default function Home() {
         console.error('轮询状态失败:', result.error);
         // 如果找不到任务，停止轮询
         if (response.status === 404) {
+          console.log(`🔍 [DEBUG] 任务不存在或已过期`);
           setIsGenerating(false);
           setGenerationStage('idle');
           setProgress(0);
@@ -286,6 +300,12 @@ export default function Home() {
       return;
     }
 
+    console.log(`🔍 [DEBUG] 开始生成故事 - 初始状态:`, {
+      isGenerating: true,
+      generationStage: 'outline',
+      progress: 10
+    });
+
     setIsGenerating(true);
     setGenerationStage('outline');
     setProgress(10);
@@ -360,11 +380,29 @@ export default function Home() {
     setStoriesError(null);
 
     try {
+      console.log('🔍 [DEBUG] 开始获取故事列表');
       const response = await fetch('/api/stories/list');
       const result = await response.json();
 
+      console.log('🔍 [DEBUG] API响应结果:', result);
+
       if (result.success) {
-        setStories(result.data || []);
+        const storiesData = result.data || [];
+        console.log('🔍 [DEBUG] 获取到的故事数据:', storiesData);
+        
+        // 验证每个故事的状态和续写按钮逻辑
+        storiesData.forEach((story: StoryListItem, index: number) => {
+          console.log(`🔍 [DEBUG] 故事 ${index + 1}:`, {
+            id: story.id,
+            title: story.title,
+            status: story.status,
+            total_chapters: story.total_chapters,
+            completed_chapters: story.completed_chapters,
+            shouldShowContinueButton: story.status !== 'completed' && story.status !== 'error'
+          });
+        });
+
+        setStories(storiesData);
         setShowStoriesList(true);
         setSelectedStoryId(null); // 重置选中的故事
       } else {
@@ -402,6 +440,80 @@ export default function Home() {
     setSelectedStoryId(null);
     // 滚动到顶部
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // 处理继续生成故事
+  const handleContinueStory = async (storyId: string) => {
+    setIsGenerating(true);
+    setGenerationStage('outline');
+    setProgress(10);
+
+    try {
+      // 获取故事详情以获取生成参数
+      const response = await fetch(`/api/stories/${storyId}`);
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || '获取故事详情失败');
+      }
+
+      const story = result.data;
+      
+      // 构建故事元素参数
+      const storyElements = {
+        protagonist: story.protagonist,
+        plot: story.plot,
+        conflict: story.conflict,
+        outcome: story.outcome,
+        length: story.length
+      };
+
+      console.log('=== 继续生成的故事元素 ===');
+      console.log('主角类型:', storyElements.protagonist);
+      console.log('情节发展:', storyElements.plot);
+      console.log('主要冲突:', storyElements.conflict);
+      console.log('故事结局:', storyElements.outcome);
+      console.log('===========================');
+
+      // 调用继续生成API
+      const response2 = await fetch('/api/generate-story?action=continue-story', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          storyId,
+          storyElements
+        })
+      });
+
+      const result2 = await response2.json();
+
+      if (!result2.success) {
+        throw new Error(result2.error || '继续生成失败');
+      }
+
+      // 获取生成ID并开始轮询
+      const newGenerationId = result2.data.generationId;
+      setGenerationId(newGenerationId);
+
+      console.log(`🔄 开始轮询继续生成状态 - ID: ${newGenerationId}`);
+
+      // 设置轮询定时器（每3秒检查一次状态）
+      const interval = setInterval(() => {
+        pollGenerationStatus(newGenerationId);
+      }, 3000);
+
+      setPollInterval(interval);
+
+      // 立即检查一次状态
+      pollGenerationStatus(newGenerationId);
+
+    } catch (error) {
+      setIsGenerating(false);
+      setGenerationStage('idle');
+      setProgress(0);
+      console.error("继续生成失败:", error);
+      alert(`继续生成失败：${error instanceof Error ? error.message : '未知错误'}`);
+    }
   };
 
   // 替换描述中的角色标识符为角色描述
@@ -607,6 +719,7 @@ export default function Home() {
                 <StoriesList
                   stories={stories}
                   onReadStory={handleReadStory}
+                  onContinueStory={handleContinueStory}
                   isLoading={isLoadingStories}
                   error={storiesError}
                 />

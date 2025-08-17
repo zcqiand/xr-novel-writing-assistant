@@ -15,6 +15,11 @@ export interface StoryListItem {
   protagonist: string;
   created_at: string;
   updated_at: string;
+  status?: 'outline' | 'scenes' | 'paragraphs_bounding' | 'paragraphs' | 'completed' | 'error';
+  total_chapters?: number;
+  completed_chapters?: number;
+  next_chapter_total_scenes?: number;
+  next_chapter_completed_scenes?: number;
 }
 
 /**
@@ -23,6 +28,7 @@ export interface StoryListItem {
 interface StoriesListProps {
   stories: StoryListItem[];
   onReadStory: (storyId: string) => void;
+  onContinueStory?: (storyId: string) => void;
   isLoading?: boolean;
   error?: string | null;
 }
@@ -52,6 +58,7 @@ interface StoriesListProps {
 export default function StoriesList({
   stories,
   onReadStory,
+  onContinueStory,
   isLoading = false,
   error
 }: StoriesListProps) {
@@ -95,6 +102,51 @@ export default function StoriesList({
       long: 'bg-purple-100 text-purple-800 border-purple-200'
     };
     return colorMap[type] || 'bg-gray-100 text-gray-800 border-gray-200';
+  };
+
+  /**
+   * 获取状态颜色样式
+   */
+  const getStatusColor = (status?: string): string => {
+    const colorMap: Record<string, string> = {
+      outline: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      scenes: 'bg-orange-100 text-orange-800 border-orange-200',
+      paragraphs_bounding: 'bg-blue-100 text-blue-800 border-blue-200',
+      paragraphs: 'bg-green-100 text-green-800 border-green-200',
+      completed: 'bg-green-100 text-green-800 border-green-200',
+      error: 'bg-red-100 text-red-800 border-red-200'
+    };
+    return colorMap[status || 'outline'] || 'bg-gray-100 text-gray-800 border-gray-200';
+  };
+
+  /**
+   * 获取状态显示文本
+   */
+  const getStatusText = (status?: string): string => {
+    const textMap: Record<string, string> = {
+      outline: '大纲',
+      scenes: '场景',
+      paragraphs_bounding: '段落边界',
+      paragraphs: '完整内容',
+      completed: '已完成',
+      error: '错误'
+    };
+    return textMap[status || 'outline'] || '未知';
+  };
+
+  /**
+   * 计算完成百分比
+   */
+  const getCompletionPercentage = (story: StoryListItem): number => {
+    if (!story.total_chapters || story.total_chapters === 0) return 0;
+    return Math.round((story.completed_chapters || 0) / story.total_chapters * 100);
+  };
+
+  /**
+   * 检查是否显示继续生成按钮
+   */
+  const shouldShowContinueButton = (story: StoryListItem): boolean => {
+    return story.status !== 'completed' && story.status !== 'error' && !!onContinueStory;
   };
 
   // 加载状态显示
@@ -180,6 +232,20 @@ export default function StoriesList({
     );
   }
 
+  // 添加调试日志
+  console.log('=== StoriesList 组件调试信息 ===');
+  console.log('接收到的stories数据:', stories);
+  stories.forEach((story, index) => {
+    console.log(`故事 ${index + 1}:`, {
+      id: story.id,
+      title: story.title,
+      status: story.status,
+      total_chapters: story.total_chapters,
+      completed_chapters: story.completed_chapters,
+      shouldShowContinueButton: shouldShowContinueButton(story)
+    });
+  });
+
   return (
     <div className="w-full">
       <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
@@ -205,6 +271,32 @@ export default function StoriesList({
                 </span>
               </div>
 
+              {/* 进度显示 */}
+              {story.status && story.status !== 'completed' && (
+                <div className="flex items-center space-x-2 mb-2">
+                  <span
+                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(story.status)}`}
+                  >
+                    {getStatusText(story.status)}
+                  </span>
+                  {story.total_chapters && story.completed_chapters !== undefined && (
+                    <span className="text-xs text-gray-500">
+                      {story.completed_chapters}/{story.total_chapters} 章节
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* 进度条 */}
+              {story.status && story.status !== 'completed' && story.total_chapters && story.total_chapters > 0 && (
+                <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+                  <div
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-in-out"
+                    style={{ width: `${getCompletionPercentage(story)}%` }}
+                  ></div>
+                </div>
+              )}
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center text-sm text-gray-500">
                   <svg
@@ -223,25 +315,51 @@ export default function StoriesList({
                   {formatDate(story.created_at)}
                 </div>
 
-                <button
-                  onClick={() => onReadStory(story.id)}
-                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  <svg
-                    className="w-4 h-4 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                {/* 按钮组 */}
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => onReadStory(story.id)}
+                    className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414-1.414m-2.828 2.828a9 9 0 010-12.728"
-                    />
-                  </svg>
-                  阅读
-                </button>
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414-1.414m-2.828 2.828a9 9 0 010-12.728"
+                      />
+                    </svg>
+                    阅读
+                  </button>
+
+                  {/* 继续生成按钮 */}
+                  {shouldShowContinueButton(story) && (
+                    <button
+                      onClick={() => onContinueStory?.(story.id)}
+                      className="inline-flex items-center justify-center px-3 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-sm font-medium rounded-lg hover:from-green-700 hover:to-emerald-700 transform hover:scale-105 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 10V3L4 14h7v7l9-11h-7z"
+                        />
+                      </svg>
+                      续写
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
