@@ -130,6 +130,46 @@ export default function Home() {
     };
   }, [pollInterval]);
 
+  // 获取生成结果的函数
+  const getGenerationResult = useCallback(async (id: string) => {
+    try {
+      const response = await fetch('/api/generate-story?action=get-result', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ generationId: id })
+      });
+
+      if (response.ok) {
+        const storyContent = await response.text();
+        setGeneratedStory(storyContent);
+        setIsGenerating(false);
+        setGenerationStage('idle');
+        setProgress(100);
+
+        // 清理轮询
+        if (pollInterval) {
+          clearInterval(pollInterval);
+          setPollInterval(null);
+        }
+
+        console.log('✅ 故事生成完成');
+      } else {
+        const errorResult = await response.json();
+        throw new Error(errorResult.error || '获取结果失败');
+      }
+    } catch (error) {
+      console.error('获取生成结果失败:', error);
+      setIsGenerating(false);
+      setGenerationStage('idle');
+      setProgress(0);
+      if (pollInterval) {
+        clearInterval(pollInterval);
+        setPollInterval(null);
+      }
+      alert(`获取结果失败：${error instanceof Error ? error.message : '未知错误'}`);
+    }
+  }, [setGeneratedStory, setIsGenerating, setGenerationStage, setProgress, pollInterval, setPollInterval]);
+
   // 轮询生成状态的函数
   const pollGenerationStatus = useCallback(async (id: string) => {
     try {
@@ -180,47 +220,7 @@ export default function Home() {
     } catch (error) {
       console.error('轮询状态出错:', error);
     }
-  }, [pollInterval]);
-
-  // 获取生成结果的函数
-  const getGenerationResult = async (id: string) => {
-    try {
-      const response = await fetch('/api/generate-story?action=get-result', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ generationId: id })
-      });
-
-      if (response.ok) {
-        const storyContent = await response.text();
-        setGeneratedStory(storyContent);
-        setIsGenerating(false);
-        setGenerationStage('idle');
-        setProgress(100);
-
-        // 清理轮询
-        if (pollInterval) {
-          clearInterval(pollInterval);
-          setPollInterval(null);
-        }
-
-        console.log('✅ 故事生成完成');
-      } else {
-        const errorResult = await response.json();
-        throw new Error(errorResult.error || '获取结果失败');
-      }
-    } catch (error) {
-      console.error('获取生成结果失败:', error);
-      setIsGenerating(false);
-      setGenerationStage('idle');
-      setProgress(0);
-      if (pollInterval) {
-        clearInterval(pollInterval);
-        setPollInterval(null);
-      }
-      alert(`获取结果失败：${error instanceof Error ? error.message : '未知错误'}`);
-    }
-  };
+  }, [pollInterval, getGenerationResult]);
 
   const handleSelectElement = (category: keyof SelectedElements, elementId: string) => {
     setSelectedElements(prev => {

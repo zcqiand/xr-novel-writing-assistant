@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateStoryOutline, generateScenes, generateParagraphsBounding, generateParagraphs, assembleFullBook, generateBookMarkdown } from '@/lib/ai-story-generator';
+import { generateStoryOutline, generateScenes, generateParagraphsBounding, generateParagraphs, assembleFullBook, generateBookMarkdown, StoryOutline, ChapterScenes, SceneParagraphs } from '@/lib/ai-story-generator';
 import { v4 as uuidv4 } from 'uuid';
 
 // 环境变量配置
@@ -12,13 +12,46 @@ const config = {
 };
 
 // 检查是否为测试模式
+interface StoryElements {
+  protagonist: string;
+  plot: string;
+  conflict: string;
+  outcome: string;
+  length: 'short' | 'medium' | 'long';
+}
+
+interface CompletedData {
+  bookMarkdown: string;
+  story_id: string;
+}
+
+interface OutlineData {
+  outline: StoryOutline;
+  story_id: string;
+}
+
+interface SceneData {
+  outline: StoryOutline;
+  story_id: string;
+  scenes: ChapterScenes[];
+}
+
+interface ParagraphsBoundingData {
+  outline: StoryOutline;
+  story_id: string;
+  scenes: ChapterScenes[];
+  allParagraphs: SceneParagraphs[];
+}
+
+type GenerationData = OutlineData | SceneData | ParagraphsBoundingData | CompletedData;
+
 const isTestMode = config.apiKey === 'test-api-key-for-debugging';
 
 // 存储生成状态的简单内存存储（生产环境应使用数据库）
 const generationStatus = new Map<string, {
   status: 'pending' | 'outline' | 'scenes' | 'paragraphs_bounding' | 'paragraphs' | 'assemble' | 'completed' | 'error';
   progress: number;
-  data?: any;
+  data?: GenerationData;
   error?: string;
   lastUpdated: number;
 }>();
@@ -36,7 +69,7 @@ const cleanupExpiredStatus = () => {
 };
 
 // 异步故事生成函数
-const generateStoryAsync = async (storyElements: any, storyId: string) => {
+const generateStoryAsync = async (storyElements: StoryElements, storyId: string) => {
   try {
     console.log(`🚀 开始异步生成故事 - ID: ${storyId}`);
 
@@ -75,7 +108,7 @@ const generateStoryAsync = async (storyElements: any, storyId: string) => {
       lastUpdated: Date.now()
     });
 
-    let scenesArray = Array.isArray(allScenes) ? allScenes : [allScenes];
+    const scenesArray = Array.isArray(allScenes) ? allScenes : [allScenes];
 
     const allParagraphsBounding = [];
     for (const chapterScenes of scenesArray) {
@@ -254,8 +287,8 @@ export async function POST(request: NextRequest) {
         }
 
         // 返回生成的故事内容
-        if (result.data && result.data.bookMarkdown) {
-          return new NextResponse(result.data.bookMarkdown, {
+        if (result.data && 'bookMarkdown' in result.data && result.data.bookMarkdown) {
+          return new NextResponse((result.data as CompletedData).bookMarkdown, {
             headers: { 'Content-Type': 'text/markdown' }
           });
         } else {
@@ -329,12 +362,12 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        let scenesArray = Array.isArray(paragraphsBody.scenes) ? paragraphsBody.scenes : [paragraphsBody.scenes];
+        const scenesArray = Array.isArray(paragraphsBody.scenes) ? paragraphsBody.scenes : [paragraphsBody.scenes];
 
         const allParagraphs = [];
         for (const chapterScenes of scenesArray) {
           if (isTestMode) {
-            const testParagraphs = chapterScenes.scenes.map((scene: any) => ({
+            const testParagraphs = chapterScenes.scenes.map((scene: { sceneNumber: number; title: string; }) => ({
               sceneNumber: scene.sceneNumber,
               title: scene.title,
               openingParagraph: `开头段落示例：${scene.title} 开始的精彩故事。`,
@@ -362,7 +395,7 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        let fullScenesArray = Array.isArray(fullBody.scenes) ? fullBody.scenes : [fullBody.scenes];
+        const fullScenesArray = Array.isArray(fullBody.scenes) ? fullBody.scenes : [fullBody.scenes];
 
         const allFullContent = [];
         for (const chapterScenes of fullScenesArray) {

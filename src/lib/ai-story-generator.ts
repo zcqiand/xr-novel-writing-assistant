@@ -230,7 +230,7 @@ export class AIStoryGenerator {
       const apiDuration = Date.now() - apiStartTime;
       console.log(`✅ [${new Date().toISOString()}] OpenAI API调用完成，耗时: ${apiDuration}ms`);
 
-      const responseContent = (completion as any).choices[0]?.message?.content || '';
+      const responseContent = (completion as OpenAI.Chat.Completions.ChatCompletion).choices[0]?.message?.content || '';
 
       // 记录生成结果
       console.log('AI大纲生成完成');
@@ -616,7 +616,7 @@ async function generateScenesTitleForOpenAI(chapterSummary: string): Promise<Sce
     const apiDuration = Date.now() - apiStartTime;
     console.log(`✅ [${new Date().toISOString()}] OpenAI API调用完成，耗时: ${apiDuration}ms`);
 
-    const responseContent = (completion as any).choices[0]?.message?.content || '';
+    const responseContent = (completion as OpenAI.Chat.Completions.ChatCompletion).choices[0]?.message?.content || '';
     console.log('OpenAI API响应内容:', responseContent);
 
     // 记录生成结果
@@ -1151,7 +1151,7 @@ async function generateSceneContentForOpenAI(
     const apiDuration = Date.now() - apiStartTime;
     console.log(`✅ [${new Date().toISOString()}] OpenAI API调用完成，耗时: ${apiDuration}ms`);
 
-    const responseContent = (completion as any).choices[0]?.message?.content || '';
+    const responseContent = (completion as OpenAI.Chat.Completions.ChatCompletion).choices[0]?.message?.content || '';
 
     // 记录生成结果
     console.log('AI段落（完整场景内容）生成完成');
