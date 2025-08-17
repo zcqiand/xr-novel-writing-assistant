@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 // 调试日志：检查环境变量在客户端的加载情况
 console.log('[DEBUG] 页面组件环境变量检查:');
@@ -94,8 +94,12 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [selectedProtagonist, setSelectedProtagonist] = useState<Protagonist | null>(null);
   const [selectedLength, setSelectedLength] = useState<'short' | 'medium' | 'long'>('short');
-  const [generationStage, setGenerationStage] = useState<'idle' | 'outline' | 'scenes' | 'paragraphs' | 'full' | 'assemble'>('idle');
+  const [generationStage, setGenerationStage] = useState<'idle' | 'outline' | 'scenes' | 'paragraphs_bounding' | 'paragraphs' | 'assemble'>('idle');
   const [progress, setProgress] = useState(0);
+
+  // 新增：异步生成相关状态
+  const [generationId, setGenerationId] = useState<string | null>(null);
+  const [pollInterval, setPollInterval] = useState<NodeJS.Timeout | null>(null);
 
   // 新增：已生成故事相关状态
   const [showStoriesList, setShowStoriesList] = useState<boolean>(false);
@@ -117,6 +121,106 @@ export default function Home() {
     initializeData();
   }, []);
 
+  // 清理轮询定时器
+  useEffect(() => {
+    return () => {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+      }
+    };
+  }, [pollInterval]);
+
+  // 轮询生成状态的函数
+  const pollGenerationStatus = useCallback(async (id: string) => {
+    try {
+      const response = await fetch('/api/generate-story?action=check-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ generationId: id })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        const { status, progress: statusProgress, error, completed } = result.data;
+
+        // 更新进度和状态
+        setProgress(statusProgress);
+        setGenerationStage(status);
+
+        if (completed) {
+          // 生成完成，获取结果
+          await getGenerationResult(id);
+        } else if (status === 'error') {
+          // 生成出错
+          setIsGenerating(false);
+          setGenerationStage('idle');
+          setProgress(0);
+          if (pollInterval) {
+            clearInterval(pollInterval);
+            setPollInterval(null);
+          }
+          alert(`生成失败：${error || '未知错误'}`);
+        }
+        // 如果还在进行中，继续轮询
+      } else {
+        console.error('轮询状态失败:', result.error);
+        // 如果找不到任务，停止轮询
+        if (response.status === 404) {
+          setIsGenerating(false);
+          setGenerationStage('idle');
+          setProgress(0);
+          if (pollInterval) {
+            clearInterval(pollInterval);
+            setPollInterval(null);
+          }
+          alert('生成任务已过期或不存在');
+        }
+      }
+    } catch (error) {
+      console.error('轮询状态出错:', error);
+    }
+  }, [pollInterval]);
+
+  // 获取生成结果的函数
+  const getGenerationResult = async (id: string) => {
+    try {
+      const response = await fetch('/api/generate-story?action=get-result', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ generationId: id })
+      });
+
+      if (response.ok) {
+        const storyContent = await response.text();
+        setGeneratedStory(storyContent);
+        setIsGenerating(false);
+        setGenerationStage('idle');
+        setProgress(100);
+
+        // 清理轮询
+        if (pollInterval) {
+          clearInterval(pollInterval);
+          setPollInterval(null);
+        }
+
+        console.log('✅ 故事生成完成');
+      } else {
+        const errorResult = await response.json();
+        throw new Error(errorResult.error || '获取结果失败');
+      }
+    } catch (error) {
+      console.error('获取生成结果失败:', error);
+      setIsGenerating(false);
+      setGenerationStage('idle');
+      setProgress(0);
+      if (pollInterval) {
+        clearInterval(pollInterval);
+        setPollInterval(null);
+      }
+      alert(`获取结果失败：${error instanceof Error ? error.message : '未知错误'}`);
+    }
+  };
 
   const handleSelectElement = (category: keyof SelectedElements, elementId: string) => {
     setSelectedElements(prev => {
@@ -184,7 +288,7 @@ export default function Home() {
 
     setIsGenerating(true);
     setGenerationStage('outline');
-    setProgress(20);
+    setProgress(10);
 
     try {
       // 构建故事元素参数
@@ -212,99 +316,41 @@ export default function Home() {
       console.log('故事结局:', storyElements.outcome);
       console.log('===========================');
 
-      // 第一回合：生成大纲
-      const outlineRes = await fetch('/api/generate-story?action=generate-outline', {
+      // 启动异步生成
+      const response = await fetch('/api/generate-story?action=generate-story', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(storyElements)
       });
-      const outlineResult = await outlineRes.json();
 
-      if (!outlineResult.success) {
-        throw new Error(outlineResult.error || '生成大纲失败');
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || '启动生成失败');
       }
 
-      const outlineData = outlineResult.data;
-      setGenerationStage('scenes');
-      setProgress(40);
+      // 获取生成ID并开始轮询
+      const newGenerationId = result.data.generationId;
+      setGenerationId(newGenerationId);
 
-      // 第二回合：生成场景
-      const scenesRes = await fetch('/api/generate-story?action=generate-scenes', {
-        method: 'POST',
-        body: JSON.stringify({
-          outline: outlineData.outline,
-          story_id: outlineData.story_id
-        }),
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const scenesResult = await scenesRes.json();
+      console.log(`🔄 开始轮询生成状态 - ID: ${newGenerationId}`);
 
-      if (!scenesResult.success) {
-        throw new Error(scenesResult.error || '生成场景失败');
-      }
+      // 设置轮询定时器（每3秒检查一次状态）
+      const interval = setInterval(() => {
+        pollGenerationStatus(newGenerationId);
+      }, 3000);
 
-      const scenesData = scenesResult.data;
-      setGenerationStage('paragraphs');
-      setProgress(60);
+      setPollInterval(interval);
 
-      // 第三回合：生成段落（边界）
-      const paragraphsRes = await fetch('/api/generate-story?action=generate-paragraphs-bounding', {
-        method: 'POST',
-        body: JSON.stringify({
-          outline: outlineData.outline,
-          scenes: scenesData,
-          story_id: outlineData.story_id
-        }),
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const paragraphsResult = await paragraphsRes.json();
+      // 立即检查一次状态
+      pollGenerationStatus(newGenerationId);
 
-      if (!paragraphsResult.success) {
-        throw new Error(paragraphsResult.error || '生成段落失败');
-      }
-
-      const paragraphsData = paragraphsResult.data;
-      setGenerationStage('full');
-      setProgress(80);
-
-      // 第四回合：生成段落（完整场景内容）
-      const fullRes = await fetch('/api/generate-story?action=generate-paragraphs', {
-        method: 'POST',
-        body: JSON.stringify({
-          outline: outlineData.outline,
-          scenes: scenesData,
-          paragraphs: paragraphsData,
-          story_id: outlineData.story_id
-        }),
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const fullResult = await fullRes.json();
-
-      if (!fullResult.success) {
-        throw new Error(fullResult.error || '生成完整内容失败');
-      }
-
-      setGenerationStage('assemble');
-      setProgress(90);
-
-      // 第五回合：组装完整书籍
-      const assembleRes = await fetch('/api/generate-story?action=assemble-book', {
-        method: 'POST',
-        body: JSON.stringify({ story_id: outlineData.story_id }),
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const assembledBook = await assembleRes.text();
-
-      setGenerationStage('idle');
-      setProgress(100);
-      setGeneratedStory(assembledBook);
     } catch (error) {
+      setIsGenerating(false);
       setGenerationStage('idle');
       setProgress(0);
       console.error("生成失败:", error);
-      alert("生成故事时出错，请查看控制台了解详情。");
-    } finally {
-      setIsGenerating(false);
+      alert(`启动生成失败：${error instanceof Error ? error.message : '未知错误'}`);
     }
   };
 
@@ -358,9 +404,6 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-
-
-
   // 替换描述中的角色标识符为角色描述
   const replaceCharacterReferences = (description: string, characterLinks: CharacterLink[]): string => {
     if (!plottoData?.characters || plottoData.characters.length === 0) {
@@ -398,7 +441,7 @@ export default function Home() {
       if (!designation || !characterDescription) continue;
 
       // 转义正则表达式中的特殊字符
-      const escapedRef = designation.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const escapedRef = designation.replace(/[.*+?^${}()|[\]\\]/g, '\\  // 处理返回到');
       const regexPattern = `\\b${escapedRef}\\b`;
 
       // 执行替换
@@ -437,7 +480,7 @@ export default function Home() {
       })),
       predicates: plottoData.predicates.map(pred => ({
         id: pred.number.toString(),
-        name: `谓词 ${pred.number}`,
+        name: `谓语 ${pred.number}`,
         description: pred.description,
         conflictLinks: pred.conflictLinks
       })),
@@ -449,8 +492,7 @@ export default function Home() {
           ? replaceCharacterReferences(conf.permutations[0].description, conf.permutations[0].characterLinks)
           : "无详细描述",
         leadUps: conf.leadUps,
-        carryOns: conf.carryOns
-        ,
+        carryOns: conf.carryOns,
         includes: conf.includes
       })),
       outcomes: plottoData.outcomes.map(outcome => ({
@@ -504,11 +546,13 @@ export default function Home() {
               onLengthChange={setSelectedLength}
             />
 
-
             <div className="flex justify-center gap-4 mb-12">
               <GenerateButton
                 onClick={handleGenerateStory}
                 disabled={isGenerating}
+                isGenerating={isGenerating}
+                progress={progress}
+                stage={generationStage}
               />
               <GeneratedStoriesButton
                 onClick={handleShowStoriesList}
@@ -524,9 +568,19 @@ export default function Home() {
                 <div className="progress-label">
                   {generationStage === 'outline' && "生成大纲中..."}
                   {generationStage === 'scenes' && "生成场景中..."}
-                  {generationStage === 'paragraphs' && "生成段落边界中..."}
-                  {generationStage === 'full' && "生成完整内容中..."}
+                  {generationStage === 'paragraphs_bounding' && "生成段落边界中..."}
+                  {generationStage === 'paragraphs' && "生成段落内容中..."}
                   {generationStage === 'assemble' && "组装完整书籍中..."}
+                  {isGenerating && (
+                    <div className="text-sm text-gray-500 mt-2">
+                      这可能需要几分钟时间，请耐心等待...
+                      {generationId && (
+                        <div className="text-xs mt-1">
+                          生成ID: {generationId}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -569,6 +623,6 @@ export default function Home() {
           </>
         )}
       </div>
-    </div >
+    </div>
   );
 }

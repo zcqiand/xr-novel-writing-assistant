@@ -57,6 +57,7 @@ export interface StoryOutline {
  * @returns 生成的故事大纲
  */
 async function generateStoryOutline(
+  id: string = '未指定ID',
   protagonist: string = "未指定主角类型",
   plot: string = "未指定情节发展",
   conflict: string = "未指定冲突",
@@ -78,6 +79,7 @@ async function generateStoryOutline(
     const { data, error } = await supabase
       .from('stories')
       .insert({
+        id: id, // 使用传入的ID
         title: outline.title,
         protagonist,
         plot,

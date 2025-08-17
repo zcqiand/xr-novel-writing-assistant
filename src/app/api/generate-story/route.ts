@@ -1,17 +1,135 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateStoryOutline, generateScenes, generateParagraphsBounding, generateParagraphs, assembleFullBook, generateBookMarkdown } from '@/lib/ai-story-generator';
+import { v4 as uuidv4 } from 'uuid';
 
 // 环境变量配置
 const config = {
-  apiKey: process.env.OPENAI_API_KEY || '', // 默认使用测试密钥
+  apiKey: process.env.OPENAI_API_KEY || '',
   baseUrl: process.env.OPENAI_BASE_URL || '',
-  model: process.env.OPENAI_MODEL || '', // 默认使用模型
+  model: process.env.OPENAI_MODEL || '',
   siteUrl: process.env.SITE_URL || '',
   siteName: process.env.SITE_NAME || '',
 };
 
 // 检查是否为测试模式
 const isTestMode = config.apiKey === 'test-api-key-for-debugging';
+
+// 存储生成状态的简单内存存储（生产环境应使用数据库）
+const generationStatus = new Map<string, {
+  status: 'pending' | 'outline' | 'scenes' | 'paragraphs_bounding' | 'paragraphs' | 'assemble' | 'completed' | 'error';
+  progress: number;
+  data?: any;
+  error?: string;
+  lastUpdated: number;
+}>();
+
+// 清理过期的生成状态（防止内存泄漏）
+const cleanupExpiredStatus = () => {
+  const now = Date.now();
+  const EXPIRE_TIME = 24 * 60 * 60 * 1000; // 24小时
+
+  for (const [key, value] of generationStatus.entries()) {
+    if (now - value.lastUpdated > EXPIRE_TIME) {
+      generationStatus.delete(key);
+    }
+  }
+};
+
+// 异步故事生成函数
+const generateStoryAsync = async (storyElements: any, storyId: string) => {
+  try {
+    console.log(`🚀 开始异步生成故事 - ID: ${storyId}`);
+
+    // 更新状态：开始生成大纲
+    generationStatus.set(storyId, {
+      status: 'outline',
+      progress: 20,
+      lastUpdated: Date.now()
+    });
+
+    // 生成大纲
+    const { outline: outlineData, story_id } = await generateStoryOutline(
+      storyId,
+      storyElements.protagonist,
+      storyElements.plot,
+      storyElements.conflict,
+      storyElements.outcome,
+      storyElements.length
+    );
+
+    // 更新状态：开始生成场景
+    generationStatus.set(storyId, {
+      status: 'scenes',
+      progress: 40,
+      data: { outline: outlineData, story_id },
+      lastUpdated: Date.now()
+    });
+
+    const allScenes = await generateScenes(outlineData, story_id);
+
+    // 更新状态：开始生成段落边界
+    generationStatus.set(storyId, {
+      status: 'paragraphs_bounding',
+      progress: 60,
+      data: { outline: outlineData, story_id, scenes: allScenes },
+      lastUpdated: Date.now()
+    });
+
+    let scenesArray = Array.isArray(allScenes) ? allScenes : [allScenes];
+
+    const allParagraphsBounding = [];
+    for (const chapterScenes of scenesArray) {
+      const chapterParagraphs = await generateParagraphsBounding(outlineData, chapterScenes, story_id);
+      allParagraphsBounding.push(...chapterParagraphs);
+    }
+
+    // 更新状态：生成完整场景内容
+    generationStatus.set(storyId, {
+      status: 'paragraphs',
+      progress: 80,
+      data: { outline: outlineData, story_id, scenes: allScenes, allParagraphs: allParagraphsBounding },
+      lastUpdated: Date.now()
+    });
+
+    for (const chapterScenes of scenesArray) {
+      await generateParagraphs(
+        outlineData,
+        chapterScenes,
+        allParagraphsBounding,
+        story_id
+      );
+    }
+
+    // 更新状态：组装完整书籍
+    generationStatus.set(storyId, {
+      status: 'assemble',
+      progress: 90,
+      lastUpdated: Date.now()
+    });
+
+    const fullBook = await assembleFullBook(story_id);
+    const bookMarkdown = generateBookMarkdown(fullBook);
+
+    // 完成
+    generationStatus.set(storyId, {
+      status: 'completed',
+      progress: 100,
+      data: { bookMarkdown, story_id },
+      lastUpdated: Date.now()
+    });
+
+    console.log(`✅ 异步生成完成 - ID: ${storyId}`);
+
+  } catch (error) {
+    console.error(`❌ 异步生成失败 - ID: ${storyId}:`, error);
+    generationStatus.set(storyId, {
+      status: 'error',
+      progress: 0,
+      error: error instanceof Error ? error.message : '生成失败',
+      lastUpdated: Date.now()
+    });
+  }
+};
 
 /**
  * POST /api/generate-story
@@ -21,17 +139,18 @@ const isTestMode = config.apiKey === 'test-api-key-for-debugging';
 export async function POST(request: NextRequest) {
   const { action } = Object.fromEntries(request.nextUrl.searchParams);
 
-  // 添加请求开始时间记录
+  // 清理过期状态
+  cleanupExpiredStatus();
+
   const requestStartTime = Date.now();
   console.log(`🚀 [${new Date().toISOString()}] API请求开始 - action: ${action}`);
 
   try {
     switch (action) {
-      case 'generate-outline':
-        // 生成故事大纲
+      case 'generate-story':
+        // 这个action改为启动异步生成并立即返回
         const outlineBody = await request.json();
 
-        // 构建故事元素参数，优先使用前端传递的值，否则使用默认值
         const protagonist = outlineBody.protagonist || "未指定主角类型";
         const plot = outlineBody.plot || "未指定情节发展";
         const conflict = outlineBody.conflict || "未指定冲突";
@@ -46,10 +165,129 @@ export async function POST(request: NextRequest) {
         console.log('故事篇幅:', length);
         console.log('==================');
 
-        console.log(`⏰ [${new Date().toISOString()}] 开始调用generateStoryOutline`);
-        const { outline: outlineData, story_id } = await generateStoryOutline(protagonist, plot, conflict, outcome, length);
-        const outlineDuration = Date.now() - requestStartTime;
-        console.log(`✅ [${new Date().toISOString()}] generateStoryOutline完成，耗时: ${outlineDuration}ms`);
+        // 生成唯一的生成ID
+        const generationId = uuidv4();
+
+        // 初始化状态
+        generationStatus.set(generationId, {
+          status: 'pending',
+          progress: 10,
+          lastUpdated: Date.now()
+        });
+
+        // 启动异步生成（不等待完成）
+        const storyElements = { protagonist, plot, conflict, outcome, length };
+        generateStoryAsync(storyElements, generationId).catch(error => {
+          console.error('异步生成过程出错:', error);
+        });
+
+        // 立即返回生成ID
+        return NextResponse.json({
+          success: true,
+          data: {
+            generationId,
+            message: '故事生成已启动，请使用生成ID查询进度'
+          }
+        });
+
+      case 'check-status':
+        // 检查生成状态
+        const statusBody = await request.json();
+        const { generationId: checkId } = statusBody;
+
+        if (!checkId) {
+          return NextResponse.json(
+            { success: false, error: "缺少generationId参数" },
+            { status: 400 }
+          );
+        }
+
+        const status = generationStatus.get(checkId);
+        if (!status) {
+          return NextResponse.json(
+            { success: false, error: "未找到对应的生成任务" },
+            { status: 404 }
+          );
+        }
+
+        return NextResponse.json({
+          success: true,
+          data: {
+            status: status.status,
+            progress: status.progress,
+            error: status.error,
+            completed: status.status === 'completed',
+            lastUpdated: status.lastUpdated
+          }
+        });
+
+      case 'get-result':
+        // 获取生成结果
+        const resultBody = await request.json();
+        const { generationId: resultId } = resultBody;
+
+        if (!resultId) {
+          return NextResponse.json(
+            { success: false, error: "缺少generationId参数" },
+            { status: 400 }
+          );
+        }
+
+        const result = generationStatus.get(resultId);
+        if (!result) {
+          return NextResponse.json(
+            { success: false, error: "未找到对应的生成任务" },
+            { status: 404 }
+          );
+        }
+
+        if (result.status !== 'completed') {
+          return NextResponse.json(
+            {
+              success: false,
+              error: `任务尚未完成，当前状态: ${result.status}`,
+              status: result.status,
+              progress: result.progress
+            },
+            { status: 202 } // 202 Accepted - 任务进行中
+          );
+        }
+
+        // 返回生成的故事内容
+        if (result.data && result.data.bookMarkdown) {
+          return new NextResponse(result.data.bookMarkdown, {
+            headers: { 'Content-Type': 'text/markdown' }
+          });
+        } else {
+          return NextResponse.json(
+            { success: false, error: "生成结果数据缺失" },
+            { status: 500 }
+          );
+        }
+
+      // 保留原有的单步生成endpoints用于调试
+      case 'generate-outline':
+        // 生成故事大纲
+        const single_outlineBody = await request.json();
+
+        // 构建故事元素参数，优先使用前端传递的值，否则使用默认值
+        const single_protagonist = single_outlineBody.protagonist || "未指定主角类型";
+        const single_plot = single_outlineBody.plot || "未指定情节发展";
+        const single_conflict = single_outlineBody.conflict || "未指定冲突";
+        const single_outcome = single_outlineBody.outcome || "未指定故事结局";
+        const single_length = single_outlineBody.length || 'short';
+
+        console.log('=== 大纲生成参数 ===');
+        console.log('主角类型:', single_protagonist);
+        console.log('情节发展:', single_plot);
+        console.log('主要冲突:', single_conflict);
+        console.log('故事结局:', single_outcome);
+        console.log('故事篇幅:', single_length);
+        console.log('==================');
+        // 生成唯一的生成ID
+        const single_generationId = uuidv4();
+
+        const { outline: outlineData, story_id } = await generateStoryOutline(single_generationId, single_protagonist, single_plot, single_conflict, single_outcome, single_length);
 
         // 返回大纲数据和ID
         return NextResponse.json({
@@ -60,38 +298,22 @@ export async function POST(request: NextRequest) {
           },
           message: '故事大纲生成成功'
         });
-
       case 'generate-scenes':
-        // 生成场景
         const scenesBody = await request.json();
-
-        // 验证必要参数
         if (!scenesBody.outline) {
-          console.error('❌ scenes 验证失败: outline 参数缺失');
           return NextResponse.json(
-            { success: false, error: "缺少必要参数: outline", details: "outline 参数是必需的" },
+            { success: false, error: "缺少必要参数: outline" },
             { status: 400 }
           );
         }
-
         if (!scenesBody.story_id) {
-          console.error('❌ scenes 验证失败: story_id 参数缺失');
           return NextResponse.json(
-            { success: false, error: "缺少必要参数: story_id", details: "story_id 参数是必需的" },
+            { success: false, error: "缺少必要参数: story_id" },
             { status: 400 }
           );
         }
 
-        const { outline, story_id: scenesStoryId } = scenesBody;
-        console.log('开始生成场景，故事ID:', scenesStoryId);
-        console.log('大纲标题:', outline?.title || '未指定');
-        console.log('大纲章节数:', outline?.chapters?.length || 0);
-
-        console.log(`⏰ [${new Date().toISOString()}] 开始调用generateScenes`);
-        const scenes = await generateScenes(outline, scenesStoryId);
-        const scenesDuration = Date.now() - requestStartTime;
-        console.log(`✅ [${new Date().toISOString()}] generateScenes完成，耗时: ${scenesDuration}ms，生成章节数: ${scenes.length}`);
-
+        const scenes = await generateScenes(scenesBody.outline, scenesBody.story_id);
         return NextResponse.json({
           success: true,
           data: scenes,
@@ -99,90 +321,29 @@ export async function POST(request: NextRequest) {
         });
 
       case 'generate-paragraphs-bounding':
-        // 生成段落（边界）
         const paragraphsBody = await request.json();
-
-        // 检查必要参数
-        if (!paragraphsBody.outline) {
-          console.error('❌ paragraphs 验证失败: outline 参数缺失');
+        if (!paragraphsBody.outline || !paragraphsBody.scenes || !paragraphsBody.story_id) {
           return NextResponse.json(
-            { success: false, error: "缺少必要参数: outline", details: "outline 参数是必需的" },
-            { status: 400 }
-          );
-        }
-        if (!paragraphsBody.scenes) {
-          console.error('❌ paragraphs 验证失败: scenes 参数缺失');
-          return NextResponse.json(
-            { success: false, error: "缺少必要参数: scenes", details: "scenes 参数是必需的" },
-            { status: 400 }
-          );
-        }
-        if (!paragraphsBody.story_id) {
-          console.error('❌ paragraphs 验证失败: story_id 参数缺失');
-          return NextResponse.json(
-            { success: false, error: "缺少必要参数: story_id", details: "story_id 参数是必需的" },
+            { success: false, error: "缺少必要参数" },
             { status: 400 }
           );
         }
 
-        // 处理scenes数据结构
-        let scenesArray: Array<{
-          chapter: number;
-          scenes: Array<{
-            sceneNumber: number;
-            title: string;
-            summary: string;
-          }>;
-        }> = [];
-        if (Array.isArray(paragraphsBody.scenes)) {
-          scenesArray = paragraphsBody.scenes;
-        } else if (paragraphsBody.scenes && typeof paragraphsBody.scenes === 'object') {
-          if (paragraphsBody.scenes.scenes && Array.isArray(paragraphsBody.scenes.scenes)) {
-            scenesArray = [paragraphsBody.scenes];
-          } else {
-            scenesArray = [paragraphsBody.scenes];
-          }
-        } else {
-          console.error('❌ scenes 数据结构异常:', paragraphsBody.scenes);
-          return NextResponse.json(
-            { success: false, error: "scenes 数据结构异常", details: `期望数组或对象，实际类型: ${typeof paragraphsBody.scenes}` },
-            { status: 400 }
-          );
-        }
+        let scenesArray = Array.isArray(paragraphsBody.scenes) ? paragraphsBody.scenes : [paragraphsBody.scenes];
 
-        // 处理所有章节的段落生成
-        const allParagraphs: Array<{
-          sceneNumber: number;
-          title: string;
-          openingParagraph: string;
-          closingParagraph: string;
-        }> = [];
-
+        const allParagraphs = [];
         for (const chapterScenes of scenesArray) {
           if (isTestMode) {
-            // 测试模式：生成模拟段落数据
-            const testParagraphs = chapterScenes.scenes.map((scene: {
-              sceneNumber: number;
-              title: string;
-              summary: string;
-            }) => {
-              const title = scene.title || '未知场景';
-              const opening = `开头段落示例：${title} 开始的精彩故事。`;
-              const closing = `结尾段落示例：${title} 结束的精彩故事。`;
-              return {
-                sceneNumber: scene.sceneNumber,
-                title: scene.title,
-                openingParagraph: opening,
-                closingParagraph: closing
-              };
-            });
+            const testParagraphs = chapterScenes.scenes.map((scene: any) => ({
+              sceneNumber: scene.sceneNumber,
+              title: scene.title,
+              openingParagraph: `开头段落示例：${scene.title} 开始的精彩故事。`,
+              closingParagraph: `结尾段落示例：${scene.title} 结束的精彩故事。`
+            }));
             allParagraphs.push(...testParagraphs);
           } else {
-            // 正常模式：调用AI生成段落
-            console.log(`⏰ [${new Date().toISOString()}] 开始调用generateParagraphsBounding - 章节${chapterScenes.chapter}`);
             const chapterParagraphs = await generateParagraphsBounding(paragraphsBody.outline, chapterScenes, paragraphsBody.story_id);
             allParagraphs.push(...chapterParagraphs);
-            console.log(`✅ [${new Date().toISOString()}] generateParagraphsBounding完成 - 章节${chapterScenes.chapter}，生成${chapterParagraphs.length}个段落`);
           }
         }
 
@@ -193,74 +354,18 @@ export async function POST(request: NextRequest) {
         });
 
       case 'generate-paragraphs':
-        // 生成段落（完整场景内容）
         const fullBody = await request.json();
-
-        // 检查必要参数
-        if (!fullBody.outline) {
-          console.error('❌ full 验证失败: outline 参数缺失');
+        if (!fullBody.outline || !fullBody.scenes || !fullBody.paragraphs || !fullBody.story_id) {
           return NextResponse.json(
-            { success: false, error: "缺少必要参数: outline", details: "outline 参数是必需的" },
-            { status: 400 }
-          );
-        }
-        if (!fullBody.scenes) {
-          console.error('❌ full 验证失败: scenes 参数缺失');
-          return NextResponse.json(
-            { success: false, error: "缺少必要参数: scenes", details: "scenes 参数是必需的" },
-            { status: 400 }
-          );
-        }
-        if (!fullBody.paragraphs) {
-          console.error('❌ full 验证失败: paragraphs 参数缺失');
-          return NextResponse.json(
-            { success: false, error: "缺少必要参数: paragraphs", details: "paragraphs 参数是必需的" },
-            { status: 400 }
-          );
-        }
-        if (!fullBody.story_id) {
-          console.error('❌ full 验证失败: story_id 参数缺失');
-          return NextResponse.json(
-            { success: false, error: "缺少必要参数: story_id", details: "story_id 参数是必需的" },
+            { success: false, error: "缺少必要参数" },
             { status: 400 }
           );
         }
 
-        // 处理scenes数据结构
-        let fullScenesArray: Array<{
-          chapter: number;
-          scenes: Array<{
-            sceneNumber: number;
-            title: string;
-            summary: string;
-          }>;
-        }> = [];
-        if (Array.isArray(fullBody.scenes)) {
-          fullScenesArray = fullBody.scenes;
-        } else if (fullBody.scenes && typeof fullBody.scenes === 'object') {
-          if (fullBody.scenes.scenes && Array.isArray(fullBody.scenes.scenes)) {
-            fullScenesArray = [fullBody.scenes];
-          } else {
-            fullScenesArray = [fullBody.scenes];
-          }
-        } else {
-          console.error('❌ fullBody.scenes 数据结构异常:', fullBody.scenes);
-          return NextResponse.json(
-            { success: false, error: "scenes 数据结构异常", details: `期望数组或对象，实际类型: ${typeof fullBody.scenes}` },
-            { status: 400 }
-          );
-        }
+        let fullScenesArray = Array.isArray(fullBody.scenes) ? fullBody.scenes : [fullBody.scenes];
 
-        // 处理所有章节的完整场景内容生成
-        const allFullContent: Array<{
-          sceneNumber: number;
-          title: string;
-          fullContent: string;
-          continuityNotes: string[];
-        }> = [];
-
+        const allFullContent = [];
         for (const chapterScenes of fullScenesArray) {
-          console.log(`⏰ [${new Date().toISOString()}] 开始调用generateParagraphs - 章节${chapterScenes.chapter}`);
           const chapterFullContent = await generateParagraphs(
             fullBody.outline,
             chapterScenes,
@@ -268,7 +373,6 @@ export async function POST(request: NextRequest) {
             fullBody.story_id
           );
           allFullContent.push(...chapterFullContent);
-          console.log(`✅ [${new Date().toISOString()}] generateParagraphs完成 - 章节${chapterScenes.chapter}，生成${chapterFullContent.length}个场景`);
         }
 
         return NextResponse.json({
@@ -278,34 +382,18 @@ export async function POST(request: NextRequest) {
         });
 
       case 'assemble-book':
-        // 组装完整书籍
         const assembleBody = await request.json();
-
         if (!assembleBody.story_id) {
           return NextResponse.json(
-            { success: false, error: "缺少必要参数: story_id", details: "story_id 参数是必需的" },
+            { success: false, error: "缺少必要参数: story_id" },
             { status: 400 }
           );
         }
 
-        try {
-          console.log(`⏰ [${new Date().toISOString()}] 开始调用assembleFullBook`);
-          // 组装完整书籍
-          const fullBook = await assembleFullBook(assembleBody.story_id);
-          const assembleDuration = Date.now() - requestStartTime;
-          console.log(`✅ [${new Date().toISOString()}] assembleFullBook完成，耗时: ${assembleDuration}ms`);
-
-          // 返回完整书籍内容
-          return new NextResponse(generateBookMarkdown(fullBook), {
-            headers: { 'Content-Type': 'text/markdown' }
-          });
-        } catch (error) {
-          console.error('组装完整书籍失败:', error);
-          return NextResponse.json(
-            { success: false, error: `组装完整书籍失败: ${error instanceof Error ? error.message : '未知错误'}` },
-            { status: 500 }
-          );
-        }
+        const fullBook = await assembleFullBook(assembleBody.story_id);
+        return new NextResponse(generateBookMarkdown(fullBook), {
+          headers: { 'Content-Type': 'text/markdown' }
+        });
 
       default:
         return NextResponse.json(
