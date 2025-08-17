@@ -24,8 +24,8 @@ export default function GenerateButton({
     const stageTexts: { [key: string]: string } = {
       'outline': '构思大纲',
       'scenes': '设计场景',
+      'paragraphs_bounding': '设计段落',
       'paragraphs': '编写段落',
-      'full': '完善内容',
       'assemble': '组装成书'
     };
 
